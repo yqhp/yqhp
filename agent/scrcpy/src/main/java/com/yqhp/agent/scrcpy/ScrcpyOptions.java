@@ -10,9 +10,9 @@ import java.util.StringJoiner;
 @Data
 public class ScrcpyOptions {
 
-    private int maxSize = 720;
-    private int bitRate = 1000000; // bps
-    private int maxFps = 30;
+    private int maxSize = 0;
+    private int bitRate = 8_000_000; // bps
+    private int maxFps = 0;
     private String codecOptions = "level=256,profile=1";
 
     private String logLevel = "info";
