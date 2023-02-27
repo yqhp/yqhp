@@ -89,8 +89,8 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public List<UserVO> listUserVoByIds(@RequestBody Set<String> userIds) {
-        return userService.listUserVoByIds(userIds);
+    public List<UserVO> listUserVOByIds(@RequestBody Set<String> userIds) {
+        return userService.listUserVOByIds(userIds);
     }
 
     @PostMapping("/usersMap")

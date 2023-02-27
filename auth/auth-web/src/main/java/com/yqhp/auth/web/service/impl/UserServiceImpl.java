@@ -181,7 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public List<UserVO> listUserVoByIds(Set<String> userIds) {
+    public List<UserVO> listUserVOByIds(Set<String> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return new ArrayList<>();
         }
@@ -193,7 +193,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public Map<String, UserVO> getUserVOMapByIds(Set<String> userIds) {
-        return listUserVoByIds(userIds).stream()
+        return listUserVOByIds(userIds).stream()
                 .collect(Collectors.toMap(UserVO::getId, Function.identity(), (k1, k2) -> k1));
     }
 

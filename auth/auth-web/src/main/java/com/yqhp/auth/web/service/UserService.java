@@ -40,7 +40,7 @@ public interface UserService extends IService<User> {
 
     UserInfo getUserInfo();
 
-    List<UserVO> listUserVoByIds(Set<String> userIds);
+    List<UserVO> listUserVOByIds(Set<String> userIds);
 
     Map<String, UserVO> getUserVOMapByIds(Set<String> userIds);
 }

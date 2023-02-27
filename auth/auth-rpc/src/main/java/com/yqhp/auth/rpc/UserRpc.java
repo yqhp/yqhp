@@ -25,7 +25,7 @@ public interface UserRpc {
     void updateUser(@RequestBody UpdateUserParam updateUserParam);
 
     @PostMapping("/users")
-    List<UserVO> listUserVoByIds(@RequestBody Set<String> userIds);
+    List<UserVO> listUserVOByIds(@RequestBody Set<String> userIds);
 
     @PostMapping("/usersMap")
     Map<String, UserVO> getUserVOMapByIds(@RequestBody Set<String> userIds);
