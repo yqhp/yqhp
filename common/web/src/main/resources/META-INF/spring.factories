@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.yqhp.common.web.config.WebMvcConfig,\
+  com.yqhp.common.web.util.ApplicationContextUtils

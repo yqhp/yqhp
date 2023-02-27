@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.yqhp.auth.sdk.gateway.RequestFilter,\
+  com.yqhp.auth.sdk.gateway.WebSecurityConfig

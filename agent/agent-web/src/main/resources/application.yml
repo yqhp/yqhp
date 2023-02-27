@@ -1,0 +1,53 @@
+server:
+  port: 10004
+  servlet:
+    context-path: /agent
+
+spring:
+  application:
+    name: agent-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:127.0.0.1:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+
+zk:
+  addr: ${ZK_ADDR:127.0.0.1:2181}
+
+agent:
+  baseDir: '@project.basedir@'
+  version: '@project.version@'
+  android:
+    enabled: true
+    adb-path:
+    scrcpy-version: 1.23
+    scrcpy-server-path: ${agent.baseDir}/vendor/scrcpy/scrcpy-server
+  iOS:
+    realDevice:
+      enabled: false
+    emulator:
+      enabled: false
+      #  ns for nanoseconds
+      #  us for microseconds
+      #  ms for milliseconds
+      #  s for seconds
+      #  m for minutes
+      #  h for hours
+      #  d for days
+      scan-period: 30s
+  appium:
+    js-path:
+  plugin:
+    base-dir: ${agent.baseDir}/vendor/plugins
+

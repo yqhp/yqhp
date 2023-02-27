@@ -1,0 +1,25 @@
+server:
+  port: 8866
+  servlet:
+    context-path: /oss
+
+spring:
+  application:
+    name: file-service
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+
+oss:
+  minio:
+    url: ${MINIO_URL:http://127.0.0.1:9000}
+    bucket: yqhp
+    accessKey: ${MINIO_ACCESS_KEY:admin}
+    secretKey: ${MINIO_SECRET_KEY:yqhp@123..Aa88}

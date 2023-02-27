@@ -1,0 +1,55 @@
+server:
+  port: 18888
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+    gateway:
+      httpclient:
+        websocket:
+          max-frame-payload-length: 10485760 # 10MB
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            allowed-methods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTION
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: console
+          uri: lb://console-service
+          predicates:
+            - Path=/console/**
+
+        - id: auth
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: file
+          uri: lb://file-service
+          predicates:
+            - Path=/oss/**
+
+        - id: agent
+          uri: no://op
+          predicates:
+            - Path=/agent/**
+          filters:
+            - Agent=agent-location # com.yqhp.gateway.filter.factory.AgentGatewayFilterFactory
+
+gw:
+  hello: world

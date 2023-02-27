@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>yqhp</artifactId>
+        <groupId>com.yqhp</groupId>
+        <version>0.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common</artifactId>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>commons</module>
+        <module>web</module>
+        <module>mybatis</module>
+        <module>base</module>
+        <module>minio</module>
+        <module>feign</module>
+        <module>zookeeper</module>
+        <module>zk-device</module>
+        <module>jshell</module>
+        <module>repository-code-generator</module>
+        <module>kafka-message</module>
+    </modules>
+
+</project>

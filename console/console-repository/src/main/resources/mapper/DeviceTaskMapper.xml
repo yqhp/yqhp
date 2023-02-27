@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yqhp.console.repository.mapper.DeviceTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.DeviceTask">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="plan_id" property="planId" />
+        <result column="plan_execution_record_id" property="planExecutionRecordId" />
+        <result column="device_id" property="deviceId" />
+        <result column="action_id" property="actionId" />
+        <result column="action" property="action" typeHandler="com.yqhp.console.repository.typehandler.ActionDTOTypeHandler" />
+        <result column="status" property="status" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+    </resultMap>
+
+</mapper>

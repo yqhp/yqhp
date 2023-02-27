@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yqhp.console.repository.mapper.DeviceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.Device">
+        <id column="id" property="id" />
+        <result column="platform" property="platform" />
+        <result column="type" property="type" />
+        <result column="manufacturer" property="manufacturer" />
+        <result column="brand" property="brand" />
+        <result column="model" property="model" />
+        <result column="cpu" property="cpu" />
+        <result column="mem_size" property="memSize" />
+        <result column="img_url" property="imgUrl" />
+        <result column="system_version" property="systemVersion" />
+        <result column="screen_width" property="screenWidth" />
+        <result column="screen_height" property="screenHeight" />
+        <result column="description" property="description" />
+        <result column="extra" property="extra" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+    </resultMap>
+
+</mapper>
