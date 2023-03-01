@@ -30,9 +30,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        http.authorizeRequests().antMatchers("/user/info").authenticated();
+
         http.exceptionHandling()
                 .authenticationEntryPoint((req, resp, e) -> {
-                    // todo fix userinfo认证失败  没走到这
                     resp.setStatus(HttpStatus.UNAUTHORIZED.value());
                     resp.setCharacterEncoding("UTF-8");
                     resp.setContentType("application/json;charset=UTF-8");
