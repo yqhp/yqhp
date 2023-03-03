@@ -56,7 +56,7 @@ public class Scrcpy {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[{}][scrcpy-log]{}", iDevice.getSerialNumber(), line);
+                            log.info("[{}][scrcpy]{}", iDevice.getSerialNumber(), line);
                         }
                     }
 
