@@ -6,11 +6,13 @@ import com.yqhp.agent.scrcpy.message.Position;
 import com.yqhp.agent.scrcpy.message.ScrollEvent;
 import com.yqhp.agent.scrcpy.message.TouchEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author jiangyitao
@@ -19,11 +21,12 @@ import java.nio.ByteBuffer;
 public class ScrcpyControlClient {
 
     private static final byte INJECT_KEYCODE = 0;
+    private static final byte INJECT_TEXT = 1;
     private static final byte INJECT_TOUCH_EVENT = 2;
     private static final byte INJECT_SCROLL_EVENT = 3;
 
     private final ByteBuffer touchEventBuffer = ByteBuffer.allocate(28);
-    private final ByteBuffer keycodeBuffer = ByteBuffer.allocate(14);
+    private final ByteBuffer keyEventBuffer = ByteBuffer.allocate(14);
     private final ByteBuffer scrollEventBuffer = ByteBuffer.allocate(25);
 
     private Socket controlSocket;
@@ -77,15 +80,27 @@ public class ScrcpyControlClient {
     }
 
     public void sendKeyEvent(KeyEvent event) throws IOException {
-        keycodeBuffer.rewind();
+        keyEventBuffer.rewind();
 
-        keycodeBuffer.put(INJECT_KEYCODE);
-        keycodeBuffer.put(event.getAction());
-        keycodeBuffer.putInt(event.getCode());
-        keycodeBuffer.putInt(event.getRepeat());
-        keycodeBuffer.putInt(event.getMetaState());
+        keyEventBuffer.put(INJECT_KEYCODE);
+        keyEventBuffer.put(event.getAction());
+        keyEventBuffer.putInt(event.getCode());
+        keyEventBuffer.putInt(event.getRepeat());
+        keyEventBuffer.putInt(event.getMetaState());
 
-        controlOutputStream.write(keycodeBuffer.array());
+        controlOutputStream.write(keyEventBuffer.array());
+    }
+
+    public void sendTextEvent(String text) throws IOException {
+        if (StringUtils.isEmpty(text)) {
+            return;
+        }
+        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer textEventBuffer = ByteBuffer.allocate(5 + bytes.length);
+        textEventBuffer.put(INJECT_TEXT);
+        textEventBuffer.putInt(bytes.length);
+        textEventBuffer.put(bytes);
+        controlOutputStream.write(textEventBuffer.array());
     }
 
     public void sendScrollEvent(ScrollEvent event) throws IOException {

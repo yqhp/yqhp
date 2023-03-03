@@ -59,6 +59,7 @@ public class DeviceWebsocket {
         messageHandler = new MessageHandler()
                 .addCommandHandler(new StartScrcpyHandler(session, deviceDriver))
                 .addCommandHandler(new ScrcpyKeyHandler(session, deviceDriver))
+                .addCommandHandler(new ScrcpyTextHandler(session, deviceDriver))
                 .addCommandHandler(new ScrcpyTouchHandler(session, deviceDriver))
                 .addCommandHandler(new ScrcpyScrollHandler(session, deviceDriver))
                 .addCommandHandler(new ReceiveDeviceLogHandler(session, deviceDriver))
