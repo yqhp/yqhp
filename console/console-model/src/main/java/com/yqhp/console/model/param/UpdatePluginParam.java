@@ -7,7 +7,7 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -22,6 +22,6 @@ public class UpdatePluginParam implements InputConverter<Plugin> {
     @Size(max = 256, message = "描述长度不能超过{max}")
     private String description;
     @Valid
-    @NotEmpty(message = "插件文件不能为空")
+    @NotNull(message = "files不能为null，可以是[]")
     private List<PluginFile> files;
 }

@@ -37,7 +37,7 @@ public class FileServiceImpl implements FileService {
 
         OSSFile ossFile = new OSSFile();
         ossFile.setKey(fileKey);
-        ossFile.setOriginalFilename(filename);
+        ossFile.setName(filename);
         ossFile.setSize(file.getSize());
         ossFile.setUrl(getFileUrl(fileKey));
         return ossFile;

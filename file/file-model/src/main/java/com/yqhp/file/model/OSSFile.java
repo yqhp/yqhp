@@ -9,7 +9,7 @@ import lombok.Data;
 public class OSSFile {
     private String url;
     private String key;
-    private String originalFilename;
+    private String name;
     private long size; // bytes
 }
 

@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 public class PluginFile {
     @NotBlank(message = "插件文件名不能为空")
     private String name;
+    @NotBlank(message = "插件文件key不能为空")
+    private String key;
     @NotBlank(message = "插件文件url不能为空")
     private String url;
     @NotNull(message = "插件文件大小不能为空")
