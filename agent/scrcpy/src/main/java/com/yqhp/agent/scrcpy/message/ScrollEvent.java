@@ -10,4 +10,5 @@ public class ScrollEvent {
     private Position position;
     private int deltaX;
     private int deltaY;
+    private int buttons;
 }

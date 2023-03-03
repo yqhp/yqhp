@@ -8,9 +8,10 @@ import lombok.Data;
 @Data
 public class KeyEvent {
     /**
-     *  down:0 up:1
+     * down:0 up:1
      */
     private byte action;
     private int code;
+    private int repeat;
     private int metaState;
 }

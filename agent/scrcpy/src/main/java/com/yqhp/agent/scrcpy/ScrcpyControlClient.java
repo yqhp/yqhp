@@ -68,10 +68,10 @@ public class ScrcpyControlClient {
 
         touchEventBuffer.put(INJECT_TOUCH_EVENT);
         touchEventBuffer.put(event.getAction());
-        touchEventBuffer.putLong(-1L); // pointerId
+        touchEventBuffer.putLong(event.getPointerId());
         setPosition(touchEventBuffer, event.getPosition());
-        touchEventBuffer.putShort((short) 0xffff); // pressure
-        touchEventBuffer.putInt(1); // buttons 鼠标左键: 1 << 0 | 右键: 1 << 1 | 中键: 1 << 2
+        touchEventBuffer.putShort(event.getPressure());
+        touchEventBuffer.putInt(event.getButtons());
 
         controlOutputStream.write(touchEventBuffer.array());
     }
@@ -82,7 +82,7 @@ public class ScrcpyControlClient {
         keycodeBuffer.put(INJECT_KEYCODE);
         keycodeBuffer.put(event.getAction());
         keycodeBuffer.putInt(event.getCode());
-        keycodeBuffer.putInt(0); // repeat先简单处理 https://github.com/Genymobile/scrcpy/issues/1013
+        keycodeBuffer.putInt(event.getRepeat());
         keycodeBuffer.putInt(event.getMetaState());
 
         controlOutputStream.write(keycodeBuffer.array());
@@ -95,7 +95,7 @@ public class ScrcpyControlClient {
         setPosition(scrollEventBuffer, event.getPosition());
         scrollEventBuffer.putInt(event.getDeltaX());
         scrollEventBuffer.putInt(event.getDeltaY());
-        scrollEventBuffer.putInt(0); // buttons https://github.com/Genymobile/scrcpy/commit/924375487e63a5a9114182015a68aedef2f52d14
+        scrollEventBuffer.putInt(event.getButtons());
 
         controlOutputStream.write(scrollEventBuffer.array());
     }
@@ -103,8 +103,8 @@ public class ScrcpyControlClient {
     private void setPosition(ByteBuffer buffer, Position position) {
         buffer.putInt(position.getX());
         buffer.putInt(position.getY());
-        buffer.putShort((short) position.getWidth());
-        buffer.putShort((short) position.getHeight());
+        buffer.putShort(position.getWidth());
+        buffer.putShort(position.getHeight());
     }
 
 }
