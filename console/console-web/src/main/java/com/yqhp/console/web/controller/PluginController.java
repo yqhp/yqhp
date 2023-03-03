@@ -8,19 +8,34 @@ import com.yqhp.console.repository.entity.Plugin;
 import com.yqhp.console.web.service.PluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @author jiangyitao
  */
+@Validated
 @RestController
 @RequestMapping("/plugin")
 public class PluginController {
 
     @Autowired
     private PluginService pluginService;
+
+    @GetMapping
+    public List<Plugin> listByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
+        return pluginService.listByProjectId(projectId);
+    }
+
+    @PreAuthorize("hasAuthority('admin')")
+    @GetMapping("/all")
+    public List<Plugin> getAll() {
+        return pluginService.list();
+    }
 
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/page")
