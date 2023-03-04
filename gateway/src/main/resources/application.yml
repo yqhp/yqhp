@@ -13,14 +13,17 @@ spring:
         websocket:
           max-frame-payload-length: 10485760 # 10MB
       globalcors:
-        add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
+            allowed-origin-patterns: "*"
             allowed-headers: "*"
-            allowed-methods: "*"
-      default-filters:
-        - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+            allow-credentials: true
+            allowed-methods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTION
       discovery:
         locator:
           enabled: true
