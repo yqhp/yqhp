@@ -158,8 +158,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 .map(pkg -> {
                     // weight先用id，后续可能在pkg加个字段用于排序
                     TreeNode<String> node = new TreeNode<>(pkg.getId(), pkg.getParentId(), pkg.getName(), pkg.getId());
-                    TreeNodeExtra<Pkg> extra = createTreeNodeExtra(TreeNodeExtra.Type.PKG, pkg.getFlags(), pkg);
-                    node.setExtra(extra.toMap());
+                    node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.PKG, pkg).toMap());
                     return node;
                 }).collect(Collectors.toList());
 
@@ -171,8 +170,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 List<TreeNode<String>> docNodes = docs.stream().map(doc -> {
                     // weight先用id，后续可能在doc加个字段用于排序
                     TreeNode<String> node = new TreeNode<>(doc.getId(), doc.getPkgId(), doc.getName(), doc.getId());
-                    TreeNodeExtra<Doc> extra = createTreeNodeExtra(TreeNodeExtra.Type.DOC, doc.getFlags(), doc);
-                    node.setExtra(extra.toMap());
+                    node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.DOC, doc).toMap());
                     return node;
                 }).collect(Collectors.toList());
                 nodes.addAll(docNodes);
@@ -181,8 +179,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 List<TreeNode<String>> actionNodes = actions.stream().map(action -> {
                     // weight先用id，后续可能在action加个字段用于排序
                     TreeNode<String> node = new TreeNode<>(action.getId(), action.getPkgId(), action.getName(), action.getId());
-                    TreeNodeExtra<Action> extra = createTreeNodeExtra(TreeNodeExtra.Type.ACTION, action.getFlags(), action);
-                    node.setExtra(extra.toMap());
+                    node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.ACTION, action).toMap());
                     return node;
                 }).collect(Collectors.toList());
                 nodes.addAll(actionNodes);
@@ -192,23 +189,11 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         return TreeUtil.build(nodes, query.getParentId());
     }
 
-    private <T> TreeNodeExtra<T> createTreeNodeExtra(TreeNodeExtra.Type type, int flags, T data) {
-        TreeNodeExtra<T> extra = new TreeNodeExtra<>();
-        extra.setType(type);
-        extra.setDeletable(!ResourceFlags.undeletable(flags));
-        extra.setRenamable(!ResourceFlags.unrenamable(flags));
-        extra.setMovable(!ResourceFlags.unmovable(flags));
-        extra.setUpdatable(!ResourceFlags.unupdatable(flags));
-        extra.setData(data);
-        return extra;
-    }
-
     /**
      * 获取后代id
      */
     private Set<String> getDescendant(String pkgId, List<Pkg> pkgs) {
         Set<String> descendant = new HashSet<>();
-
         if (CollectionUtils.isEmpty(pkgs)) {
             return descendant;
         }
