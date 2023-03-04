@@ -168,8 +168,7 @@ CREATE TABLE `doc` (
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_pkg_id` (`pkg_id`) USING BTREE,
-  UNIQUE KEY `uk_project_id_type_name` (`project_id`,`type`,`name`) USING BTREE
+  KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文档';
 
 CREATE TABLE `action` (

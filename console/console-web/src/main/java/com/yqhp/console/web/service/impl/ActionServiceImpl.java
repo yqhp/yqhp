@@ -5,15 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.model.param.CreateActionParam;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.ActionStatus;
 import com.yqhp.console.repository.enums.ActionStepType;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStep;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.mapper.ActionMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -215,7 +215,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         if (ActionStepType.ACTION.equals(actionStep.getType())) {
             ActionDTO availableAction = getAvailableActionDTOById(idOfType, availableActionCache, availableDocCache);
             step.setAction(availableAction);
-        } else if (ActionStepType.DOC.equals(actionStep.getType())) {
+        } else if (ActionStepType.DOC_JSHELL_RUN.equals(actionStep.getType())) {
             Doc availableDoc;
             if (availableDocCache.containsKey(idOfType)) {
                 availableDoc = availableDocCache.get(idOfType);

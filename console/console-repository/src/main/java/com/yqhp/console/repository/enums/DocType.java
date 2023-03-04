@@ -11,18 +11,15 @@ import lombok.Getter;
 @Getter
 public enum DocType implements BaseEnum<Integer> {
 
-    JAVA(1, "java"),
-    JSH(2, "jsh"),
+    JSH_DEFINE(1),
+    JSH_RUN(2),
     ;
 
     @EnumValue
     @JsonValue
     private final Integer value;
 
-    private final String ext;
-
-    DocType(Integer value, String ext) {
+    DocType(Integer value) {
         this.value = value;
-        this.ext = ext;
     }
 }

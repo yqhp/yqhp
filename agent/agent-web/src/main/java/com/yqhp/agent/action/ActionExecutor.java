@@ -89,17 +89,22 @@ public class ActionExecutor {
 
         try {
             listeners.forEach(listener -> listener.onStepStarted(action, type, step, isRoot));
-            if (ActionStepType.DOC.equals(step.getType()) && step.getDoc() != null) {
-                String content = step.getDoc().getContent();
-                listeners.forEach(listener -> listener.onStepDocEvalStarted(action, type, step, isRoot));
+            if (ActionStepType.ACTION.equals(step.getType())) {
+                exec(step.getAction(), false);
+            } else {
+                String content = null;
+                if (ActionStepType.DOC_JSHELL_RUN.equals(step.getType())) {
+                    if (step.getDoc() != null) {
+                        content = step.getDoc().getContent();
+                    }
+                } else if (ActionStepType.JSHELL.equals(step.getType())) {
+                    content = step.getContent();
+                }
                 List<JShellEvalResult> results = driver.jshellEval(content);
                 boolean stepFailed = results.stream().anyMatch(JShellEvalResult::isFailed);
-                listeners.forEach(listener -> listener.onStepDocEvalFinished(action, type, step, results, stepFailed, isRoot));
                 if (stepFailed) {
                     throw new ActionStepExecutionException(results);
                 }
-            } else if (ActionStepType.ACTION.equals(step.getType())) {
-                exec(step.getAction(), false);
             }
             listeners.forEach(listener -> listener.onStepSuccessful(action, type, step, isRoot));
         } catch (Throwable cause) {

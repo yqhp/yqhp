@@ -74,10 +74,6 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.googlejavaformat</groupId>
-            <artifactId>google-java-format</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
         </dependency>

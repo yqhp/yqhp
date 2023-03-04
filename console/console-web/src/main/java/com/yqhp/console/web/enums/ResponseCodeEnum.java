@@ -28,7 +28,6 @@ public enum ResponseCodeEnum implements ResponseCode {
     DEL_DOC_FAIL(1701, "删除文档失败，请稍后重试"),
     UPDATE_DOC_FAIL(1702, "更新文档失败，请稍后重试"),
     DOC_NOT_FOUND(1703, "文档不存在"),
-    DUPLICATE_DOC(1704, "文档已存在"),
     DOC_UNDELETABLE(1705, "无法删除的文档"),
     DOC_UNMOVABLE(1706, "无法移动的文档"),
     DOC_UNRENAMABLE(1707, "无法重命名的文档"),

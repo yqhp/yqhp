@@ -90,7 +90,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 CreateDocParam createDocParam = new CreateDocParam();
                 createDocParam.setProjectId(project.getId());
                 createDocParam.setPkgId(pkg.getId());
-                createDocParam.setType(DocType.JAVA);
+                createDocParam.setType(DocType.JSH_DEFINE);
                 createDocParam.setName("G");
                 createDocParam.setStatus(DocStatus.RELEASED);
                 createDocParam.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);

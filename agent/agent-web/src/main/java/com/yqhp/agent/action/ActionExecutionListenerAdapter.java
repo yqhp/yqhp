@@ -1,6 +1,5 @@
 package com.yqhp.agent.action;
 
-import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.repository.enums.ActionStepsType;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStepDTO;
@@ -53,16 +52,6 @@ public class ActionExecutionListenerAdapter implements ActionExecutionListener {
 
     @Override
     public void onStepFailed(ActionDTO action, ActionStepsType stepsType, ActionStepDTO step, Throwable cause, boolean isRoot) {
-
-    }
-
-    @Override
-    public void onStepDocEvalStarted(ActionDTO action, ActionStepsType stepsType, ActionStepDTO step, boolean isRoot) {
-
-    }
-
-    @Override
-    public void onStepDocEvalFinished(ActionDTO action, ActionStepsType stepsType, ActionStepDTO step, List<JShellEvalResult> results, boolean failed, boolean isRoot) {
 
     }
 }

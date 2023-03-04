@@ -11,8 +11,10 @@ import lombok.Getter;
 @Getter
 public enum ActionStepType implements BaseEnum<Integer> {
 
-    DOC(1),
-    ACTION(2);
+    DOC_JSHELL_RUN(1),
+    ACTION(2),
+    JSHELL(3),
+    ;
 
     @EnumValue
     @JsonValue
