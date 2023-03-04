@@ -365,7 +365,7 @@ public class JShellTool {
      */
     void error(String format, Object... args) {
 //        (interactiveModeBegun ? cmdout : cmderr).printf(prefixError(format), args);
-        result.getError().append(new Formatter().format(format, args)).append("\n"); // ~~~ 记录代码执行信息 ~~~ by jiangyitao
+        result.getError().append(new Formatter().format(prefixError(format), args)); // ~~~ 记录代码执行信息 ~~~ by jiangyitao
     }
 
     final Feedback feedback = new Feedback();

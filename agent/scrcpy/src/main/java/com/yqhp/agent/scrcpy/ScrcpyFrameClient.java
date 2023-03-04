@@ -3,7 +3,6 @@ package com.yqhp.agent.scrcpy;
 import com.android.ddmlib.IDevice;
 import com.yqhp.common.commons.model.Size;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -24,8 +23,7 @@ public class ScrcpyFrameClient {
     private Size screenSize;
 
     private final IDevice iDevice;
-    @Setter
-    private boolean isReadFrameMeta;
+    private ScrcpyOptions scrcpyOptions;
     private int localPort;
 
     private Socket frameSocket;
@@ -37,14 +35,20 @@ public class ScrcpyFrameClient {
         frameBuffer = new byte[1024 * 1024];
     }
 
-    void connect(int localPort, Duration readTimeout) throws IOException {
-        try {
-            log.info("[{}]adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
-            iDevice.createForward(localPort, REMOTE_SOCKET_NAME, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-            this.localPort = localPort;
-        } catch (Exception e) {
-            throw new ScrcpyException(e);
+    void connect(int localPort, Duration readTimeout, ScrcpyOptions scrcpyOptions) throws IOException {
+        this.scrcpyOptions = scrcpyOptions;
+
+        if (scrcpyOptions.isTunnelForward()) {
+            try {
+                log.info("[{}]adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
+                iDevice.createForward(localPort, REMOTE_SOCKET_NAME, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+            } catch (Exception e) {
+                throw new ScrcpyException(e);
+            }
+        } else {
+            // todo iDevice.createReverse
         }
+        this.localPort = localPort;
 
         frameSocket = new Socket("127.0.0.1", localPort);
         frameInputStream = frameSocket.getInputStream();
@@ -95,17 +99,21 @@ public class ScrcpyFrameClient {
         }
 
         if (localPort > 0) {
-            try {
-                log.info("[{}]adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
-                iDevice.removeForward(localPort);
-            } catch (Exception e) {
-                log.warn("[{}]adb remove forward err", iDevice.getSerialNumber(), e);
+            if (scrcpyOptions.isTunnelForward()) {
+                try {
+                    log.info("[{}]adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
+                    iDevice.removeForward(localPort);
+                } catch (Exception e) {
+                    log.warn("[{}]adb remove forward err", iDevice.getSerialNumber(), e);
+                }
+            } else {
+                // todo iDevice.removeReverse
             }
             localPort = 0;
         }
     }
 
-    Size readVideoSize() throws IOException {
+    void readDeviceMeta() throws IOException {
         // deviceName 64字节，暂时用不到，忽略
         for (int i = 0; i < 64; i++) {
             frameInputStream.read();
@@ -116,12 +124,11 @@ public class ScrcpyFrameClient {
         int height = frameInputStream.read() << 8 | frameInputStream.read();
         log.info("[{}]scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
         screenSize = new Size(width, height);
-        return screenSize;
     }
 
     public ByteBuffer readFrame() throws IOException {
         int frameSize;
-        if (isReadFrameMeta) {
+        if (scrcpyOptions.isSendFrameMeta()) {
             // presentationTimeUs 8字节，暂时用不到，忽略
             for (int i = 0; i < 8; i++) {
                 frameInputStream.read();

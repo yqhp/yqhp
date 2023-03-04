@@ -15,8 +15,11 @@ public class ScrcpyOptions {
     private int bitRate = 4_000_000; // bps
     private int maxFps;
 
+    private boolean tunnelForward = true;
     // Options not used by the scrcpy client, but useful to use scrcpy-server directly
+    private boolean sendDummyByte = true; // write a byte on start to detect connection issues
     private boolean sendFrameMeta = false; // send PTS so that the client may record properly
+    private boolean sendDeviceMeta = true; // send device name and size
 
     public String asString() {
         return new StringJoiner(" ")
@@ -24,10 +27,10 @@ public class ScrcpyOptions {
                 .add("max_size=" + maxSize)
                 .add("bit_rate=" + bitRate)
                 .add("max_fps=" + maxFps)
-                .add("tunnel_forward=true")
-                .add("send_dummy_byte=true") // write a byte on start to detect connection issues
+                .add("tunnel_forward=" + tunnelForward)
+                .add("send_dummy_byte=" + sendDummyByte)
                 .add("send_frame_meta=" + sendFrameMeta)
-                .add("send_device_meta=true") // send device name and size
+                .add("send_device_meta=" + sendDeviceMeta)
                 .toString();
     }
 }

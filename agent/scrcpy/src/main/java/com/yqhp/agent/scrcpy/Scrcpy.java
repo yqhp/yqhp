@@ -85,10 +85,11 @@ public class Scrcpy {
 
         // 连接scrcpy
         try {
-            scrcpyFrameClient.connect(localPort, timeout);
-            scrcpyFrameClient.setReadFrameMeta(scrcpyOptions.isSendFrameMeta());
+            scrcpyFrameClient.connect(localPort, timeout, scrcpyOptions);
             scrcpyControlClient.connect(localPort);
-            scrcpyFrameClient.readVideoSize();
+            if (scrcpyOptions.isSendDeviceMeta()) {
+                scrcpyFrameClient.readDeviceMeta();
+            }
         } catch (ScrcpyException e) {
             stop();
             throw e;
