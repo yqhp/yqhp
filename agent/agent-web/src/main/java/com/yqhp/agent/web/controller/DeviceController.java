@@ -33,18 +33,18 @@ public class DeviceController {
     }
 
     @GetMapping("/unlock")
-    public void unlock(@NotBlank(message = "token不能为空") String token) {
+    public void unlock(@RequestHeader("deviceToken") String token) {
         deviceService.unlockDevice(token);
     }
 
     @PostMapping("/installApp")
-    public void installApp(@NotBlank(message = "token不能为空") String token,
+    public void installApp(@RequestHeader("deviceToken") String token,
                            @NotNull(message = "app不能为空") MultipartFile app) {
         deviceService.installAppByToken(token, app);
     }
 
     @GetMapping("/screenshot")
-    public OSSFile screenshotByToken(@NotBlank(message = "token不能为空") String token) {
+    public OSSFile screenshotByToken(@RequestHeader("deviceToken") String token) {
         return deviceService.screenshotByToken(token, true);
     }
 
@@ -63,25 +63,25 @@ public class DeviceController {
     }
 
     @PostMapping("/jshell/eval")
-    public List<JShellEvalResult> jshellEval(@NotBlank(message = "token不能为空") String token,
+    public List<JShellEvalResult> jshellEval(@RequestHeader("deviceToken") String token,
                                              @NotBlank(message = "input不能为空") String input) {
         return deviceService.jshellEval(token, input);
     }
 
     @PostMapping("/jshell/suggestions")
-    public List<String> jshellCompletionSuggestions(@NotBlank(message = "token不能为空") String token,
+    public List<String> jshellCompletionSuggestions(@RequestHeader("deviceToken") String token,
                                                     @NotBlank(message = "input不能为空") String input) {
         return deviceService.jshellCompletionSuggestions(token, input);
     }
 
     @PostMapping("/jshell/docs")
-    public List<String> jshellDocs(@NotBlank(message = "token不能为空") String token,
+    public List<String> jshellDocs(@RequestHeader("deviceToken") String token,
                                    @NotBlank(message = "input不能为空") String input) {
         return deviceService.jshellDocs(token, input);
     }
 
     @PostMapping
-    public void execAction(@NotBlank(message = "token不能为空") String token, @RequestBody ActionDTO action) {
+    public void execAction(@RequestHeader("deviceToken") String token, @RequestBody ActionDTO action) {
         deviceService.execAction(token, action);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -79,6 +80,13 @@ public class ControllerExceptionHandler {
         return CollectionUtils.isEmpty(fieldErrors)
                 ? new Response<>(HttpStatus.BAD_REQUEST)
                 : new Response<>(ResponseCodeEnum.FIELD_ERRORS, fieldErrors);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public Response handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+        return new Response<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
     @ResponseBody

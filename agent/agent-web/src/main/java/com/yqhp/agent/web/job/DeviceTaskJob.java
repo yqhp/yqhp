@@ -68,7 +68,7 @@ public class DeviceTaskJob {
                     List<File> files = pluginService.getFiles(plugin);
                     driver.jshellAddToClasspath(files);
                 }
-                // 执行java代码
+                // 执行define代码
                 List<Doc> docs = received.getPlanExecutionRecord().getDocs();
                 for (Doc doc : docs) {
                     driver.jshellEval(doc.getContent());
