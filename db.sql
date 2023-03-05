@@ -142,6 +142,7 @@ CREATE TABLE `pkg` (
   `project_id` varchar(32) NOT NULL,
   `type` tinyint(4) NOT NULL,
   `parent_id` varchar(32) NOT NULL DEFAULT '0' COMMENT '父节点，0为根节点',
+  `weight` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
   `description` varchar(256) NOT NULL DEFAULT '' COMMENT '描述',
   `flags` int(11) NOT NULL DEFAULT '1',
@@ -157,6 +158,7 @@ CREATE TABLE `doc` (
   `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
   `pkg_id` varchar(32) NOT NULL DEFAULT '0',
+  `weight` int(11) NOT NULL DEFAULT '0',
   `type` tinyint(4) NOT NULL,
   `name` varchar(128) NOT NULL,
   `description` varchar(256) NOT NULL DEFAULT '' COMMENT '描述',
@@ -168,6 +170,7 @@ CREATE TABLE `doc` (
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_project_id_pkg_id_name` (`project_id`,`pkg_id`,`name`) USING BTREE,
   KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文档';
 
@@ -175,6 +178,7 @@ CREATE TABLE `action` (
   `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
   `pkg_id` varchar(32) NOT NULL DEFAULT '0',
+  `weight` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
   `description` varchar(256) NOT NULL DEFAULT '' COMMENT '描述',
   `before` json,
@@ -187,7 +191,7 @@ CREATE TABLE `action` (
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_project_id_name` (`project_id`,`name`) USING BTREE,
+  UNIQUE KEY `uk_project_id_pkg_id_name` (`project_id`,`pkg_id`, `name`) USING BTREE,
   KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

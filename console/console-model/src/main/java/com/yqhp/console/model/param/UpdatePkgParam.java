@@ -13,8 +13,6 @@ import javax.validation.constraints.Size;
 @Data
 public class UpdatePkgParam implements InputConverter<Pkg> {
 
-    private String parentId;
-
     @NotBlank(message = "包名不能为空")
     @Size(max = 128, message = "包名长度不能超过{max}")
     private String name;

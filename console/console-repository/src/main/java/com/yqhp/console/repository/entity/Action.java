@@ -34,6 +34,8 @@ public class Action implements Serializable {
 
     private String pkgId;
 
+    private Integer weight;
+
     private String name;
 
     /**

@@ -28,11 +28,11 @@ public enum ResponseCodeEnum implements ResponseCode {
     DEL_DOC_FAIL(1701, "删除文档失败，请稍后重试"),
     UPDATE_DOC_FAIL(1702, "更新文档失败，请稍后重试"),
     DOC_NOT_FOUND(1703, "文档不存在"),
+    DUPLICATE_DOC(1704, "文档已存在"),
     DOC_UNDELETABLE(1705, "无法删除的文档"),
     DOC_UNMOVABLE(1706, "无法移动的文档"),
     DOC_UNRENAMABLE(1707, "无法重命名的文档"),
     DOC_UNUPDATABLE(1709, "无法更新的文档"),
-    FORMAT_JAVA_CODE_FAIL(1710, "格式化JAVA代码失败"),
     AVAILABLE_DOC_CONTENT_MUST_HAS_TEXT(1711, "可用的文档内容不能为空"),
 
     SAVE_VIEW_RESOURCE_FAIL(2100, "保存视图资源失败，请稍后重试"),

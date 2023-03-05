@@ -11,4 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class CreateActionParam extends UpdateActionParam {
     @NotBlank(message = "项目不能为空")
     private String projectId;
+
+    private String pkgId;
 }

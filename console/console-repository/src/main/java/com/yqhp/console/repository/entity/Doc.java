@@ -31,6 +31,8 @@ public class Doc implements Serializable {
 
     private String pkgId;
 
+    private Integer weight;
+
     private DocType type;
 
     private String name;

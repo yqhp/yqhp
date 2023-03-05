@@ -15,4 +15,6 @@ public class CreatePkgParam extends UpdatePkgParam {
     private String projectId;
     @NotNull(message = "包类型不能为空")
     private PkgType type;
+
+    private String parentId;
 }

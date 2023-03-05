@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.TreeNodeExtra;
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreatePkgParam;
 import com.yqhp.console.model.param.UpdatePkgParam;
 import com.yqhp.console.model.param.query.PkgTreeQuery;
@@ -26,7 +27,9 @@ import com.yqhp.console.web.service.PkgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -50,6 +53,9 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     public Pkg createPkg(CreatePkgParam createPkgParam) {
         Pkg pkg = createPkgParam.convertTo();
         pkg.setId(snowflake.nextIdStr());
+
+        Integer minWeight = getMinWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
+        pkg.setWeight(minWeight != null ? minWeight - 1 : null);
 
         String currUid = CurrentUser.id();
         pkg.setCreateBy(currUid);
@@ -108,11 +114,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         if (renamed && ResourceFlags.unrenamable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNRENAMABLE);
         }
-        boolean moved = updatePkgParam.getParentId() != null
-                && !pkg.getParentId().equals(updatePkgParam.getParentId());
-        if (moved && ResourceFlags.unmovable(pkg.getFlags())) {
-            throw new ServiceException(ResponseCodeEnum.PKG_UNMOVABLE);
-        }
 
         updatePkgParam.update(pkg);
         update(pkg);
@@ -120,16 +121,57 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public void move(String pkgId, String parentId) {
-        Pkg pkg = getPkgById(pkgId);
-        boolean unmoved = pkg.getParentId().equals(parentId);
-        if (unmoved) return;
+    @Transactional
+    public void move(TreeNodeMoveEvent moveEvent) {
+        Pkg pkg = getPkgById(moveEvent.getId());
         if (ResourceFlags.unmovable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNMOVABLE);
         }
 
-        pkg.setParentId(parentId);
-        update(pkg);
+        // 移动到某个文件夹内
+        if (StringUtils.hasText(moveEvent.getInner())) {
+            pkg.setParentId(moveEvent.getInner());
+            update(pkg);
+            return;
+        }
+
+        String currUid = CurrentUser.id();
+        LocalDateTime now = LocalDateTime.now();
+        boolean isBefore = StringUtils.hasText(moveEvent.getBefore());
+        Pkg toPkg = getPkgById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
+
+        Pkg fromPkg = new Pkg();
+        fromPkg.setId(pkg.getId());
+        fromPkg.setParentId(toPkg.getParentId());
+        fromPkg.setWeight(toPkg.getWeight());
+        fromPkg.setUpdateBy(currUid);
+        fromPkg.setUpdateTime(now);
+
+        List<Pkg> toUpdatePkgs = new ArrayList<>();
+        toUpdatePkgs.add(fromPkg);
+        toUpdatePkgs.addAll(
+                listByProjectIdAndTypeAndParentIdAndWeightGeOrLe(
+                        toPkg.getProjectId(),
+                        toPkg.getType(),
+                        toPkg.getParentId(),
+                        toPkg.getWeight(),
+                        isBefore
+                ).stream().map(p -> {
+                    Pkg toUpdate = new Pkg();
+                    toUpdate.setId(p.getId());
+                    toUpdate.setWeight(isBefore ? p.getWeight() + 1 : p.getWeight() - 1);
+                    toUpdate.setUpdateBy(currUid);
+                    toUpdate.setUpdateTime(now);
+                    return toUpdate;
+                }).collect(Collectors.toList())
+        );
+        try {
+            if (!saveBatch(toUpdatePkgs)) {
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_PKG);
+        }
     }
 
     private void update(Pkg pkg) {
@@ -156,8 +198,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         List<Pkg> pkgs = listByProjectIdAndType(query.getProjectId(), query.getType());
         List<TreeNode<String>> nodes = pkgs.stream()
                 .map(pkg -> {
-                    // weight先用id，后续可能在pkg加个字段用于排序
-                    TreeNode<String> node = new TreeNode<>(pkg.getId(), pkg.getParentId(), pkg.getName(), pkg.getId());
+                    TreeNode<String> node = new TreeNode<>(pkg.getId(), pkg.getParentId(), pkg.getName(), pkg.getWeight());
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.PKG, pkg).toMap());
                     return node;
                 }).collect(Collectors.toList());
@@ -168,8 +209,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
             if (PkgType.DOC.equals(query.getType())) {
                 List<Doc> docs = docService.listInPkgIds(pkgIds);
                 List<TreeNode<String>> docNodes = docs.stream().map(doc -> {
-                    // weight先用id，后续可能在doc加个字段用于排序
-                    TreeNode<String> node = new TreeNode<>(doc.getId(), doc.getPkgId(), doc.getName(), doc.getId());
+                    TreeNode<String> node = new TreeNode<>(doc.getId(), doc.getPkgId(), doc.getName(), doc.getWeight());
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.DOC, doc).toMap());
                     return node;
                 }).collect(Collectors.toList());
@@ -177,8 +217,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
             } else if (PkgType.ACTION.equals(query.getType())) {
                 List<Action> actions = actionService.listInPkgIds(pkgIds);
                 List<TreeNode<String>> actionNodes = actions.stream().map(action -> {
-                    // weight先用id，后续可能在action加个字段用于排序
-                    TreeNode<String> node = new TreeNode<>(action.getId(), action.getPkgId(), action.getName(), action.getId());
+                    TreeNode<String> node = new TreeNode<>(action.getId(), action.getPkgId(), action.getName(), action.getWeight());
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.ACTION, action).toMap());
                     return node;
                 }).collect(Collectors.toList());
@@ -223,10 +262,29 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         return descendant;
     }
 
+    private List<Pkg> listByProjectIdAndTypeAndParentIdAndWeightGeOrLe(String projectId, PkgType type, String parentId, Integer weight, boolean ge) {
+        LambdaQueryWrapper<Pkg> query = new LambdaQueryWrapper<>();
+        query.eq(Pkg::getProjectId, projectId)
+                .eq(Pkg::getType, type)
+                .eq(Pkg::getParentId, parentId);
+        if (ge) {
+            query.ge(Pkg::getWeight, weight);
+        } else {
+            query.le(Pkg::getWeight, weight);
+        }
+        return list(query);
+    }
+
     private List<Pkg> listByProjectIdAndType(String projectId, PkgType type) {
         LambdaQueryWrapper<Pkg> query = new LambdaQueryWrapper<>();
         query.eq(Pkg::getProjectId, projectId)
                 .eq(Pkg::getType, type);
         return list(query);
+    }
+
+    private Integer getMinWeightByProjectIdAndType(String projectId, PkgType type) {
+        return listByProjectIdAndType(projectId, type).stream()
+                .min(Comparator.comparing(Pkg::getWeight))
+                .map(Pkg::getWeight).orElse(null);
     }
 }

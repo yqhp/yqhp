@@ -1,5 +1,6 @@
 package com.yqhp.console.web.controller;
 
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
@@ -41,8 +42,8 @@ public class DocController {
         return docService.updateDoc(id, updateDocParam);
     }
 
-    @PutMapping("/{id}/moveTo/{pkgId}")
-    public void move(@PathVariable String id, @PathVariable String pkgId) {
-        docService.move(id, pkgId);
+    @PutMapping("/move")
+    public void move(@Valid @RequestBody TreeNodeMoveEvent moveEvent) {
+        docService.move(moveEvent);
     }
 }

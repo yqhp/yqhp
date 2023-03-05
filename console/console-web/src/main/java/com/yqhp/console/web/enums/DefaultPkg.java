@@ -9,7 +9,6 @@ public enum DefaultPkg {
 
     COMMON("common"),
     PAGE("page"),
-    JSH("jsh"),
     ;
 
     @Getter

@@ -1,6 +1,7 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
@@ -17,7 +18,7 @@ public interface DocService extends IService<Doc> {
 
     Doc updateDoc(String id, UpdateDocParam updateDocParam);
 
-    void move(String id, String pkgId);
+    void move(TreeNodeMoveEvent moveEvent);
 
     void deleteDocById(String id);
 

@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
 import cn.hutool.core.lang.tree.Tree;
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreatePkgParam;
 import com.yqhp.console.model.param.UpdatePkgParam;
 import com.yqhp.console.model.param.query.PkgTreeQuery;
@@ -43,8 +44,8 @@ public class PkgController {
         pkgService.updatePkg(pkgId, updatePkgParam);
     }
 
-    @PutMapping("/{pkgId}/moveTo/{parentId}")
-    public void move(@PathVariable String pkgId, @PathVariable String parentId) {
-        pkgService.move(pkgId, parentId);
+    @PutMapping("/move")
+    public void move(@Valid @RequestBody TreeNodeMoveEvent moveEvent) {
+        pkgService.move(moveEvent);
     }
 }

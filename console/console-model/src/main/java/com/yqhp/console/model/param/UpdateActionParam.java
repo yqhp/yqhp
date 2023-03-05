@@ -17,8 +17,6 @@ import java.util.List;
 @Data
 public class UpdateActionParam implements InputConverter<Action> {
 
-    private String pkgId;
-
     @NotBlank(message = "名称不能为空")
     @Size(max = 128, message = "名称长度不能超过{max}")
     private String name;

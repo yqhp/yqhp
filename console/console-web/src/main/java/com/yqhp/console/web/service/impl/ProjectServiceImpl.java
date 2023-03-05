@@ -21,7 +21,6 @@ import com.yqhp.console.repository.enums.DocStatus;
 import com.yqhp.console.repository.enums.DocType;
 import com.yqhp.console.repository.enums.PkgType;
 import com.yqhp.console.repository.mapper.ProjectMapper;
-import com.yqhp.console.web.common.Const;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.DefaultPkg;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -80,7 +79,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             CreatePkgParam createPkgParam = new CreatePkgParam();
             createPkgParam.setProjectId(project.getId());
             createPkgParam.setType(PkgType.DOC);
-            createPkgParam.setParentId(Const.ROOT_PID);
             createPkgParam.setName(defaultPkg.getName());
             createPkgParam.setFlags(ResourceFlags.ALL_LIMITS);
             Pkg pkg = pkgService.createPkg(createPkgParam);
@@ -91,7 +89,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 createDocParam.setProjectId(project.getId());
                 createDocParam.setPkgId(pkg.getId());
                 createDocParam.setType(DocType.JSH_DEFINE);
-                createDocParam.setName("G");
+                createDocParam.setName("全局变量");
                 createDocParam.setStatus(DocStatus.RELEASED);
                 createDocParam.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
 
@@ -106,7 +104,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                         .initializer(CodeBlock.of("java.time.Duration.ofMillis(2000)"))
                         .build();
                 TypeSpec type = TypeSpec.classBuilder("G")
-                        .addJavadoc("全局变量")
                         .addModifiers(Modifier.PUBLIC)
                         .addField(field1).addField(field2)
                         .build();

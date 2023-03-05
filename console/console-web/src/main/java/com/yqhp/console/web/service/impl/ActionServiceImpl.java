@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateActionParam;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
@@ -24,7 +25,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -51,6 +55,9 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         Action action = param.convertTo();
         action.setId(snowflake.nextIdStr());
 
+        Integer minWeight = getMinWeightByProjectId(param.getProjectId());
+        action.setWeight(minWeight != null ? minWeight - 1 : null);
+
         String currUid = CurrentUser.id();
         action.setCreateBy(currUid);
         action.setUpdateBy(currUid);
@@ -75,27 +82,63 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         if (renamed && ResourceFlags.unrenamable(action.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.ACTION_UNRENAMABLE);
         }
-        boolean moved = param.getPkgId() != null
-                && !action.getPkgId().equals(param.getPkgId());
-        if (moved && ResourceFlags.unmovable(action.getFlags())) {
-            throw new ServiceException(ResponseCodeEnum.ACTION_UNMOVABLE);
-        }
         param.update(action);
         update(action);
         return getById(id);
     }
 
     @Override
-    public void move(String id, String pkgId) {
-        Action action = getActionById(id);
-        boolean unmoved = action.getPkgId().equals(pkgId);
-        if (unmoved) return;
+    @Transactional
+    public void move(TreeNodeMoveEvent moveEvent) {
+        Action action = getActionById(moveEvent.getId());
         if (ResourceFlags.unmovable(action.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.ACTION_UNMOVABLE);
         }
 
-        action.setPkgId(pkgId);
-        update(action);
+        // 移动到某个文件夹内
+        if (StringUtils.hasText(moveEvent.getInner())) {
+            action.setPkgId(moveEvent.getInner());
+            update(action);
+            return;
+        }
+
+        String currUid = CurrentUser.id();
+        LocalDateTime now = LocalDateTime.now();
+        boolean isBefore = StringUtils.hasText(moveEvent.getBefore());
+        Action toAction = getActionById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
+
+        Action fromAction = new Action();
+        fromAction.setId(toAction.getId());
+        fromAction.setPkgId(toAction.getPkgId());
+        fromAction.setWeight(toAction.getWeight());
+        fromAction.setUpdateBy(currUid);
+        fromAction.setUpdateTime(now);
+
+        List<Action> toUpdateActions = new ArrayList<>();
+        toUpdateActions.add(fromAction);
+        toUpdateActions.addAll(
+                listByProjectIdAndPkgIdAndWeightGeOrLe(
+                        toAction.getProjectId(),
+                        toAction.getPkgId(),
+                        toAction.getWeight(),
+                        isBefore
+                ).stream().map(d -> {
+                    Action toUpdate = new Action();
+                    toUpdate.setId(d.getId());
+                    toUpdate.setWeight(isBefore ? d.getWeight() + 1 : d.getWeight() - 1);
+                    toUpdate.setUpdateBy(currUid);
+                    toUpdate.setUpdateTime(now);
+                    return toUpdate;
+                }).collect(Collectors.toList())
+        );
+
+        try {
+            if (!saveBatch(toUpdateActions)) {
+                throw new ServiceException(ResponseCodeEnum.UPDATE_ACTION_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_ACTION);
+        }
     }
 
     private void update(Action action) {
@@ -226,5 +269,30 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
             step.setDoc(availableDoc);
         }
         return step;
+    }
+
+    private List<Action> listByProjectIdAndPkgIdAndWeightGeOrLe(String projectId, String pkgId, Integer weight, boolean ge) {
+        LambdaQueryWrapper<Action> query = new LambdaQueryWrapper<>();
+        query.eq(Action::getProjectId, projectId)
+                .eq(Action::getPkgId, pkgId);
+        if (ge) {
+            query.ge(Action::getWeight, weight);
+        } else {
+            query.le(Action::getWeight, weight);
+        }
+        return list(query);
+    }
+
+    private List<Action> listByProjectId(String projectId) {
+        Assert.hasText(projectId, "projectId must has text");
+        LambdaQueryWrapper<Action> query = new LambdaQueryWrapper<>();
+        query.eq(Action::getProjectId, projectId);
+        return list(query);
+    }
+
+    private Integer getMinWeightByProjectId(String projectId) {
+        return listByProjectId(projectId).stream()
+                .min(Comparator.comparing(Action::getWeight))
+                .map(Action::getWeight).orElse(null);
     }
 }

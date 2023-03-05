@@ -2,6 +2,7 @@ package com.yqhp.console.web.service;
 
 import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreatePkgParam;
 import com.yqhp.console.model.param.UpdatePkgParam;
 import com.yqhp.console.model.param.query.PkgTreeQuery;
@@ -19,7 +20,7 @@ public interface PkgService extends IService<Pkg> {
 
     Pkg updatePkg(String pkgId, UpdatePkgParam updatePkgParam);
 
-    void move(String pkgId, String parentId);
+    void move(TreeNodeMoveEvent moveEvent);
 
     Pkg getPkgById(String pkgId);
 

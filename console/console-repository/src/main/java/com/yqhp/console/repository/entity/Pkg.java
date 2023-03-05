@@ -30,6 +30,8 @@ public class Pkg implements Serializable {
 
     private String parentId;
 
+    private Integer weight;
+
     private String name;
 
     /**

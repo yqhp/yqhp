@@ -1,5 +1,6 @@
 package com.yqhp.console.web.controller;
 
+import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateActionParam;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
@@ -40,9 +41,9 @@ public class ActionController {
         return actionService.updateAction(id, param);
     }
 
-    @PutMapping("/{id}/moveTo/{pkgId}")
-    public void move(@PathVariable String id, @PathVariable String pkgId) {
-        actionService.move(id, pkgId);
+    @PutMapping("/move")
+    public void move(@Valid @RequestBody TreeNodeMoveEvent moveEvent) {
+        actionService.move(moveEvent);
     }
 
     @PostMapping("/dto")
