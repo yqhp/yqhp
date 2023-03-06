@@ -3,8 +3,8 @@ package com.yqhp.agent.web.service.impl;
 import com.yqhp.agent.web.config.prop.AgentProperties;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
-import com.yqhp.console.repository.entity.Plugin;
-import com.yqhp.console.repository.jsonfield.PluginFile;
+import com.yqhp.console.repository.entity.PluginFile;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +33,7 @@ public class PluginServiceImpl implements PluginService {
     }
 
     @Override
-    public List<File> getFiles(Plugin plugin) throws IOException {
+    public List<File> getFiles(PluginDTO plugin) throws IOException {
         if (plugin == null || CollectionUtils.isEmpty(plugin.getFiles())) {
             return new ArrayList<>();
         }

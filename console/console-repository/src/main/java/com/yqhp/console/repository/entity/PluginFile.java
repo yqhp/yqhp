@@ -1,7 +1,6 @@
 package com.yqhp.console.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,24 +9,29 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 插件
+ *
  * </p>
  *
  * @author mybatis-plus generator
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName(autoResultMap = true)
-public class Plugin implements Serializable {
+public class PluginFile implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id")
     private String id;
 
+    private String pluginId;
+
     private String name;
 
-    private String description;
+    private String key;
+
+    private String url;
+
+    private Long size;
 
     /**
      * 创建时间

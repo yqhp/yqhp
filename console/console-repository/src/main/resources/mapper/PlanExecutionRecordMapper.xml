@@ -8,7 +8,7 @@
         <result column="project_id" property="projectId" />
         <result column="plan_id" property="planId" />
         <result column="plan_name" property="planName" />
-        <result column="plugins" property="plugins" typeHandler="com.yqhp.console.repository.typehandler.PluginsTypeHandler" />
+        <result column="plugins" property="plugins" typeHandler="com.yqhp.console.repository.typehandler.PluginDTOsTypeHandler" />
         <result column="docs" property="docs" typeHandler="com.yqhp.console.repository.typehandler.DocsTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />

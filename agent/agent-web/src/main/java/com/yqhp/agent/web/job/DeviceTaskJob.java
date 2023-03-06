@@ -11,11 +11,11 @@ import com.yqhp.common.kafka.message.StepExecutionRecordMessage;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.entity.Plugin;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.enums.StepExecutionStatus;
 import com.yqhp.console.repository.jsonfield.ActionStepX;
 import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.rpc.DeviceTaskRpc;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -65,8 +65,8 @@ public class DeviceTaskJob {
             );
             try {
                 // 加载插件jar包
-                List<Plugin> plugins = received.getPlanExecutionRecord().getPlugins();
-                for (Plugin plugin : plugins) {
+                List<PluginDTO> plugins = received.getPlanExecutionRecord().getPlugins();
+                for (PluginDTO plugin : plugins) {
                     List<File> files = pluginService.getFiles(plugin);
                     driver.jshellAddToClasspath(files);
                 }

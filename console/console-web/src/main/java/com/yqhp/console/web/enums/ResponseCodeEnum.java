@@ -52,12 +52,17 @@ public enum ResponseCodeEnum implements ResponseCode {
     PKG_UNRENAMABLE(2412, "无法重命名的包"),
     PKG_UNUPDATABLE(2413, "无法更新的包"),
 
-    SAVE_PLUGIN_FAIL(3000, "保存插件失败，请稍后重试"),
-    DEL_PLUGIN_FAIL(3001, "删除插件失败，请稍后重试"),
-    UPDATE_PLUGIN_FAIL(3002, "更新插件失败，请稍后重试"),
-    PLUGIN_NOT_FOUND(3003, "插件不存在"),
-    DUPLICATE_PLUGIN(3004, "插件已存在"),
-    PROJECT_IN_USE(3005, "项目正在使用该插件"),
+    SAVE_PLUGIN_FAIL(2800, "保存插件失败，请稍后重试"),
+    DEL_PLUGIN_FAIL(2801, "删除插件失败，请稍后重试"),
+    UPDATE_PLUGIN_FAIL(2802, "更新插件失败，请稍后重试"),
+    PLUGIN_NOT_FOUND(2803, "插件不存在"),
+    DUPLICATE_PLUGIN(2804, "插件已存在"),
+    PROJECT_IN_USE(2805, "项目正在使用该插件"),
+
+    SAVE_PLUGIN_FILE_FAIL(3000, "保存插件文件失败，请稍后重试"),
+    DEL_PLUGIN_FILE_FAIL(3001, "删除插件文件失败，请稍后重试"),
+    PLUGIN_FILE_NOT_FOUND(3003, "插件文件不存在"),
+    DUPLICATE_PLUGIN_FILE(3004, "插件文件已存在"),
 
     SAVE_PROJECT_PLUGIN_FAIL(3100, "保存项目插件失败，请稍后重试"),
     DEL_PROJECT_PLUGIN_FAIL(3101, "删除项目插件失败，请稍后重试"),

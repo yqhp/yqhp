@@ -6,6 +6,7 @@ import com.yqhp.console.model.param.CreatePluginParam;
 import com.yqhp.console.model.param.UpdatePluginParam;
 import com.yqhp.console.model.param.query.PluginPageQuery;
 import com.yqhp.console.repository.entity.Plugin;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface PluginService extends IService<Plugin> {
     void deletePluginById(String id);
 
     List<Plugin> listByProjectId(String projectId);
+
+    List<PluginDTO> listPluginDTOByProjectId(String projectId);
 }

@@ -118,7 +118,6 @@ CREATE TABLE `plugin` (
   `id` varchar(32) NOT NULL,
   `name` varchar(128) NOT NULL,
   `description` varchar(256) NOT NULL DEFAULT '',
-  `files` json,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
@@ -126,6 +125,21 @@ CREATE TABLE `plugin` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_name` (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='插件';
+
+CREATE TABLE `plugin_file` (
+  `id` varchar(32) NOT NULL,
+  `plugin_id` varchar(32) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `key` varchar(128) NOT NULL,
+  `url` varchar(128) NOT NULL,
+  `size` bigint(20) NOT NULL,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_by` varchar(32) NOT NULL COMMENT '创建人',
+  `update_by` varchar(32) NOT NULL COMMENT '更新人',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_plugin_id_name` (`plugin_id`, `name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `project_plugin` (
   `project_id` varchar(32) NOT NULL,

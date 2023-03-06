@@ -11,20 +11,26 @@ import com.yqhp.console.model.param.CreatePluginParam;
 import com.yqhp.console.model.param.UpdatePluginParam;
 import com.yqhp.console.model.param.query.PluginPageQuery;
 import com.yqhp.console.repository.entity.Plugin;
+import com.yqhp.console.repository.entity.PluginFile;
 import com.yqhp.console.repository.entity.ProjectPlugin;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.repository.mapper.PluginMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
+import com.yqhp.console.web.service.PluginFileService;
 import com.yqhp.console.web.service.PluginService;
 import com.yqhp.console.web.service.ProjectPluginService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +45,8 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
     private Snowflake snowflake;
     @Autowired
     private ProjectPluginService projectPluginService;
+    @Autowired
+    private PluginFileService pluginFileService;
 
     @Override
     public IPage<Plugin> pageBy(PluginPageQuery query) {
@@ -119,4 +127,27 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
         List<String> pluginIds = projectPluginService.listPluginIdByProjectId(projectId);
         return pluginIds.isEmpty() ? new ArrayList<>() : listByIds(pluginIds);
     }
+
+    @Override
+    public List<PluginDTO> listPluginDTOByProjectId(String projectId) {
+        List<Plugin> plugins = listByProjectId(projectId);
+        return toPluginDTOs(plugins);
+    }
+
+    private List<PluginDTO> toPluginDTOs(List<Plugin> plugins) {
+        if (CollectionUtils.isEmpty(plugins)) return new ArrayList<>();
+
+        List<String> pluginIds = plugins.stream().map(Plugin::getId).collect(Collectors.toList());
+        // pluginId -> files
+        Map<String, List<PluginFile>> pluginFilesMap = pluginFileService.listInPluginIds(pluginIds).stream()
+                .collect(Collectors.groupingBy(PluginFile::getPluginId));
+        return plugins.stream().map(plugin -> {
+            PluginDTO dto = new PluginDTO();
+            BeanUtils.copyProperties(plugin, dto);
+            dto.setFiles(pluginFilesMap.get(plugin.getId()));
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
 }

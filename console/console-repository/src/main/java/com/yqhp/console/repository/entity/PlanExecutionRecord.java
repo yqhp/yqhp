@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.repository.typehandler.DocsTypeHandler;
-import com.yqhp.console.repository.typehandler.PluginsTypeHandler;
+import com.yqhp.console.repository.typehandler.PluginDTOsTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,8 +37,8 @@ public class PlanExecutionRecord implements Serializable {
 
     private String planName;
 
-    @TableField(typeHandler = PluginsTypeHandler.class)
-    private List<Plugin> plugins;
+    @TableField(typeHandler = PluginDTOsTypeHandler.class)
+    private List<PluginDTO> plugins;
 
     @TableField(typeHandler = DocsTypeHandler.class)
     private List<Doc> docs;

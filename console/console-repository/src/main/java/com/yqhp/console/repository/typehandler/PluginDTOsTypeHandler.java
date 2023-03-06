@@ -2,16 +2,16 @@ package com.yqhp.console.repository.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.common.mybatis.typehandler.JacksonTypeHandler;
-import com.yqhp.console.repository.entity.Plugin;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 
 import java.util.List;
 
 /**
  * @author jiangyitao
  */
-public class PluginsTypeHandler extends JacksonTypeHandler<List<Plugin>> {
+public class PluginDTOsTypeHandler extends JacksonTypeHandler<List<PluginDTO>> {
     @Override
-    protected TypeReference<List<Plugin>> typeReference() {
+    protected TypeReference<List<PluginDTO>> typeReference() {
         return new TypeReference<>() {
         };
     }
