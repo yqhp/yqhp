@@ -1,6 +1,7 @@
 package com.yqhp.auth.web.controller;
 
-import com.yqhp.auth.model.param.UserRoleParam;
+import com.yqhp.auth.model.param.CreateUserRoleParam;
+import com.yqhp.auth.model.param.UpdateUserRoleParam;
 import com.yqhp.auth.repository.entity.UserRole;
 import com.yqhp.auth.web.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,13 @@ public class UserRoleController {
     private UserRoleService userRoleService;
 
     @PostMapping
-    public void createUserRole(@Valid @RequestBody UserRoleParam userRoleParam) {
-        userRoleService.createUserRole(userRoleParam);
+    public void createUserRole(@Valid @RequestBody CreateUserRoleParam param) {
+        userRoleService.createUserRole(param);
+    }
+
+    @PutMapping("/{id}")
+    public void updateUserRole(@PathVariable String id, @Valid @RequestBody UpdateUserRoleParam param) {
+        userRoleService.updateUserRole(id, param);
     }
 
     @GetMapping
@@ -34,8 +40,8 @@ public class UserRoleController {
         return userRoleService.listByUserId(userId);
     }
 
-    @DeleteMapping
-    public void deleteUserRole(@Valid @RequestBody UserRoleParam userRoleParam) {
-        userRoleService.deleteUserRole(userRoleParam);
+    @DeleteMapping("/{id}")
+    public void deleteUserRoleById(@PathVariable String id) {
+        userRoleService.deleteUserRoleById(id);
     }
 }

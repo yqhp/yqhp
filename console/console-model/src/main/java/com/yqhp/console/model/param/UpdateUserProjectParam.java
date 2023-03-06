@@ -10,9 +10,7 @@ import javax.validation.constraints.NotBlank;
  * @author jiangyitao
  */
 @Data
-public class UserProjectParam implements InputConverter<UserProject> {
-    @NotBlank(message = "用户不能为空")
-    private String userId;
+public class UpdateUserProjectParam implements InputConverter<UserProject> {
     @NotBlank(message = "项目不能为空")
     private String projectId;
 }

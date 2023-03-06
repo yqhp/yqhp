@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
-import com.yqhp.console.model.param.UserProjectParam;
+import com.yqhp.console.model.param.CreateUserProjectParam;
+import com.yqhp.console.model.param.UpdateUserProjectParam;
 import com.yqhp.console.repository.entity.UserProject;
 import com.yqhp.console.web.service.UserProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,13 @@ public class UserProjectController {
     private UserProjectService userProjectService;
 
     @PostMapping
-    public void createUserProject(@Valid @RequestBody UserProjectParam userProjectParam) {
-        userProjectService.createUserProject(userProjectParam);
+    public void createUserProject(@Valid @RequestBody CreateUserProjectParam param) {
+        userProjectService.createUserProject(param);
+    }
+
+    @PutMapping("/{id}")
+    public void updateUserProject(@PathVariable String id, @Valid @RequestBody UpdateUserProjectParam param) {
+        userProjectService.updateUserProject(id, param);
     }
 
     @GetMapping
@@ -34,8 +40,8 @@ public class UserProjectController {
         return userProjectService.listByUserId(userId);
     }
 
-    @DeleteMapping
-    public void deleteUserProject(@Valid @RequestBody UserProjectParam userProjectParam) {
-        userProjectService.deleteUserProject(userProjectParam);
+    @DeleteMapping("/{id}")
+    public void deleteUserProjectById(@PathVariable String id) {
+        userProjectService.deleteUserProjectById(id);
     }
 }

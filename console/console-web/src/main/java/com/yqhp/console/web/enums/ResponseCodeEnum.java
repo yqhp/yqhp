@@ -19,6 +19,8 @@ public enum ResponseCodeEnum implements ResponseCode {
     SAVE_USER_PROJECT_FAIL(1300, "保存用户项目失败，请稍后重试"),
     DEL_USER_PROJECT_FAIL(1301, "删除用户项目失败，请稍后重试"),
     DUPLICATE_USER_PROJECT(1302, "用户项目已存在"),
+    USER_PROJECT_NOT_FOUND(1303, "用户项目不存在"),
+    UPDATE_USER_PROJECT_FAIL(1304, "更新用户项目失败，请稍后重试"),
 
     UPDATE_DEVICE_FAIL(1602, "更新设备失败，请稍后重试"),
     DEVICE_NOT_FOUND(1603, "设备不存在"),
@@ -67,6 +69,8 @@ public enum ResponseCodeEnum implements ResponseCode {
     SAVE_PROJECT_PLUGIN_FAIL(3100, "保存项目插件失败，请稍后重试"),
     DEL_PROJECT_PLUGIN_FAIL(3101, "删除项目插件失败，请稍后重试"),
     DUPLICATE_PROJECT_PLUGIN(3102, "项目插件已存在"),
+    UPDATE_PROJECT_PLUGIN_FAIL(3203, "更新项目插件失败，请稍后重试"),
+    PROJECT_PLUGIN_NOT_FOUND(3204, "项目插件不存在"),
 
     SAVE_ACTION_FAIL(3200, "保存Action失败，请稍后重试"),
     DEL_ACTION_FAIL(3201, "删除Action失败，请稍后重试"),

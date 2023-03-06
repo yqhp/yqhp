@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
-import com.yqhp.console.model.param.ProjectPluginParam;
+import com.yqhp.console.model.param.CreateProjectPluginParam;
+import com.yqhp.console.model.param.UpdateProjectPluginParam;
 import com.yqhp.console.repository.entity.ProjectPlugin;
 import com.yqhp.console.web.service.ProjectPluginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,13 @@ public class ProjectPluginController {
     private ProjectPluginService projectPluginService;
 
     @PostMapping
-    public void createProjectPlugin(@Valid @RequestBody ProjectPluginParam param) {
+    public void createProjectPlugin(@Valid @RequestBody CreateProjectPluginParam param) {
         projectPluginService.createProjectPlugin(param);
+    }
+
+    @PutMapping("/{id}")
+    public void updateProjectPlugin(@PathVariable String id, @Valid @RequestBody UpdateProjectPluginParam param) {
+        projectPluginService.updateProjectPlugin(id, param);
     }
 
     @GetMapping
@@ -34,8 +40,9 @@ public class ProjectPluginController {
         return projectPluginService.listByProjectId(projectId);
     }
 
-    @DeleteMapping
-    public void deleteProjectPlugin(@Valid @RequestBody ProjectPluginParam param) {
-        projectPluginService.deleteProjectPlugin(param);
+    @DeleteMapping("/{id}")
+    public void deleteProjectPluginById(@PathVariable String id) {
+        projectPluginService.deleteProjectPluginById(id);
     }
+
 }

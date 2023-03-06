@@ -4,8 +4,9 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.ProjectPlugin">
-        <id column="project_id" property="projectId" />
-        <id column="plugin_id" property="pluginId" />
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="plugin_id" property="pluginId" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />

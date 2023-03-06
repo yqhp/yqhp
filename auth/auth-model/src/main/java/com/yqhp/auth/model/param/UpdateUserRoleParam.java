@@ -10,9 +10,7 @@ import javax.validation.constraints.NotBlank;
  * @author jiangyitao
  */
 @Data
-public class UserRoleParam implements InputConverter<UserRole> {
-    @NotBlank(message = "用户不能为空")
-    private String userId;
+public class UpdateUserRoleParam implements InputConverter<UserRole> {
     @NotBlank(message = "角色不能为空")
     private String roleId;
 }

@@ -29,6 +29,8 @@ public enum ResponseCodeEnum implements ResponseCode {
     SAVE_USER_ROLE_FAIL(1200, "保存用户角色失败，请稍后重试"),
     DEL_USER_ROLE_FAIL(1201, "删除用户角色失败，请稍后重试"),
     DUPLICATE_USER_ROLE(1202, "用户角色已存在"),
+    UPDATE_USER_ROLE_FAIL(1203, "更新用户角色失败，请稍后重试"),
+    USER_ROLE_NOT_FOUND(1204, "用户角色不存在"),
 
     SAVE_ROLE_AUTHORITY_FAIL(1300, "保存角色权限失败，请稍后重试"),
     DUPLICATE_ROLE_AUTHORITY(1301, "角色权限已存在"),

@@ -45,13 +45,15 @@ CREATE TABLE `role_authority` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色权限';
 
 CREATE TABLE `user_role` (
+    `id` varchar(32) NOT NULL,
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `role_id` varchar(32) NOT NULL COMMENT '角色id',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
-    PRIMARY KEY (`user_id`, `role_id`) USING BTREE
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE KEY `uk_user_id_role_id` (`user_id`, `role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色';
 
 -- admin/admin
@@ -59,7 +61,7 @@ INSERT INTO `user` ( `id`, `username`, `password`, `nickname`, `email`, `create_
 VALUES
     ( '1', 'admin', '$2a$12$v1ERBqyxhU/ocHRPywOjvOAMkhmZGJB3hRoNjr4bWO3HLWZSIlnne', '超级管理员', '283052497@qq.com', '1', '1' );
 INSERT INTO `role`(`id`, `name`, `create_by`, `update_by`) VALUES ('1', '超级管理员', '1', '1');
-INSERT INTO `user_role`(`user_id`, `role_id`, `create_by`, `update_by`) VALUES ('1', '1', '1', '1');
+INSERT INTO `user_role`(`id`, `user_id`, `role_id`, `create_by`, `update_by`) VALUES ('1', '1', '1', '1', '1');
 INSERT INTO `role_authority`(`id`, `role_id`, `authority_name`, `authority_value`, `create_by`, `update_by`)
 VALUES
     ( '1', '1', '超级管理员', 'admin', '1', '1');
@@ -91,13 +93,15 @@ CREATE TABLE `device` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备';
 
 CREATE TABLE `user_project` (
+  `id` varchar(32) NOT NULL,
   `user_id` varchar(32) NOT NULL COMMENT '用户id',
   `project_id` varchar(32) NOT NULL COMMENT '项目id',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
-  PRIMARY KEY (`user_id`, `project_id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_user_id_project_id` (`user_id`, `project_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户项目';
 
 CREATE TABLE `project` (
@@ -142,13 +146,15 @@ CREATE TABLE `plugin_file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `project_plugin` (
+  `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
   `plugin_id` varchar(32) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
-  PRIMARY KEY (`project_id`, `plugin_id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_project_id_plugin_id` (`project_id`, `plugin_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目插件';
 
 CREATE TABLE `pkg` (

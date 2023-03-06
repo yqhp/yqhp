@@ -4,8 +4,9 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yqhp.auth.repository.entity.UserRole">
-        <id column="user_id" property="userId" />
-        <id column="role_id" property="roleId" />
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="role_id" property="roleId" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />

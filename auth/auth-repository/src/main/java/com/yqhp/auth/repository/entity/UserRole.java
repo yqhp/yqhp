@@ -1,5 +1,6 @@
 package com.yqhp.auth.repository.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,6 +19,9 @@ import java.time.LocalDateTime;
 public class UserRole implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id")
+    private String id;
 
     /**
      * 用户id

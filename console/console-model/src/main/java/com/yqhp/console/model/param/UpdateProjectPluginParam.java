@@ -10,9 +10,7 @@ import javax.validation.constraints.NotBlank;
  * @author jiangyitao
  */
 @Data
-public class ProjectPluginParam implements InputConverter<ProjectPlugin> {
-    @NotBlank(message = "项目不能为空")
-    private String projectId;
+public class UpdateProjectPluginParam implements InputConverter<ProjectPlugin> {
     @NotBlank(message = "插件不能为空")
     private String pluginId;
 }

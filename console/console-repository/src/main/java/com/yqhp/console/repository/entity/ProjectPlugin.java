@@ -1,5 +1,6 @@
 package com.yqhp.console.repository.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,13 +13,15 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author mybatis-plus generator
- * @since 2023-02-04
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ProjectPlugin implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id")
+    private String id;
 
     private String projectId;
 

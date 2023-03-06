@@ -1,7 +1,8 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yqhp.console.model.param.UserProjectParam;
+import com.yqhp.console.model.param.CreateUserProjectParam;
+import com.yqhp.console.model.param.UpdateUserProjectParam;
 import com.yqhp.console.repository.entity.UserProject;
 
 import java.util.List;
@@ -10,9 +11,13 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface UserProjectService extends IService<UserProject> {
-    UserProject createUserProject(UserProjectParam userProjectParam);
+    void createUserProject(CreateUserProjectParam param);
 
-    void deleteUserProject(UserProjectParam userProjectParam);
+    void updateUserProject(String id, UpdateUserProjectParam param);
+
+    void deleteUserProjectById(String id);
+
+    UserProject getUserProjectById(String id);
 
     List<String> listProjectIdByUserId(String userId);
 
