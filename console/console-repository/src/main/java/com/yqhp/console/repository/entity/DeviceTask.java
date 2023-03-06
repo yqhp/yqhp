@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.typehandler.ActionDTOTypeHandler;
+import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.typehandler.ActionXTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -39,8 +39,8 @@ public class DeviceTask implements Serializable {
 
     private String actionId;
 
-    @TableField(typeHandler = ActionDTOTypeHandler.class)
-    private ActionDTO action;
+    @TableField(typeHandler = ActionXTypeHandler.class)
+    private ActionX action;
 
     private DeviceTaskStatus status;
 

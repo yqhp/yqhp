@@ -2,17 +2,20 @@ package com.yqhp.agent.action;
 
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.common.jshell.JShellEvalResult;
+import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.enums.ActionStepErrorHandler;
+import com.yqhp.console.repository.enums.ActionStepFlag;
 import com.yqhp.console.repository.enums.ActionStepType;
-import com.yqhp.console.repository.enums.ActionStepsType;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepX;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
@@ -33,27 +36,29 @@ public class ActionExecutor {
         listeners.add(listener);
     }
 
-    public void execQuietly(ActionDTO action) {
+    public void execQuietly(ActionX action) {
         try {
             exec(action);
         } catch (Throwable ignore) {
         }
     }
 
-    public void exec(ActionDTO action) {
+    public void exec(ActionX action) {
         exec(action, true);
     }
 
-    private void exec(ActionDTO action, boolean isRoot) {
+    private void exec(ActionX action, boolean isRoot) {
         if (action == null) return;
 
         try {
             listeners.forEach(listener -> listener.onActionStarted(action, isRoot));
-            execSteps(action, ActionStepsType.BEFORE, action.getBefore(), isRoot);
+            Map<ActionStepFlag, List<ActionStepX>> stepsMap = action.getSteps().stream()
+                    .collect(Collectors.groupingBy(ActionStep::getFlag));
+            execSteps(action, stepsMap.get(ActionStepFlag.BEFORE), isRoot);
             try {
-                execSteps(action, ActionStepsType.STEPS, action.getSteps(), isRoot);
+                execSteps(action, stepsMap.get(ActionStepFlag.NORMAL), isRoot);
             } finally {
-                execSteps(action, ActionStepsType.AFTER, action.getAfter(), isRoot);
+                execSteps(action, stepsMap.get(ActionStepFlag.AFTER), isRoot);
             }
             listeners.forEach(listener -> listener.onActionSuccessful(action, isRoot));
         } catch (Throwable cause) {
@@ -62,14 +67,14 @@ public class ActionExecutor {
         }
     }
 
-    private void execSteps(ActionDTO action, ActionStepsType type, List<ActionStepDTO> steps, boolean isRoot) {
+    private void execSteps(ActionX action, List<ActionStepX> steps, boolean isRoot) {
         if (CollectionUtils.isEmpty(steps)) return;
 
         try {
-            listeners.forEach(listener -> listener.onStepsStarted(action, type, steps, isRoot));
-            for (ActionStepDTO step : steps) {
+            listeners.forEach(listener -> listener.onStepsStarted(action, steps, isRoot));
+            for (ActionStepX step : steps) {
                 try {
-                    execStep(action, type, step, isRoot);
+                    execStep(action, step, isRoot);
                 } catch (Throwable cause) {
                     ActionStepErrorHandler errorHandler = step.getErrorHandler();
                     if (errorHandler == null || ActionStepErrorHandler.THROW_ERROR.equals(errorHandler)) {
@@ -77,18 +82,18 @@ public class ActionExecutor {
                     }
                 }
             }
-            listeners.forEach(listener -> listener.onStepsSuccessful(action, type, steps, isRoot));
+            listeners.forEach(listener -> listener.onStepsSuccessful(action, steps, isRoot));
         } catch (Throwable cause) {
-            listeners.forEach(listener -> listener.onStepsFailed(action, type, steps, cause, isRoot));
+            listeners.forEach(listener -> listener.onStepsFailed(action, steps, cause, isRoot));
             throw cause;
         }
     }
 
-    private void execStep(ActionDTO action, ActionStepsType type, ActionStepDTO step, boolean isRoot) {
+    private void execStep(ActionX action, ActionStepX step, boolean isRoot) {
         if (step == null) return;
 
         try {
-            listeners.forEach(listener -> listener.onStepStarted(action, type, step, isRoot));
+            listeners.forEach(listener -> listener.onStepStarted(action, step, isRoot));
             if (ActionStepType.ACTION.equals(step.getType())) {
                 exec(step.getAction(), false);
             } else {
@@ -106,9 +111,9 @@ public class ActionExecutor {
                     throw new ActionStepExecutionException(results);
                 }
             }
-            listeners.forEach(listener -> listener.onStepSuccessful(action, type, step, isRoot));
+            listeners.forEach(listener -> listener.onStepSuccessful(action, step, isRoot));
         } catch (Throwable cause) {
-            listeners.forEach(listener -> listener.onStepFailed(action, type, step, cause, isRoot));
+            listeners.forEach(listener -> listener.onStepFailed(action, step, cause, isRoot));
             throw cause;
         }
     }

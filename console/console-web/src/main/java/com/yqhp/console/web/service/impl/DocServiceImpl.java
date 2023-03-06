@@ -113,7 +113,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         Doc toDoc = getDocById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
 
         Doc fromDoc = new Doc();
-        fromDoc.setId(toDoc.getId());
+        fromDoc.setId(doc.getId());
         fromDoc.setPkgId(toDoc.getPkgId());
         fromDoc.setWeight(toDoc.getWeight());
         fromDoc.setUpdateBy(currUid);
@@ -175,14 +175,6 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public Doc getAvailableDocById(String id) {
-        LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
-        query.eq(Doc::getId, id);
-        query.in(Doc::getStatus, AVAILABLE_DOC_STATUS_LIST);
-        return getOne(query);
-    }
-
-    @Override
     public List<Doc> listInPkgIds(Collection<String> pkgIds) {
         if (CollectionUtils.isEmpty(pkgIds)) {
             return new ArrayList<>();
@@ -193,14 +185,13 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listAvailableDocByProjectIdAndType(String projectId, DocType type) {
+    public List<Doc> listByProjectIdAndType(String projectId, DocType type) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(type, "docType cannot be null");
 
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
         query.eq(Doc::getProjectId, projectId);
         query.eq(Doc::getType, type);
-        query.in(Doc::getStatus, AVAILABLE_DOC_STATUS_LIST);
         return list(query);
     }
 

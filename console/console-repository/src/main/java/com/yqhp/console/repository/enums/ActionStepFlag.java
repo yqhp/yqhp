@@ -9,18 +9,18 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum ActionStepsType implements BaseEnum<Integer> {
+public enum ActionStepFlag implements BaseEnum<Integer> {
 
     BEFORE(1),
-    STEPS(2),
-    AFTER(3);
+    NORMAL(2),
+    AFTER(3),
+    ;
 
     @EnumValue
     @JsonValue
     private final Integer value;
 
-    ActionStepsType(Integer value) {
+    ActionStepFlag(Integer value) {
         this.value = value;
     }
 }
-

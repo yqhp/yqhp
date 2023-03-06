@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yqhp.console.repository.mapper.ActionMapper">
+<mapper namespace="com.yqhp.console.repository.mapper.ActionStepMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.Action">
+    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.ActionStep">
         <id column="id" property="id" />
         <result column="project_id" property="projectId" />
-        <result column="pkg_id" property="pkgId" />
+        <result column="action_id" property="actionId" />
+        <result column="flag" property="flag" />
         <result column="weight" property="weight" />
+        <result column="type" property="type" />
+        <result column="id_of_type" property="idOfType" />
         <result column="name" property="name" />
-        <result column="description" property="description" />
-        <result column="status" property="status" />
-        <result column="flags" property="flags" />
+        <result column="content" property="content" />
+        <result column="error_handler" property="errorHandler" />
+        <result column="enabled" property="enabled" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />

@@ -11,15 +11,12 @@ import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.ActionStatus;
-import com.yqhp.console.repository.enums.ActionStepType;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStep;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.console.repository.mapper.ActionMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.ActionService;
-import com.yqhp.console.web.service.DocService;
+import com.yqhp.console.web.service.ActionStepService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     @Autowired
     private Snowflake snowflake;
     @Autowired
-    private DocService docService;
+    private ActionStepService actionStepService;
 
     @Override
     public Action createAction(CreateActionParam param) {
@@ -68,7 +65,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_ACTION);
         }
-
         return getById(action.getId());
     }
 
@@ -108,7 +104,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         Action toAction = getActionById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
 
         Action fromAction = new Action();
-        fromAction.setId(toAction.getId());
+        fromAction.setId(action.getId());
         fromAction.setPkgId(toAction.getPkgId());
         fromAction.setWeight(toAction.getWeight());
         fromAction.setUpdateBy(currUid);
@@ -122,10 +118,10 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
                         toAction.getPkgId(),
                         toAction.getWeight(),
                         isBefore
-                ).stream().map(d -> {
+                ).stream().map(a -> {
                     Action toUpdate = new Action();
-                    toUpdate.setId(d.getId());
-                    toUpdate.setWeight(isBefore ? d.getWeight() + 1 : d.getWeight() - 1);
+                    toUpdate.setId(a.getId());
+                    toUpdate.setWeight(isBefore ? a.getWeight() + 1 : a.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;
@@ -172,11 +168,16 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     }
 
     @Override
-    public Action getAvailableActionById(String id) {
-        LambdaQueryWrapper<Action> query = new LambdaQueryWrapper<>();
-        query.eq(Action::getId, id);
-        query.in(Action::getStatus, AVAILABLE_ACTION_STATUS_LIST);
-        return getOne(query);
+    public ActionX getActionXById(String id,
+                                  Map<String, ActionX> actionCache,
+                                  Map<String, Doc> docCache) {
+        if (actionCache.containsKey(id)) {
+            return actionCache.get(id);
+        }
+        Action action = getById(id);
+        ActionX actionX = toActionX(action, actionCache, docCache);
+        actionCache.put(id, actionX);
+        return actionX;
     }
 
     @Override
@@ -189,86 +190,32 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         return list(query);
     }
 
-    /**
-     * @param action action未保存可能没id
-     */
     @Override
-    public ActionDTO toActionDTO(Action action) {
-        return toActionDTO(action, new HashMap<>(), new HashMap<>());
+    public ActionX toActionX(Action action) {
+        return toActionX(action, new HashMap<>(), new HashMap<>());
     }
 
     @Override
-    public List<ActionDTO> listAvailableActionDTOByIds(Collection<String> ids) {
+    public List<ActionX> listActionXByIds(Collection<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return new ArrayList<>();
         }
-        Map<String, ActionDTO> availableActionCache = new HashMap<>();
-        Map<String, Doc> availableDocCache = new HashMap<>();
+        Map<String, ActionX> actionCache = new HashMap<>();
+        Map<String, Doc> docCache = new HashMap<>();
         return ids.stream()
-                .map(id -> getAvailableActionDTOById(id, availableActionCache, availableDocCache))
+                .map(id -> getActionXById(id, actionCache, docCache))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private ActionDTO getAvailableActionDTOById(String id,
-                                                Map<String, ActionDTO> availableActionCache,
-                                                Map<String, Doc> availableDocCache) {
-        if (availableActionCache.containsKey(id)) {
-            return availableActionCache.get(id);
-        }
-        Action availableAction = getAvailableActionById(id);
-        ActionDTO actionDTO = toActionDTO(availableAction, availableActionCache, availableDocCache);
-        availableActionCache.put(id, actionDTO);
-        return actionDTO;
-    }
-
-    private ActionDTO toActionDTO(Action action,
-                                  Map<String, ActionDTO> availableActionCache,
-                                  Map<String, Doc> availableDocCache) {
+    private ActionX toActionX(Action action,
+                              Map<String, ActionX> actionCache,
+                              Map<String, Doc> docCache) {
         if (action == null) return null;
-        ActionDTO actionDTO = new ActionDTO();
-        BeanUtils.copyProperties(action, actionDTO, "before", "steps", "after");
-        actionDTO.setBefore(toEnabledActionStepDTOs(action.getBefore(), availableActionCache, availableDocCache));
-        actionDTO.setSteps(toEnabledActionStepDTOs(action.getSteps(), availableActionCache, availableDocCache));
-        actionDTO.setAfter(toEnabledActionStepDTOs(action.getAfter(), availableActionCache, availableDocCache));
-        return actionDTO;
-    }
-
-    private List<ActionStepDTO> toEnabledActionStepDTOs(List<ActionStep> steps,
-                                                        Map<String, ActionDTO> availableActionCache,
-                                                        Map<String, Doc> availableDocCache) {
-        if (CollectionUtils.isEmpty(steps)) {
-            return new ArrayList<>();
-        }
-        return steps.stream()
-                .filter(ActionStep::isEnabled)
-                .map(step -> toActionStepDTO(step, availableActionCache, availableDocCache))
-                .collect(Collectors.toList());
-    }
-
-    private ActionStepDTO toActionStepDTO(ActionStep actionStep,
-                                          Map<String, ActionDTO> availableActionCache,
-                                          Map<String, Doc> availableDocCache) {
-        if (actionStep == null) return null;
-        ActionStepDTO step = new ActionStepDTO();
-        BeanUtils.copyProperties(actionStep, step);
-        step.setExecutionId(snowflake.nextIdStr());
-
-        String idOfType = step.getIdOfType();
-        if (ActionStepType.ACTION.equals(actionStep.getType())) {
-            ActionDTO availableAction = getAvailableActionDTOById(idOfType, availableActionCache, availableDocCache);
-            step.setAction(availableAction);
-        } else if (ActionStepType.DOC_JSHELL_RUN.equals(actionStep.getType())) {
-            Doc availableDoc;
-            if (availableDocCache.containsKey(idOfType)) {
-                availableDoc = availableDocCache.get(idOfType);
-            } else {
-                availableDoc = docService.getAvailableDocById(idOfType);
-                availableDocCache.put(idOfType, availableDoc);
-            }
-            step.setDoc(availableDoc);
-        }
-        return step;
+        ActionX actionX = new ActionX();
+        BeanUtils.copyProperties(action, actionX);
+        actionX.setSteps(actionStepService.listActionStepXByActionId(actionX.getId(), actionCache, docCache));
+        return actionX;
     }
 
     private List<Action> listByProjectIdAndPkgIdAndWeightGeOrLe(String projectId, String pkgId, Integer weight, boolean ge) {

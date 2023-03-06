@@ -8,8 +8,8 @@
         <result column="device_task_id" property="deviceTaskId" />
         <result column="device_id" property="deviceId" />
         <result column="action_id" property="actionId" />
-        <result column="action_steps_type" property="actionStepsType" />
-        <result column="step_name" property="stepName" />
+        <result column="step_id" property="stepId" />
+        <result column="step" property="step" typeHandler="com.yqhp.console.repository.typehandler.ActionStepXTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />

@@ -10,7 +10,7 @@
         <result column="plan_execution_record_id" property="planExecutionRecordId" />
         <result column="device_id" property="deviceId" />
         <result column="action_id" property="actionId" />
-        <result column="action" property="action" typeHandler="com.yqhp.console.repository.typehandler.ActionDTOTypeHandler" />
+        <result column="action" property="action" typeHandler="com.yqhp.console.repository.typehandler.ActionXTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />

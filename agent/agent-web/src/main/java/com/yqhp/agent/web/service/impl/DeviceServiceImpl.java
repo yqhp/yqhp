@@ -16,7 +16,7 @@ import com.yqhp.common.zkdevice.ZkDeviceManager;
 import com.yqhp.common.zookeeper.ZkTemplate;
 import com.yqhp.console.repository.enums.DevicePlatform;
 import com.yqhp.console.repository.enums.DeviceType;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.file.model.OSSFile;
 import com.yqhp.file.rpc.FileRpc;
 import lombok.extern.slf4j.Slf4j;
@@ -245,7 +245,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public void execAction(String token, ActionDTO action) {
+    public void execAction(String token, ActionX action) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
         // todo 异常响应
         new ActionExecutor(deviceDriver).exec(action);

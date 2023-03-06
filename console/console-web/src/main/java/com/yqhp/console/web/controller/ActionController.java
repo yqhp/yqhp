@@ -4,7 +4,7 @@ import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateActionParam;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.console.web.service.ActionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +46,8 @@ public class ActionController {
         actionService.move(moveEvent);
     }
 
-    @PostMapping("/dto")
-    public ActionDTO toActionDTO(@RequestBody Action action) {
-        return actionService.toActionDTO(action);
+    @PostMapping("/x")
+    public ActionX toActionX(@RequestBody Action action) {
+        return actionService.toActionX(action);
     }
 }

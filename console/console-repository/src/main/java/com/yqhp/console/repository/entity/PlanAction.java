@@ -1,11 +1,6 @@
 package com.yqhp.console.repository.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.yqhp.console.repository.enums.StepExecutionStatus;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.typehandler.ActionStepXTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,30 +16,20 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName(autoResultMap = true)
-public class StepExecutionRecord implements Serializable {
+public class PlanAction implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id")
     private String id;
 
-    private String deviceTaskId;
-
-    private String deviceId;
+    private String planId;
 
     private String actionId;
 
-    private String stepId;
+    private Integer weight;
 
-    @TableField(typeHandler = ActionStepXTypeHandler.class)
-    private ActionStepX step;
-
-    private StepExecutionStatus status;
-
-    private Long startTime;
-
-    private Long endTime;
+    private Integer enabled;
 
     /**
      * 创建时间
@@ -65,5 +50,6 @@ public class StepExecutionRecord implements Serializable {
      * 更新人
      */
     private String updateBy;
+
 
 }

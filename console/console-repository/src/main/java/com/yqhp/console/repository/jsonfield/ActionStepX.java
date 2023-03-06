@@ -1,5 +1,6 @@
 package com.yqhp.console.repository.jsonfield;
 
+import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
 import lombok.Data;
 
@@ -7,8 +8,8 @@ import lombok.Data;
  * @author jiangyitao
  */
 @Data
-public class ActionStepDTO extends ActionStep {
+public class ActionStepX extends ActionStep {
     private String executionId;
-    private ActionDTO action;
+    private ActionX action;
     private Doc doc;
 }

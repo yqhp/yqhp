@@ -11,10 +11,7 @@ import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
 import com.yqhp.console.repository.entity.StepExecutionRecord;
 import com.yqhp.console.repository.enums.*;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
-import com.yqhp.console.repository.jsonfield.PlanAction;
-import com.yqhp.console.repository.jsonfield.PlanDevice;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.console.repository.mapper.PlanMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.*;
@@ -49,6 +46,10 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     private PluginService pluginService;
     @Autowired
     private DocService docService;
+    @Autowired
+    private PlanDeviceService planDeviceService;
+    @Autowired
+    private PlanActionService planActionService;
 
     @Override
     public Plan createPlan(CreatePlanParam param) {
@@ -103,7 +104,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Override
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
-        Map<String, List<ActionDTO>> deviceActionsMap = assignDeviceTasks(plan);
+        Map<String, List<ActionX>> deviceActionsMap = assignDeviceTasks(plan);
         if (deviceActionsMap.isEmpty()) {
             throw new ServiceException(ResponseCodeEnum.NO_DEVICES_OR_ACTIONS);
         }
@@ -117,7 +118,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         planExecutionRecord.setPlanId(plan.getId());
         planExecutionRecord.setPlanName(plan.getName()); // 保留提交执行时的计划名
         planExecutionRecord.setPlugins(pluginService.listByProjectId(plan.getProjectId())); // 保留提交执行时的项目插件
-        planExecutionRecord.setDocs(docService.listAvailableDocByProjectIdAndType(plan.getProjectId(), DocType.JSH_DEFINE)); // 保留提交执行时的JSH_DEFINE
+        planExecutionRecord.setDocs(docService.listByProjectIdAndType(plan.getProjectId(), DocType.JSH_DEFINE)); // 保留提交执行时的JSH_DEFINE
         planExecutionRecord.setStatus(PlanExecutionRecordStatus.UNCOMPLETED);
         planExecutionRecord.setCreateBy(createBy);
         planExecutionRecord.setUpdateBy(createBy);
@@ -128,7 +129,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         List<StepExecutionRecord> stepExecutionRecords = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         deviceActionsMap.forEach((deviceId, actions) -> {
-            for (ActionDTO action : actions) {
+            for (ActionX action : actions) {
                 DeviceTask task = new DeviceTask();
                 task.setId(snowflake.nextIdStr());
                 task.setProjectId(plan.getProjectId());
@@ -143,10 +144,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                 task.setUpdateBy(createBy);
                 task.setUpdateTime(now);
                 deviceTasks.add(task);
-
-                addStepExecutionRecords(stepExecutionRecords, task, action, ActionStepsType.BEFORE, action.getBefore());
-                addStepExecutionRecords(stepExecutionRecords, task, action, ActionStepsType.STEPS, action.getSteps());
-                addStepExecutionRecords(stepExecutionRecords, task, action, ActionStepsType.AFTER, action.getAfter());
+                stepExecutionRecords.addAll(createStepExecutionRecords(task, action));
             }
         });
         if (stepExecutionRecords.isEmpty()) {
@@ -160,58 +158,53 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         }
     }
 
-    private void addStepExecutionRecords(List<StepExecutionRecord> stepExecutionRecords, DeviceTask task,
-                                         ActionDTO action, ActionStepsType stepsType, List<ActionStepDTO> steps) {
-        if (CollectionUtils.isEmpty(steps)) return;
-        stepExecutionRecords.addAll(steps.stream().map(step -> {
+    private List<StepExecutionRecord> createStepExecutionRecords(DeviceTask task, ActionX action) {
+        if (CollectionUtils.isEmpty(action.getSteps())) return new ArrayList<>();
+        return action.getSteps().stream().map(step -> {
             StepExecutionRecord record = new StepExecutionRecord();
             record.setId(step.getExecutionId());
             record.setDeviceTaskId(task.getId());
             record.setDeviceId(task.getDeviceId());
             record.setActionId(action.getId());
-            record.setActionStepsType(stepsType);
-            record.setStepName(step.getName());
+            record.setStepId(step.getId());
+            record.setStep(step);
             record.setStatus(StepExecutionStatus.TODO);
             record.setCreateBy(task.getCreateBy());
             record.setCreateTime(task.getCreateTime());
             record.setUpdateBy(task.getUpdateBy());
             record.setUpdateTime(task.getUpdateTime());
             return record;
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
     }
 
     /**
-     * @return deviceId -> available List<ActionDTO>
+     * @return deviceId -> v
      */
-    private Map<String, List<ActionDTO>> assignDeviceTasks(Plan plan) {
-        HashMap<String, List<ActionDTO>> result = new HashMap<>();
-        List<String> enabledDeviceIds = plan.getDevices().stream()
-                .filter(PlanDevice::isEnabled).map(PlanDevice::getDeviceId)
-                .collect(Collectors.toList());
+    private Map<String, List<ActionX>> assignDeviceTasks(Plan plan) {
+        HashMap<String, List<ActionX>> result = new HashMap<>();
+        List<String> enabledDeviceIds = planDeviceService.listEnabledPlanDeviceIdByPlanId(plan.getId());
         if (CollectionUtils.isEmpty(enabledDeviceIds)) {
             return result;
         }
-        List<String> enabledActionIds = plan.getActions().stream()
-                .filter(PlanAction::isEnabled).map(PlanAction::getActionId)
-                .collect(Collectors.toList());
-        List<ActionDTO> availableActions = actionService.listAvailableActionDTOByIds(enabledActionIds);
-        if (CollectionUtils.isEmpty(availableActions)) {
+        List<String> enabledActionIds = planActionService.listEnabledActionIdByPlanId(plan.getId());
+        List<ActionX> actionXs = actionService.listActionXByIds(enabledActionIds);
+        if (CollectionUtils.isEmpty(actionXs)) {
             return result;
         }
 
         if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {
             // 兼容模式，执行同一份
             for (String deviceId : enabledDeviceIds) {
-                result.put(deviceId, availableActions);
+                result.put(deviceId, actionXs);
             }
         } else if (RunMode.EFFICIENT.equals(plan.getRunMode())) {
             // 高效模式，平均分
             int i = 0;
             int deviceCount = enabledDeviceIds.size();
-            for (ActionDTO action : availableActions) {
+            for (ActionX action : actionXs) {
                 if (i == deviceCount) i = 0;
                 String deviceId = enabledDeviceIds.get(i);
-                List<ActionDTO> actions = result.computeIfAbsent(deviceId, k -> new ArrayList<>());
+                List<ActionX> actions = result.computeIfAbsent(deviceId, k -> new ArrayList<>());
                 actions.add(action);
                 i++;
             }

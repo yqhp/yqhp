@@ -4,7 +4,7 @@ import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.file.model.OSSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -81,7 +81,7 @@ public class DeviceController {
     }
 
     @PostMapping
-    public void execAction(@RequestHeader("deviceToken") String token, @RequestBody ActionDTO action) {
+    public void execAction(@RequestHeader("deviceToken") String token, @RequestBody ActionX action) {
         deviceService.execAction(token, action);
     }
 }
