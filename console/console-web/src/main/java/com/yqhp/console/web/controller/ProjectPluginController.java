@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreateProjectPluginParam;
+import com.yqhp.console.model.param.DeleteProjectPluginParam;
 import com.yqhp.console.model.param.UpdateProjectPluginParam;
 import com.yqhp.console.repository.entity.ProjectPlugin;
 import com.yqhp.console.web.service.ProjectPluginService;
@@ -43,6 +44,11 @@ public class ProjectPluginController {
     @DeleteMapping("/{id}")
     public void deleteProjectPluginById(@PathVariable String id) {
         projectPluginService.deleteProjectPluginById(id);
+    }
+
+    @DeleteMapping
+    public void deleteProjectPlugin(@Valid @RequestBody DeleteProjectPluginParam param) {
+        projectPluginService.deleteProjectPlugin(param);
     }
 
 }

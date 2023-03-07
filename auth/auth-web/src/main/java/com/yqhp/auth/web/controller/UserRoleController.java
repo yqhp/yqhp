@@ -1,6 +1,7 @@
 package com.yqhp.auth.web.controller;
 
 import com.yqhp.auth.model.param.CreateUserRoleParam;
+import com.yqhp.auth.model.param.DeleteUserRoleParam;
 import com.yqhp.auth.model.param.UpdateUserRoleParam;
 import com.yqhp.auth.repository.entity.UserRole;
 import com.yqhp.auth.web.service.UserRoleService;
@@ -43,5 +44,10 @@ public class UserRoleController {
     @DeleteMapping("/{id}")
     public void deleteUserRoleById(@PathVariable String id) {
         userRoleService.deleteUserRoleById(id);
+    }
+
+    @DeleteMapping
+    public void deleteUserRole(@Valid @RequestBody DeleteUserRoleParam param) {
+        userRoleService.deleteUserRole(param);
     }
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreateProjectPluginParam;
+import com.yqhp.console.model.param.DeleteProjectPluginParam;
 import com.yqhp.console.model.param.UpdateProjectPluginParam;
 import com.yqhp.console.repository.entity.ProjectPlugin;
 import com.yqhp.console.repository.mapper.ProjectPluginMapper;
@@ -69,6 +70,16 @@ public class ProjectPluginServiceImpl
     @Override
     public void deleteProjectPluginById(String id) {
         if (!removeById(id)) {
+            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAIL);
+        }
+    }
+
+    @Override
+    public void deleteProjectPlugin(DeleteProjectPluginParam param) {
+        LambdaQueryWrapper<ProjectPlugin> query = new LambdaQueryWrapper<>();
+        query.eq(ProjectPlugin::getProjectId, param.getProjectId());
+        query.eq(ProjectPlugin::getPluginId, param.getPluginId());
+        if (!remove(query)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAIL);
         }
     }

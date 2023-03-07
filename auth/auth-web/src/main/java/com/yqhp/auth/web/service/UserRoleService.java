@@ -2,6 +2,7 @@ package com.yqhp.auth.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.auth.model.param.CreateUserRoleParam;
+import com.yqhp.auth.model.param.DeleteUserRoleParam;
 import com.yqhp.auth.model.param.UpdateUserRoleParam;
 import com.yqhp.auth.repository.entity.UserRole;
 
@@ -16,6 +17,8 @@ public interface UserRoleService extends IService<UserRole> {
     void updateUserRole(String id, UpdateUserRoleParam param);
 
     void deleteUserRoleById(String id);
+
+    void deleteUserRole(DeleteUserRoleParam param);
 
     UserRole getUserRoleById(String id);
 

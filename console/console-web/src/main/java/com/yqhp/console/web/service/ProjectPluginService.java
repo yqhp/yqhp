@@ -2,6 +2,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.param.CreateProjectPluginParam;
+import com.yqhp.console.model.param.DeleteProjectPluginParam;
 import com.yqhp.console.model.param.UpdateProjectPluginParam;
 import com.yqhp.console.repository.entity.ProjectPlugin;
 
@@ -16,6 +17,8 @@ public interface ProjectPluginService extends IService<ProjectPlugin> {
     void updateProjectPlugin(String id, UpdateProjectPluginParam param);
 
     void deleteProjectPluginById(String id);
+
+    void deleteProjectPlugin(DeleteProjectPluginParam param);
 
     ProjectPlugin getProjectPluginById(String id);
 

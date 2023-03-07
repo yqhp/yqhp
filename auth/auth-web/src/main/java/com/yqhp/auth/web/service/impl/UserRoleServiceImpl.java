@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.auth.model.param.CreateUserRoleParam;
+import com.yqhp.auth.model.param.DeleteUserRoleParam;
 import com.yqhp.auth.model.param.UpdateUserRoleParam;
 import com.yqhp.auth.repository.entity.UserRole;
 import com.yqhp.auth.repository.mapper.UserRoleMapper;
@@ -72,6 +73,16 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     }
 
     @Override
+    public void deleteUserRole(DeleteUserRoleParam param) {
+        LambdaQueryWrapper<UserRole> query = new LambdaQueryWrapper<>();
+        query.eq(UserRole::getUserId, param.getUserId());
+        query.eq(UserRole::getRoleId, param.getRoleId());
+        if (!remove(query)) {
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_ROLE_FAIL);
+        }
+    }
+
+    @Override
     public UserRole getUserRoleById(String id) {
         return Optional.ofNullable(getById(id))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.USER_ROLE_NOT_FOUND));
@@ -91,4 +102,5 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
                 .map(UserRole::getRoleId)
                 .collect(Collectors.toList());
     }
+
 }

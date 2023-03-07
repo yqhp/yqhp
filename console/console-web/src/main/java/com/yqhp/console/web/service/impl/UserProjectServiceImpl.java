@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreateUserProjectParam;
+import com.yqhp.console.model.param.DeleteUserProjectParam;
 import com.yqhp.console.model.param.UpdateUserProjectParam;
 import com.yqhp.console.repository.entity.UserProject;
 import com.yqhp.console.repository.mapper.UserProjectMapper;
@@ -68,6 +69,16 @@ public class UserProjectServiceImpl
     @Override
     public void deleteUserProjectById(String id) {
         if (!removeById(id)) {
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAIL);
+        }
+    }
+
+    @Override
+    public void deleteUserProject(DeleteUserProjectParam param) {
+        LambdaQueryWrapper<UserProject> query = new LambdaQueryWrapper<>();
+        query.eq(UserProject::getUserId, param.getUserId());
+        query.eq(UserProject::getProjectId, param.getProjectId());
+        if (!remove(query)) {
             throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAIL);
         }
     }

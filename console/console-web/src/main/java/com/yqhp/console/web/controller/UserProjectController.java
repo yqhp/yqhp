@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreateUserProjectParam;
+import com.yqhp.console.model.param.DeleteUserProjectParam;
 import com.yqhp.console.model.param.UpdateUserProjectParam;
 import com.yqhp.console.repository.entity.UserProject;
 import com.yqhp.console.web.service.UserProjectService;
@@ -43,5 +44,10 @@ public class UserProjectController {
     @DeleteMapping("/{id}")
     public void deleteUserProjectById(@PathVariable String id) {
         userProjectService.deleteUserProjectById(id);
+    }
+
+    @DeleteMapping
+    public void deleteUserProject(@Valid @RequestBody DeleteUserProjectParam param) {
+        userProjectService.deleteUserProject(param);
     }
 }
