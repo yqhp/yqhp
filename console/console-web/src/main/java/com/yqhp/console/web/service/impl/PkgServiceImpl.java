@@ -164,7 +164,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 }).collect(Collectors.toList())
         );
         try {
-            if (!saveBatch(toUpdatePkgs)) {
+            if (!updateBatchById(toUpdatePkgs)) {
                 throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAIL);
             }
         } catch (DuplicateKeyException e) {

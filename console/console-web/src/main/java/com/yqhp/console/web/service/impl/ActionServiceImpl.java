@@ -129,7 +129,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         );
 
         try {
-            if (!saveBatch(toUpdateActions)) {
+            if (!updateBatchById(toUpdateActions)) {
                 throw new ServiceException(ResponseCodeEnum.UPDATE_ACTION_FAIL);
             }
         } catch (DuplicateKeyException e) {

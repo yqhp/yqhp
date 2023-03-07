@@ -136,7 +136,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
                 }).collect(Collectors.toList())
         );
         try {
-            if (!saveBatch(toUpdateDocs)) {
+            if (!updateBatchById(toUpdateDocs)) {
                 throw new ServiceException(ResponseCodeEnum.UPDATE_DOC_FAIL);
             }
         } catch (DuplicateKeyException e) {
