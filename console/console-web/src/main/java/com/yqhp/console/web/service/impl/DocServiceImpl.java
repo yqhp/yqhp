@@ -127,13 +127,16 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
                         toDoc.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(d -> {
+                    if (d.getId().equals(fromDoc.getId())) {
+                        return null;
+                    }
                     Doc toUpdate = new Doc();
                     toUpdate.setId(d.getId());
                     toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;
-                }).collect(Collectors.toList())
+                }).filter(Objects::nonNull).collect(Collectors.toList())
         );
         try {
             if (!updateBatchById(toUpdateDocs)) {

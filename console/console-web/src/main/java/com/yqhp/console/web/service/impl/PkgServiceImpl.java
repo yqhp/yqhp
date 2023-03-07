@@ -155,13 +155,16 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                         toPkg.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(p -> {
+                    if (p.getId().equals(fromPkg.getId())) {
+                        return null;
+                    }
                     Pkg toUpdate = new Pkg();
                     toUpdate.setId(p.getId());
                     toUpdate.setWeight(moveEvent.isBefore() ? p.getWeight() + 1 : p.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;
-                }).collect(Collectors.toList())
+                }).filter(Objects::nonNull).collect(Collectors.toList())
         );
         try {
             if (!updateBatchById(toUpdatePkgs)) {
