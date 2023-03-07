@@ -95,22 +95,21 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Doc doc = getDocById(moveEvent.getId());
+        Doc doc = getDocById(moveEvent.getFrom());
         if (ResourceFlags.unmovable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
-        if (StringUtils.hasText(moveEvent.getInner())) {
-            doc.setPkgId(moveEvent.getInner());
+        if (moveEvent.isInner()) {
+            doc.setPkgId(moveEvent.getTo());
             update(doc);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        boolean isBefore = StringUtils.hasText(moveEvent.getBefore());
-        Doc toDoc = getDocById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
+        Doc toDoc = getDocById(moveEvent.getTo());
 
         Doc fromDoc = new Doc();
         fromDoc.setId(doc.getId());
@@ -126,11 +125,11 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
                         toDoc.getProjectId(),
                         toDoc.getPkgId(),
                         toDoc.getWeight(),
-                        isBefore
+                        moveEvent.isBefore()
                 ).stream().map(d -> {
                     Doc toUpdate = new Doc();
                     toUpdate.setId(d.getId());
-                    toUpdate.setWeight(isBefore ? d.getWeight() + 1 : d.getWeight() - 1);
+                    toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;

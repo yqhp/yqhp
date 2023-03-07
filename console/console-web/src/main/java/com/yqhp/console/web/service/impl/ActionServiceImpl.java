@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -88,22 +87,21 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Action action = getActionById(moveEvent.getId());
+        Action action = getActionById(moveEvent.getFrom());
         if (ResourceFlags.unmovable(action.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.ACTION_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
-        if (StringUtils.hasText(moveEvent.getInner())) {
-            action.setPkgId(moveEvent.getInner());
+        if (moveEvent.isInner()) {
+            action.setPkgId(moveEvent.getTo());
             update(action);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        boolean isBefore = StringUtils.hasText(moveEvent.getBefore());
-        Action toAction = getActionById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
+        Action toAction = getActionById(moveEvent.getTo());
 
         Action fromAction = new Action();
         fromAction.setId(action.getId());
@@ -119,11 +117,11 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
                         toAction.getProjectId(),
                         toAction.getPkgId(),
                         toAction.getWeight(),
-                        isBefore
+                        moveEvent.isBefore()
                 ).stream().map(a -> {
                     Action toUpdate = new Action();
                     toUpdate.setId(a.getId());
-                    toUpdate.setWeight(isBefore ? a.getWeight() + 1 : a.getWeight() - 1);
+                    toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;

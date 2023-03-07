@@ -29,7 +29,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -123,22 +122,21 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Pkg pkg = getPkgById(moveEvent.getId());
+        Pkg pkg = getPkgById(moveEvent.getFrom());
         if (ResourceFlags.unmovable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
-        if (StringUtils.hasText(moveEvent.getInner())) {
-            pkg.setParentId(moveEvent.getInner());
+        if (moveEvent.isInner()) {
+            pkg.setParentId(moveEvent.getTo());
             update(pkg);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        boolean isBefore = StringUtils.hasText(moveEvent.getBefore());
-        Pkg toPkg = getPkgById(isBefore ? moveEvent.getBefore() : moveEvent.getAfter());
+        Pkg toPkg = getPkgById(moveEvent.getTo());
 
         Pkg fromPkg = new Pkg();
         fromPkg.setId(pkg.getId());
@@ -155,11 +153,11 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                         toPkg.getType(),
                         toPkg.getParentId(),
                         toPkg.getWeight(),
-                        isBefore
+                        moveEvent.isBefore()
                 ).stream().map(p -> {
                     Pkg toUpdate = new Pkg();
                     toUpdate.setId(p.getId());
-                    toUpdate.setWeight(isBefore ? p.getWeight() + 1 : p.getWeight() - 1);
+                    toUpdate.setWeight(moveEvent.isBefore() ? p.getWeight() + 1 : p.getWeight() - 1);
                     toUpdate.setUpdateBy(currUid);
                     toUpdate.setUpdateTime(now);
                     return toUpdate;
