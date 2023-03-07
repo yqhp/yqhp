@@ -183,11 +183,12 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     }
 
     @Override
-    public List<Action> listInPkgIds(Collection<String> pkgIds) {
+    public List<Action> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds) {
         if (CollectionUtils.isEmpty(pkgIds)) {
             return new ArrayList<>();
         }
         LambdaQueryWrapper<Action> query = new LambdaQueryWrapper<>();
+        query.eq(Action::getProjectId, projectId);
         query.in(Action::getPkgId, pkgIds);
         return list(query);
     }

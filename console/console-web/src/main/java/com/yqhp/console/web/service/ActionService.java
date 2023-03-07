@@ -28,7 +28,7 @@ public interface ActionService extends IService<Action> {
 
     ActionX getActionXById(String id, Map<String, ActionX> actionCache, Map<String, Doc> docCache);
 
-    List<Action> listInPkgIds(Collection<String> pkgIds);
+    List<Action> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds);
 
     ActionX toActionX(Action action);
 

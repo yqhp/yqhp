@@ -175,11 +175,12 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listInPkgIds(Collection<String> pkgIds) {
+    public List<Doc> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds) {
         if (CollectionUtils.isEmpty(pkgIds)) {
             return new ArrayList<>();
         }
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
+        query.eq(Doc::getProjectId, projectId);
         query.in(Doc::getPkgId, pkgIds);
         return list(query);
     }

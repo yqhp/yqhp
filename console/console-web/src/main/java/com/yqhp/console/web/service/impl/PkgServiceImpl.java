@@ -87,13 +87,13 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
         if (PkgType.DOC.equals(pkg.getType())) {
             // 检查包下是否有文档
-            List<Doc> docs = docService.listInPkgIds(pkgIds);
+            List<Doc> docs = docService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!docs.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_DOCS_NOT_EMPTY);
             }
         } else if (PkgType.ACTION.equals(pkg.getType())) {
             // 检查包下是否有action
-            List<Action> actions = actionService.listInPkgIds(pkgIds);
+            List<Action> actions = actionService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!actions.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_ACTIONS_NOT_EMPTY);
             }
@@ -207,7 +207,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
             List<String> pkgIds = pkgs.stream().map(Pkg::getId).collect(Collectors.toList());
             pkgIds.add(Const.ROOT_PID);
             if (PkgType.DOC.equals(query.getType())) {
-                List<Doc> docs = docService.listInPkgIds(pkgIds);
+                List<Doc> docs = docService.listByProjectIdAndInPkgIds(query.getProjectId(), pkgIds);
                 List<TreeNode<String>> docNodes = docs.stream().map(doc -> {
                     TreeNode<String> node = new TreeNode<>(doc.getId(), doc.getPkgId(), doc.getName(), doc.getWeight());
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.DOC, doc).toMap());
@@ -215,7 +215,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 }).collect(Collectors.toList());
                 nodes.addAll(docNodes);
             } else if (PkgType.ACTION.equals(query.getType())) {
-                List<Action> actions = actionService.listInPkgIds(pkgIds);
+                List<Action> actions = actionService.listByProjectIdAndInPkgIds(query.getProjectId(), pkgIds);
                 List<TreeNode<String>> actionNodes = actions.stream().map(action -> {
                     TreeNode<String> node = new TreeNode<>(action.getId(), action.getPkgId(), action.getName(), action.getWeight());
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.ACTION, action).toMap());
