@@ -12,7 +12,7 @@ public interface PluginFileService extends IService<PluginFile> {
 
     PluginFile getPluginFileById(String id);
 
-    void deletePluginFile(String id);
+    void deletePluginFileById(String id);
 
     List<PluginFile> listByPluginId(String pluginId);
 

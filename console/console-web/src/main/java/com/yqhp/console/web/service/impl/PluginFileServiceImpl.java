@@ -54,7 +54,7 @@ public class PluginFileServiceImpl
     }
 
     @Override
-    public void deletePluginFile(String id) {
+    public void deletePluginFileById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PLUGIN_FILE_FAIL);
         }
