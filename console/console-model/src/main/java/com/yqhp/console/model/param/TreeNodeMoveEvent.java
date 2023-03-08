@@ -1,4 +1,4 @@
-package com.yqhp.console.model;
+package com.yqhp.console.model.param;
 
 import lombok.Data;
 

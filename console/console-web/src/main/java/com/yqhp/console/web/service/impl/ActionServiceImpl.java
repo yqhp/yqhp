@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.CreateActionParam;
+import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.ActionStatus;
 import com.yqhp.console.repository.jsonfield.ActionX;
 import com.yqhp.console.repository.mapper.ActionMapper;
 import com.yqhp.console.web.common.ResourceFlags;
@@ -37,10 +36,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> implements ActionService {
-
-    private static final List<ActionStatus> AVAILABLE_ACTION_STATUS_LIST = List.of(
-            ActionStatus.RELEASED, ActionStatus.DEPRECATED
-    );
 
     @Autowired
     private Snowflake snowflake;

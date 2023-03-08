@@ -2,6 +2,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.param.CreateActionStepParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdateActionStepParam;
 import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
@@ -19,6 +20,10 @@ public interface ActionStepService extends IService<ActionStep> {
     ActionStep getActionStepById(String id);
 
     void deleteActionStepById(String id);
+
+    List<ActionStep> listByActionId(String actionId);
+
+    void move(TableRowMoveEvent moveEvent);
 
     List<ActionStepX> listActionStepXByActionId(String actionId,
                                                 Map<String, ActionX> actionCache,

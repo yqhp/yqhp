@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreateActionStepParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdateActionStepParam;
 import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
@@ -46,10 +47,8 @@ public class ActionStepServiceImpl
         ActionStep step = param.convertTo();
         step.setId(snowflake.nextIdStr());
 
-        if (param.getWeight() == null) {
-            Integer weight = getMaxWeightByActionIdAndFlag(param.getActionId(), param.getFlag());
-            step.setWeight(weight != null ? weight + 1 : null);
-        }
+        Integer weight = getMaxWeightByActionIdAndFlag(param.getActionId(), param.getFlag());
+        step.setWeight(weight != null ? weight + 1 : null);
 
         String currUid = CurrentUser.id();
         step.setCreateBy(currUid);
@@ -94,19 +93,64 @@ public class ActionStepServiceImpl
     }
 
     @Override
+    public List<ActionStep> listByActionId(String actionId) {
+        Assert.hasText(actionId, "actionId must has text");
+        LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
+        query.eq(ActionStep::getActionId, actionId);
+        return list(query);
+    }
+
+    @Override
+    public void move(TableRowMoveEvent moveEvent) {
+        ActionStep step = getActionStepById(moveEvent.getFrom());
+        ActionStep toStep = getActionStepById(moveEvent.getTo());
+
+        String currUid = CurrentUser.id();
+        LocalDateTime now = LocalDateTime.now();
+
+        ActionStep fromStep = new ActionStep();
+        fromStep.setId(step.getId());
+        fromStep.setWeight(toStep.getWeight());
+        fromStep.setUpdateBy(currUid);
+        fromStep.setUpdateTime(now);
+
+        List<ActionStep> toUpdateSteps = new ArrayList<>();
+        toUpdateSteps.add(fromStep);
+        toUpdateSteps.addAll(
+                listByActionIdAndFlagAndWeightGeOrLe(
+                        toStep.getActionId(),
+                        toStep.getFlag(),
+                        toStep.getWeight(),
+                        moveEvent.isBefore()
+                ).stream().map(s -> {
+                    if (s.getId().equals(fromStep.getId())) {
+                        return null;
+                    }
+                    ActionStep toUpdate = new ActionStep();
+                    toUpdate.setId(s.getId());
+                    toUpdate.setWeight(moveEvent.isBefore() ? s.getWeight() + 1 : s.getWeight() - 1);
+                    toUpdate.setUpdateBy(currUid);
+                    toUpdate.setUpdateTime(now);
+                    return toUpdate;
+                }).filter(Objects::nonNull).collect(Collectors.toList())
+        );
+
+        try {
+            if (!updateBatchById(toUpdateSteps)) {
+                throw new ServiceException(ResponseCodeEnum.UPDATE_ACTION_STEP_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_ACTION_STEP);
+        }
+    }
+
+    @Override
     public List<ActionStepX> listActionStepXByActionId(String actionId,
                                                        Map<String, ActionX> actionCache,
                                                        Map<String, Doc> docCache) {
 
         List<ActionStep> steps = listByActionId(actionId);
         return toActionStepXs(steps, actionCache, docCache);
-    }
-
-    private List<ActionStep> listByActionId(String actionId) {
-        Assert.hasText(actionId, "actionId must has text");
-        LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
-        query.eq(ActionStep::getActionId, actionId);
-        return list(query);
     }
 
     private List<ActionStepX> toActionStepXs(List<ActionStep> steps,
@@ -144,6 +188,18 @@ public class ActionStepServiceImpl
             stepX.setDoc(doc);
         }
         return stepX;
+    }
+
+    private List<ActionStep> listByActionIdAndFlagAndWeightGeOrLe(String actionId, ActionStepFlag flag, Integer weight, boolean ge) {
+        LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
+        query.eq(ActionStep::getActionId, actionId);
+        query.eq(ActionStep::getFlag, flag);
+        if (ge) {
+            query.eq(ActionStep::getWeight, weight);
+        } else {
+            query.le(ActionStep::getWeight, weight);
+        }
+        return list(query);
     }
 
     private List<ActionStep> listByActionIdAndFlag(String actionId, ActionStepFlag flag) {
