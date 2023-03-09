@@ -322,7 +322,7 @@ CREATE TABLE `step_execution_record` (
   `device_task_id` varchar(32) NOT NULL,
   `device_id` varchar(128) NOT NULL,
   `action_id` varchar(128) NOT NULL,
-  `step_id` tinyint(4) NOT NULL,
+  `step_id` varchar(128) NOT NULL,
   `step` json,
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `start_time` bigint(20) NOT NULL DEFAULT '0',
