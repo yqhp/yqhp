@@ -6,8 +6,8 @@ import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.enums.ActionStepErrorHandler;
 import com.yqhp.console.repository.enums.ActionStepFlag;
 import com.yqhp.console.repository.enums.ActionStepType;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -36,23 +36,23 @@ public class ActionExecutor {
         listeners.add(listener);
     }
 
-    public void execQuietly(ActionX action) {
+    public void execQuietly(ActionDTO action) {
         try {
             exec(action);
         } catch (Throwable ignore) {
         }
     }
 
-    public void exec(ActionX action) {
+    public void exec(ActionDTO action) {
         exec(action, true);
     }
 
-    private void exec(ActionX action, boolean isRoot) {
+    private void exec(ActionDTO action, boolean isRoot) {
         if (action == null) return;
 
         try {
             listeners.forEach(listener -> listener.onActionStarted(action, isRoot));
-            Map<ActionStepFlag, List<ActionStepX>> stepsMap = action.getSteps().stream()
+            Map<ActionStepFlag, List<ActionStepDTO>> stepsMap = action.getSteps().stream()
                     .collect(Collectors.groupingBy(ActionStep::getFlag));
             execSteps(action, stepsMap.get(ActionStepFlag.BEFORE), isRoot);
             try {
@@ -67,12 +67,12 @@ public class ActionExecutor {
         }
     }
 
-    private void execSteps(ActionX action, List<ActionStepX> steps, boolean isRoot) {
+    private void execSteps(ActionDTO action, List<ActionStepDTO> steps, boolean isRoot) {
         if (CollectionUtils.isEmpty(steps)) return;
 
         try {
             listeners.forEach(listener -> listener.onStepsStarted(action, steps, isRoot));
-            for (ActionStepX step : steps) {
+            for (ActionStepDTO step : steps) {
                 try {
                     execStep(action, step, isRoot);
                 } catch (Throwable cause) {
@@ -89,7 +89,7 @@ public class ActionExecutor {
         }
     }
 
-    private void execStep(ActionX action, ActionStepX step, boolean isRoot) {
+    private void execStep(ActionDTO action, ActionStepDTO step, boolean isRoot) {
         if (step == null) return;
 
         try {

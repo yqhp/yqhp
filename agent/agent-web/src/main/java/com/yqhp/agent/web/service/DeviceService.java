@@ -4,7 +4,7 @@ import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.file.model.OSSFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,5 +46,5 @@ public interface DeviceService {
 
     List<String> jshellDocs(String token, String input);
 
-    void execAction(String token, ActionX action);
+    void execAction(String token, ActionDTO action);
 }

@@ -12,8 +12,8 @@ import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.ActionStepFlag;
 import com.yqhp.console.repository.enums.ActionStepType;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.mapper.ActionStepMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.ActionService;
@@ -145,39 +145,39 @@ public class ActionStepServiceImpl
     }
 
     @Override
-    public List<ActionStepX> listActionStepXByActionId(String actionId,
-                                                       Map<String, ActionX> actionCache,
-                                                       Map<String, Doc> docCache) {
+    public List<ActionStepDTO> listActionStepDTOByActionId(String actionId,
+                                                           Map<String, ActionDTO> actionCache,
+                                                           Map<String, Doc> docCache) {
 
         List<ActionStep> steps = listByActionId(actionId);
-        return toActionStepXs(steps, actionCache, docCache);
+        return toActionStepDTOs(steps, actionCache, docCache);
     }
 
-    private List<ActionStepX> toActionStepXs(List<ActionStep> steps,
-                                             Map<String, ActionX> actionCache,
-                                             Map<String, Doc> docCache) {
+    private List<ActionStepDTO> toActionStepDTOs(List<ActionStep> steps,
+                                                 Map<String, ActionDTO> actionCache,
+                                                 Map<String, Doc> docCache) {
         if (CollectionUtils.isEmpty(steps)) {
             return new ArrayList<>();
         }
         return steps.stream()
-                .map(step -> toActionStepX(step, actionCache, docCache))
+                .map(step -> toActionStepDTO(step, actionCache, docCache))
                 .collect(Collectors.toList());
     }
 
 
-    private ActionStepX toActionStepX(ActionStep step,
-                                      Map<String, ActionX> actionCache,
-                                      Map<String, Doc> docCache) {
+    private ActionStepDTO toActionStepDTO(ActionStep step,
+                                          Map<String, ActionDTO> actionCache,
+                                          Map<String, Doc> docCache) {
         if (step == null) return null;
-        ActionStepX stepX = new ActionStepX();
-        BeanUtils.copyProperties(step, stepX);
-        stepX.setExecutionId(snowflake.nextIdStr());
+        ActionStepDTO stepDTO = new ActionStepDTO();
+        stepDTO.setExecutionId(snowflake.nextIdStr());
+        BeanUtils.copyProperties(step, stepDTO);
 
-        String idOfType = stepX.getIdOfType();
-        if (ActionStepType.ACTION.equals(stepX.getType())) {
-            ActionX actionX = actionService.getActionXById(idOfType, actionCache, docCache);
-            stepX.setAction(actionX);
-        } else if (ActionStepType.DOC_JSHELL_RUN.equals(stepX.getType())) {
+        String idOfType = stepDTO.getIdOfType();
+        if (ActionStepType.ACTION.equals(stepDTO.getType())) {
+            ActionDTO actionDTO = actionService.getActionDTOById(idOfType, actionCache, docCache);
+            stepDTO.setAction(actionDTO);
+        } else if (ActionStepType.DOC_JSHELL_RUN.equals(stepDTO.getType())) {
             Doc doc;
             if (docCache.containsKey(idOfType)) {
                 doc = docCache.get(idOfType);
@@ -185,9 +185,9 @@ public class ActionStepServiceImpl
                 doc = docService.getById(idOfType);
                 docCache.put(idOfType, doc);
             }
-            stepX.setDoc(doc);
+            stepDTO.setDoc(doc);
         }
-        return stepX;
+        return stepDTO;
     }
 
     private List<ActionStep> listByActionIdAndFlagAndWeightGeOrLe(String actionId, ActionStepFlag flag, Integer weight, boolean ge) {

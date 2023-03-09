@@ -281,7 +281,7 @@ CREATE TABLE `plan_execution_record` (
   `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
   `plan_id` varchar(32) NOT NULL,
-  `plan_name` varchar(128) NOT NULL,
+  `plan` json,
   `plugins` json,
   `docs` json,
   `status` tinyint(4) NOT NULL DEFAULT '0',

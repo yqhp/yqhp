@@ -9,7 +9,7 @@
         <result column="device_id" property="deviceId" />
         <result column="action_id" property="actionId" />
         <result column="step_id" property="stepId" />
-        <result column="step" property="step" typeHandler="com.yqhp.console.repository.typehandler.ActionStepXTypeHandler" />
+        <result column="step" property="step" typeHandler="com.yqhp.console.repository.typehandler.ActionStepDTOTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />

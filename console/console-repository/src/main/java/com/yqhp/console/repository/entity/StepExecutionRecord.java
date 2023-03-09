@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.console.repository.enums.StepExecutionStatus;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.typehandler.ActionStepXTypeHandler;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
+import com.yqhp.console.repository.typehandler.ActionStepDTOTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -37,8 +37,8 @@ public class StepExecutionRecord implements Serializable {
 
     private String stepId;
 
-    @TableField(typeHandler = ActionStepXTypeHandler.class)
-    private ActionStepX step;
+    @TableField(typeHandler = ActionStepDTOTypeHandler.class)
+    private ActionStepDTO step;
 
     private StepExecutionStatus status;
 

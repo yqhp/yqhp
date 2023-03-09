@@ -8,8 +8,8 @@ import lombok.Data;
  * @author jiangyitao
  */
 @Data
-public class ActionStepX extends ActionStep {
+public class ActionStepDTO extends ActionStep {
     private String executionId;
-    private ActionX action;
+    private ActionDTO action;
     private Doc doc;
 }

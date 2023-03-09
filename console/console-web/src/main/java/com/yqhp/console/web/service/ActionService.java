@@ -6,7 +6,7 @@ import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,13 +24,13 @@ public interface ActionService extends IService<Action> {
 
     void deleteActionById(String id);
 
-    Action getActionById(String id);
-
-    ActionX getActionXById(String id, Map<String, ActionX> actionCache, Map<String, Doc> docCache);
-
     List<Action> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds);
 
-    ActionX toActionX(Action action);
+    Action getActionById(String id);
 
-    List<ActionX> listActionXByIds(Collection<String> ids);
+    ActionDTO getActionDTOById(String id, Map<String, ActionDTO> actionCache, Map<String, Doc> docCache);
+
+    ActionDTO toActionDTO(Action action);
+
+    List<ActionDTO> listActionDTOByIds(Collection<String> ids);
 }

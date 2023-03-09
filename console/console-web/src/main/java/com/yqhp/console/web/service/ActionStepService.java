@@ -6,8 +6,8 @@ import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdateActionStepParam;
 import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ public interface ActionStepService extends IService<ActionStep> {
 
     void move(TableRowMoveEvent moveEvent);
 
-    List<ActionStepX> listActionStepXByActionId(String actionId,
-                                                Map<String, ActionX> actionCache,
-                                                Map<String, Doc> docCache);
+    List<ActionStepDTO> listActionStepDTOByActionId(String actionId,
+                                                    Map<String, ActionDTO> actionCache,
+                                                    Map<String, Doc> docCache);
 }

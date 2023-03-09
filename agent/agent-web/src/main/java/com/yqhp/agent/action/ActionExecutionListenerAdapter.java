@@ -1,7 +1,7 @@
 package com.yqhp.agent.action;
 
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 
 import java.util.List;
 
@@ -10,47 +10,47 @@ import java.util.List;
  */
 public class ActionExecutionListenerAdapter implements ActionExecutionListener {
     @Override
-    public void onActionStarted(ActionX action, boolean isRoot) {
+    public void onActionStarted(ActionDTO action, boolean isRoot) {
 
     }
 
     @Override
-    public void onActionSuccessful(ActionX action, boolean isRoot) {
+    public void onActionSuccessful(ActionDTO action, boolean isRoot) {
 
     }
 
     @Override
-    public void onActionFailed(ActionX action, Throwable cause, boolean isRoot) {
+    public void onActionFailed(ActionDTO action, Throwable cause, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepsStarted(ActionX action, List<ActionStepX> steps, boolean isRoot) {
+    public void onStepsStarted(ActionDTO action, List<ActionStepDTO> steps, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepsSuccessful(ActionX action, List<ActionStepX> steps, boolean isRoot) {
+    public void onStepsSuccessful(ActionDTO action, List<ActionStepDTO> steps, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepsFailed(ActionX action, List<ActionStepX> steps, Throwable cause, boolean isRoot) {
+    public void onStepsFailed(ActionDTO action, List<ActionStepDTO> steps, Throwable cause, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepStarted(ActionX action, ActionStepX step, boolean isRoot) {
+    public void onStepStarted(ActionDTO action, ActionStepDTO step, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepSuccessful(ActionX action, ActionStepX step, boolean isRoot) {
+    public void onStepSuccessful(ActionDTO action, ActionStepDTO step, boolean isRoot) {
 
     }
 
     @Override
-    public void onStepFailed(ActionX action, ActionStepX step, Throwable cause, boolean isRoot) {
+    public void onStepFailed(ActionDTO action, ActionStepDTO step, Throwable cause, boolean isRoot) {
 
     }
 }

@@ -9,6 +9,6 @@ import java.util.List;
  * @author jiangyitao
  */
 @Data
-public class ActionX extends Action {
-    private List<ActionStepX> steps;
+public class ActionDTO extends Action {
+    private List<ActionStepDTO> steps;
 }

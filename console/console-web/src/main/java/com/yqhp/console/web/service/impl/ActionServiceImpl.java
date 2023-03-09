@@ -10,7 +10,7 @@ import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateActionParam;
 import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.mapper.ActionMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -160,25 +160,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     }
 
     @Override
-    public Action getActionById(String id) {
-        return Optional.ofNullable(getById(id))
-                .orElseThrow(() -> new ServiceException(ResponseCodeEnum.ACTION_NOT_FOUND));
-    }
-
-    @Override
-    public ActionX getActionXById(String id,
-                                  Map<String, ActionX> actionCache,
-                                  Map<String, Doc> docCache) {
-        if (actionCache.containsKey(id)) {
-            return actionCache.get(id);
-        }
-        Action action = getById(id);
-        ActionX actionX = toActionX(action, actionCache, docCache);
-        actionCache.put(id, actionX);
-        return actionX;
-    }
-
-    @Override
     public List<Action> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds) {
         if (CollectionUtils.isEmpty(pkgIds)) {
             return new ArrayList<>();
@@ -190,31 +171,50 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     }
 
     @Override
-    public ActionX toActionX(Action action) {
-        return toActionX(action, new HashMap<>(), new HashMap<>());
+    public Action getActionById(String id) {
+        return Optional.ofNullable(getById(id))
+                .orElseThrow(() -> new ServiceException(ResponseCodeEnum.ACTION_NOT_FOUND));
     }
 
     @Override
-    public List<ActionX> listActionXByIds(Collection<String> ids) {
+    public ActionDTO getActionDTOById(String id,
+                                      Map<String, ActionDTO> actionCache,
+                                      Map<String, Doc> docCache) {
+        if (actionCache.containsKey(id)) {
+            return actionCache.get(id);
+        }
+        Action action = getById(id);
+        ActionDTO actionDTO = toActionDTO(action, actionCache, docCache);
+        actionCache.put(id, actionDTO);
+        return actionDTO;
+    }
+
+    @Override
+    public ActionDTO toActionDTO(Action action) {
+        return toActionDTO(action, new HashMap<>(), new HashMap<>());
+    }
+
+    @Override
+    public List<ActionDTO> listActionDTOByIds(Collection<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return new ArrayList<>();
         }
-        Map<String, ActionX> actionCache = new HashMap<>();
+        Map<String, ActionDTO> actionCache = new HashMap<>();
         Map<String, Doc> docCache = new HashMap<>();
         return ids.stream()
-                .map(id -> getActionXById(id, actionCache, docCache))
+                .map(id -> getActionDTOById(id, actionCache, docCache))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private ActionX toActionX(Action action,
-                              Map<String, ActionX> actionCache,
-                              Map<String, Doc> docCache) {
+    private ActionDTO toActionDTO(Action action,
+                                  Map<String, ActionDTO> actionCache,
+                                  Map<String, Doc> docCache) {
         if (action == null) return null;
-        ActionX actionX = new ActionX();
-        BeanUtils.copyProperties(action, actionX);
-        actionX.setSteps(actionStepService.listActionStepXByActionId(actionX.getId(), actionCache, docCache));
-        return actionX;
+        ActionDTO actionDTO = new ActionDTO();
+        BeanUtils.copyProperties(action, actionDTO);
+        actionDTO.setSteps(actionStepService.listActionStepDTOByActionId(actionDTO.getId(), actionCache, docCache));
+        return actionDTO;
     }
 
     private List<Action> listByProjectIdAndPkgIdAndWeightGeOrLe(String projectId, String pkgId, Integer weight, boolean ge) {

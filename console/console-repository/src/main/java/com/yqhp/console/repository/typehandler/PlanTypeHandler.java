@@ -2,14 +2,14 @@ package com.yqhp.console.repository.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.common.mybatis.typehandler.JacksonTypeHandler;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
+import com.yqhp.console.repository.entity.Plan;
 
 /**
  * @author jiangyitao
  */
-public class ActionStepXTypeHandler extends JacksonTypeHandler<ActionStepX> {
+public class PlanTypeHandler extends JacksonTypeHandler<Plan> {
     @Override
-    protected TypeReference<ActionStepX> typeReference() {
+    protected TypeReference<Plan> typeReference() {
         return new TypeReference<>() {
         };
     }

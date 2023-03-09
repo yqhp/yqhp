@@ -9,12 +9,11 @@ import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.kafka.message.DeviceTaskMessage;
 import com.yqhp.common.kafka.message.StepExecutionRecordMessage;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
-import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.enums.StepExecutionStatus;
-import com.yqhp.console.repository.jsonfield.ActionStepX;
-import com.yqhp.console.repository.jsonfield.ActionX;
+import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.rpc.DeviceTaskRpc;
 import lombok.Setter;
@@ -59,12 +58,10 @@ public class DeviceTaskJob {
             ReceivedDeviceTasks received = deviceTaskRpc.receive(driver.getDeviceId());
             if (received == null) return;
 
-            String token = deviceService.lockDevice(
-                    driver.getDeviceId(),
-                    received.getPlanExecutionRecord().getPlanName()
-            );
+            String planName = received.getPlanExecutionRecord().getPlan().getName();
+            String token = deviceService.lockDevice(driver.getDeviceId(), planName);
             try {
-                // 加载插件jar包
+                // 加载插件
                 List<PluginDTO> plugins = received.getPlanExecutionRecord().getPlugins();
                 for (PluginDTO plugin : plugins) {
                     List<File> files = pluginService.getFiles(plugin);
@@ -75,11 +72,11 @@ public class DeviceTaskJob {
                 for (Doc doc : docs) {
                     driver.jshellEval(doc.getContent());
                 }
-                // 执行deviceTasks
+                // 执行任务
                 ActionExecutor executor = new ActionExecutor(driver);
                 ExecutionListener listener = new ExecutionListener(driver.getDeviceId());
                 executor.addListener(listener);
-                for (DeviceTask task : received.getDeviceTasks()) {
+                for (ReceivedDeviceTasks.Task task : received.getTasks()) {
                     listener.setTaskId(task.getId());
                     executor.execQuietly(task.getAction());
                 }
@@ -102,7 +99,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onActionStarted(ActionX action, boolean isRoot) {
+        public void onActionStarted(ActionDTO action, boolean isRoot) {
             if (isRoot) {
                 DeviceTaskMessage message = new DeviceTaskMessage();
                 message.setId(taskId);
@@ -114,7 +111,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onActionSuccessful(ActionX action, boolean isRoot) {
+        public void onActionSuccessful(ActionDTO action, boolean isRoot) {
             if (isRoot) {
                 DeviceTaskMessage message = new DeviceTaskMessage();
                 message.setId(taskId);
@@ -126,7 +123,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onActionFailed(ActionX action, Throwable cause, boolean isRoot) {
+        public void onActionFailed(ActionDTO action, Throwable cause, boolean isRoot) {
             if (isRoot) {
                 DeviceTaskMessage message = new DeviceTaskMessage();
                 message.setId(taskId);
@@ -138,7 +135,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onStepStarted(ActionX action, ActionStepX step, boolean isRoot) {
+        public void onStepStarted(ActionDTO action, ActionStepDTO step, boolean isRoot) {
             if (isRoot) {
                 StepExecutionRecordMessage message = new StepExecutionRecordMessage();
                 message.setId(step.getExecutionId());
@@ -150,7 +147,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onStepSuccessful(ActionX action, ActionStepX step, boolean isRoot) {
+        public void onStepSuccessful(ActionDTO action, ActionStepDTO step, boolean isRoot) {
             if (isRoot) {
                 StepExecutionRecordMessage message = new StepExecutionRecordMessage();
                 message.setId(step.getExecutionId());
@@ -162,7 +159,7 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onStepFailed(ActionX action, ActionStepX step, Throwable cause, boolean isRoot) {
+        public void onStepFailed(ActionDTO action, ActionStepDTO step, Throwable cause, boolean isRoot) {
             if (isRoot) {
                 StepExecutionRecordMessage message = new StepExecutionRecordMessage();
                 message.setId(step.getExecutionId());
