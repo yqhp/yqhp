@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +28,9 @@ public class PlanDeviceServiceImpl
     @Override
     public void createPlanDevice(CreatePlanDeviceParam param) {
         PlanDevice planDevice = param.convertTo();
+
+        Integer weight = getMaxWeightByPlanId(param.getPlanId());
+        planDevice.setWeight(weight != null ? weight + 1 : null);
 
         String currUid = CurrentUser.id();
         planDevice.setCreateBy(currUid);
@@ -77,5 +81,19 @@ public class PlanDeviceServiceImpl
         return list(query).stream()
                 .map(PlanDevice::getDeviceId)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PlanDevice> listByPlanId(String planId) {
+        Assert.hasText(planId, "planId must has text");
+        LambdaQueryWrapper<PlanDevice> query = new LambdaQueryWrapper<>();
+        query.eq(PlanDevice::getPlanId, planId);
+        return list(query);
+    }
+
+    private Integer getMaxWeightByPlanId(String planId) {
+        return listByPlanId(planId).stream()
+                .max(Comparator.comparing(PlanDevice::getWeight))
+                .map(PlanDevice::getWeight).orElse(null);
     }
 }

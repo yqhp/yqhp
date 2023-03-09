@@ -29,10 +29,8 @@ public class PlanActionServiceImpl
     public void createPlanAction(CreatePlanActionParam param) {
         PlanAction planAction = param.convertTo();
 
-        if (param.getWeight() == null) {
-            Integer weight = getMaxWeightByPlanId(param.getPlanId());
-            planAction.setWeight(weight != null ? weight + 1 : null);
-        }
+        Integer weight = getMaxWeightByPlanId(param.getPlanId());
+        planAction.setWeight(weight != null ? weight + 1 : null);
 
         String currUid = CurrentUser.id();
         planAction.setCreateBy(currUid);
@@ -86,7 +84,8 @@ public class PlanActionServiceImpl
                 .collect(Collectors.toList());
     }
 
-    private List<PlanAction> listByPlanId(String planId) {
+    @Override
+    public List<PlanAction> listByPlanId(String planId) {
         Assert.hasText(planId, "planId must has text");
         LambdaQueryWrapper<PlanAction> query = new LambdaQueryWrapper<>();
         query.eq(PlanAction::getPlanId, planId);

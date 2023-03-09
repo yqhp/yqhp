@@ -7,6 +7,7 @@
         <id column="id" property="id" />
         <result column="plan_id" property="planId" />
         <result column="device_id" property="deviceId" />
+        <result column="weight" property="weight" />
         <result column="enabled" property="enabled" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />

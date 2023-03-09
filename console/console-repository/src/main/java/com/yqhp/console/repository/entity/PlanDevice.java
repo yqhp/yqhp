@@ -27,6 +27,8 @@ public class PlanDevice implements Serializable {
 
     private String deviceId;
 
+    private Integer weight;
+
     private Integer enabled;
 
     /**

@@ -18,4 +18,6 @@ public interface PlanActionService extends IService<PlanAction> {
     PlanAction getPlanActionById(String id);
 
     List<String> listEnabledActionIdByPlanId(String planId);
+
+    List<PlanAction> listByPlanId(String planId);
 }

@@ -13,6 +13,5 @@ import javax.validation.constraints.NotBlank;
 public class UpdatePlanActionParam implements InputConverter<PlanAction> {
     @NotBlank(message = "actionId不能为空")
     private String actionId;
-    private Integer weight;
     private Integer enabled;
 }
