@@ -75,7 +75,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
 
         for (DefaultPkg defaultPkg : DefaultPkg.values()) {
-            // 创建默认包
+            // 创建默认目录
             CreatePkgParam createPkgParam = new CreatePkgParam();
             createPkgParam.setProjectId(project.getId());
             createPkgParam.setType(PkgType.DOC);

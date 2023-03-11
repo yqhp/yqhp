@@ -85,13 +85,13 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         pkgIds.add(pkgId);
 
         if (PkgType.DOC.equals(pkg.getType())) {
-            // 检查包下是否有文档
+            // 检查目录下是否有文档
             List<Doc> docs = docService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!docs.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_DOCS_NOT_EMPTY);
             }
         } else if (PkgType.ACTION.equals(pkg.getType())) {
-            // 检查包下是否有action
+            // 检查目录下是否有action
             List<Action> actions = actionService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!actions.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_ACTIONS_NOT_EMPTY);

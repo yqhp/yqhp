@@ -172,7 +172,7 @@ CREATE TABLE `pkg` (
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_project_id_type_parent_id_name` (`project_id`,`type`,`parent_id`,`name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='包';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='目录';
 
 CREATE TABLE `doc` (
   `id` varchar(32) NOT NULL,
