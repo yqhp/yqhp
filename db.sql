@@ -171,8 +171,7 @@ CREATE TABLE `pkg` (
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_project_id_type_parent_id_name` (`project_id`,`type`,`parent_id`,`name`) USING BTREE,
-  UNIQUE KEY `uk_project_id_type_parent_id_weight` (`project_id`,`type`,`parent_id`,`weight`) USING BTREE
+  UNIQUE KEY `uk_project_id_type_parent_id_name` (`project_id`,`type`,`parent_id`,`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='包';
 
 CREATE TABLE `doc` (
@@ -192,7 +191,6 @@ CREATE TABLE `doc` (
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_project_id_pkg_id_name` (`project_id`,`pkg_id`,`name`) USING BTREE,
-  UNIQUE KEY `uk_project_id_pkg_id_weight` (`project_id`,`pkg_id`,`weight`) USING BTREE,
   KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文档';
 
@@ -211,7 +209,6 @@ CREATE TABLE `action` (
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_project_id_pkg_id_name` (`project_id`,`pkg_id`,`name`) USING BTREE,
-  UNIQUE KEY `uk_project_id_pkg_id_weight` (`project_id`,`pkg_id`,`weight`) USING BTREE,
   KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -232,7 +229,7 @@ CREATE TABLE `action_step` (
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_action_id_flag_weight` (`action_id`, `flag`, `weight`) USING BTREE
+    KEY `idx_action_id` (`action_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `plan` (
@@ -260,8 +257,7 @@ CREATE TABLE `plan_device` (
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_device_id` (`plan_id`, `device_id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_weight` (`plan_id`, `weight`) USING BTREE
+    UNIQUE KEY `uk_plan_id_device_id` (`plan_id`, `device_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `plan_action` (
@@ -275,8 +271,7 @@ CREATE TABLE `plan_action` (
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_action_id` (`plan_id`, `action_id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_weight` (`plan_id`, `weight`) USING BTREE
+    UNIQUE KEY `uk_plan_id_action_id` (`plan_id`, `action_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `plan_execution_record` (
