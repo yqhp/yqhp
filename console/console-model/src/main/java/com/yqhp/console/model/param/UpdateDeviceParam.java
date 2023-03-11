@@ -20,7 +20,7 @@ public class UpdateDeviceParam implements InputConverter<Device> {
     private String model;
     @Size(max = 128, message = "CPU长度不能超过{max}")
     private String cpu;
-    private Float memSize;
+    private Long memSize;
     @Size(max = 512, message = "图片url长度不能超过{max}")
     private String imgUrl;
     @Size(max = 16, message = "系统版本长度不能超过{max}")

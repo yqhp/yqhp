@@ -78,7 +78,7 @@ CREATE TABLE `device` (
   `brand` varchar(128) NOT NULL DEFAULT '' COMMENT '品牌',
   `model` varchar(128) NOT NULL DEFAULT '' COMMENT '型号',
   `cpu` varchar(128) NOT NULL DEFAULT '',
-  `mem_size` float (5,1) NOT NULL DEFAULT '-1.0' COMMENT '内存(GB)',
+  `mem_size` bigint (20) NOT NULL DEFAULT '-1' COMMENT '内存(kB)',
   `img_url` varchar(512) NOT NULL DEFAULT '',
   `system_version` varchar(16) NOT NULL DEFAULT '' COMMENT '系统版本',
   `screen_width` int(11) NOT NULL DEFAULT '-1' COMMENT '屏幕宽',

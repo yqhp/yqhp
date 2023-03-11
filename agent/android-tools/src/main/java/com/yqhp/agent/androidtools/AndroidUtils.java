@@ -93,13 +93,13 @@ public class AndroidUtils {
     /**
      * 获取内存大小
      */
-    public static Double getMemSizeGB(IDevice iDevice) {
+    public static Long getMemSizeKB(IDevice iDevice) {
         String memInfo = executeShellCommand(iDevice, "cat /proc/meminfo |grep MemTotal"); // MemTotal:        1959700 kB
         try {
             String kB = StringUtils.splitByWholeSeparator(memInfo, null)[1];
-            return Integer.parseInt(kB) / (1024.0 * 1024);
+            return Long.valueOf(kB);
         } catch (Exception e) {
-            log.warn("get memSizeGB err, memInfo={}", memInfo, e);
+            log.warn("get memSize err, memInfo={}", memInfo, e);
             return null;
         }
     }

@@ -60,7 +60,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setBrand(AndroidUtils.getBrand(iDevice));
         deviceInfo.setManufacturer(AndroidUtils.getManufacturer(iDevice));
-        deviceInfo.setMemSize(AndroidUtils.getMemSizeGB(iDevice));
+        deviceInfo.setMemSize(AndroidUtils.getMemSizeKB(iDevice));
         deviceInfo.setModel(AndroidUtils.getModel(iDevice));
         deviceInfo.setSystemVersion(AndroidUtils.getSystemVersion(iDevice));
 

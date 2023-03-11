@@ -16,9 +16,9 @@ public class DeviceInfo {
      */
     private String manufacturer;
     /**
-     * 内存 GB
+     * 内存 kB
      */
-    private Double memSize;
+    private Long memSize;
     /**
      * 型号
      */

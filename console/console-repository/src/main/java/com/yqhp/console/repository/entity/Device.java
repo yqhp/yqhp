@@ -55,9 +55,9 @@ public class Device implements Serializable {
     private String cpu;
 
     /**
-     * 内存(GB)
+     * 内存(kB)
      */
-    private Float memSize;
+    private Long memSize;
 
     private String imgUrl;
 
