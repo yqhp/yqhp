@@ -35,7 +35,6 @@ public enum ResponseCodeEnum implements ResponseCode {
     DOC_UNMOVABLE(1706, "无法移动的Doc"),
     DOC_UNRENAMABLE(1707, "无法重命名的Doc"),
     DOC_UNUPDATABLE(1709, "无法更新的Doc"),
-    AVAILABLE_DOC_CONTENT_MUST_HAS_TEXT(1711, "可用的Doc内容不能为空"),
 
     SAVE_VIEW_RESOURCE_FAIL(2100, "保存视图资源失败，请稍后重试"),
     DEL_VIEW_RESOURCE_FAIL(2101, "删除视图资源失败，请稍后重试"),

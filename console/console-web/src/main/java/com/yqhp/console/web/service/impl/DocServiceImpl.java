@@ -9,7 +9,6 @@ import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.DocStatus;
 import com.yqhp.console.repository.enums.DocType;
 import com.yqhp.console.repository.mapper.DocMapper;
 import com.yqhp.console.web.common.ResourceFlags;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -36,20 +34,11 @@ import java.util.stream.Collectors;
 public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         implements DocService {
 
-    private static final List<DocStatus> AVAILABLE_DOC_STATUS_LIST = List.of(
-            DocStatus.RELEASED, DocStatus.DEPRECATED
-    );
-
     @Autowired
     private Snowflake snowflake;
 
     @Override
     public Doc createDoc(CreateDocParam createDocParam) {
-        if (AVAILABLE_DOC_STATUS_LIST.contains(createDocParam.getStatus())
-                && !StringUtils.hasText(createDocParam.getContent())) {
-            throw new ServiceException(ResponseCodeEnum.AVAILABLE_DOC_CONTENT_MUST_HAS_TEXT);
-        }
-
         Doc doc = createDocParam.convertTo();
         doc.setId(snowflake.nextIdStr());
 
@@ -72,12 +61,6 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
     @Override
     public Doc updateDoc(String id, UpdateDocParam updateDocParam) {
-        if (updateDocParam.getContent() != null
-                && AVAILABLE_DOC_STATUS_LIST.contains(updateDocParam.getStatus())
-                && !StringUtils.hasText(updateDocParam.getContent())) {
-            throw new ServiceException(ResponseCodeEnum.AVAILABLE_DOC_CONTENT_MUST_HAS_TEXT);
-        }
-
         Doc doc = getDocById(id);
         if (ResourceFlags.unupdatable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNUPDATABLE);
