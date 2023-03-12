@@ -9,6 +9,7 @@ import com.yqhp.console.repository.entity.StepExecutionRecord;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.enums.StepExecutionStatus;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.mapper.DeviceTaskMapper;
 import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.PlanExecutionRecordService;
@@ -107,7 +108,11 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
             ActionDTO action = new ActionDTO();
             BeanUtils.copyProperties(task.getAction(), action);
             action.setSteps(recordsMap.get(task.getId()).stream()
-                    .map(StepExecutionRecord::getStep)
+                    .map(record -> {
+                        ActionStepDTO step = record.getStep();
+                        step.setExecutionId(record.getId());
+                        return step;
+                    })
                     .collect(Collectors.toList())
             );
             rTask.setAction(action);

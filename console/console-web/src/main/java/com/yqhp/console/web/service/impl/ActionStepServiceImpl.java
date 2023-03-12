@@ -170,7 +170,6 @@ public class ActionStepServiceImpl
                                           Map<String, Doc> docCache) {
         if (step == null) return null;
         ActionStepDTO stepDTO = new ActionStepDTO();
-        stepDTO.setExecutionId(snowflake.nextIdStr());
         BeanUtils.copyProperties(step, stepDTO);
 
         String idOfType = stepDTO.getIdOfType();

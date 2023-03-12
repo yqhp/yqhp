@@ -137,7 +137,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                 task.setPlanExecutionRecordId(planExecutionRecord.getId());
                 task.setDeviceId(deviceId);
                 task.setActionId(action.getId());
-                task.setAction(action); // 保留提交执行时的action
+                task.setAction(action); // 保留提交执行时的action, todo fix 保存的action写入了steps冗余的内容
                 task.setStatus(DeviceTaskStatus.TODO);
                 task.setCreateBy(createBy);
                 task.setCreateTime(now);
@@ -164,7 +164,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         }
         return action.getSteps().stream().map(step -> {
             StepExecutionRecord record = new StepExecutionRecord();
-            record.setId(step.getExecutionId());
+            record.setId(snowflake.nextIdStr());
             record.setDeviceTaskId(task.getId());
             record.setDeviceId(task.getDeviceId());
             record.setActionId(action.getId());
