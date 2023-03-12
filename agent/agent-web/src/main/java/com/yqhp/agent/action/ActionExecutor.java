@@ -4,7 +4,7 @@ import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.enums.ActionStepErrorHandler;
-import com.yqhp.console.repository.enums.ActionStepFlag;
+import com.yqhp.console.repository.enums.ActionStepKind;
 import com.yqhp.console.repository.enums.ActionStepType;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStepDTO;
@@ -52,13 +52,13 @@ public class ActionExecutor {
 
         try {
             listeners.forEach(listener -> listener.onActionStarted(action, isRoot));
-            Map<ActionStepFlag, List<ActionStepDTO>> stepsMap = action.getSteps().stream()
-                    .collect(Collectors.groupingBy(ActionStep::getFlag));
-            execSteps(action, stepsMap.get(ActionStepFlag.BEFORE), isRoot);
+            Map<ActionStepKind, List<ActionStepDTO>> stepsMap = action.getSteps().stream()
+                    .collect(Collectors.groupingBy(ActionStep::getKind));
+            execSteps(action, stepsMap.get(ActionStepKind.BEFORE), isRoot);
             try {
-                execSteps(action, stepsMap.get(ActionStepFlag.NORMAL), isRoot);
+                execSteps(action, stepsMap.get(ActionStepKind.NORMAL), isRoot);
             } finally {
-                execSteps(action, stepsMap.get(ActionStepFlag.AFTER), isRoot);
+                execSteps(action, stepsMap.get(ActionStepKind.AFTER), isRoot);
             }
             listeners.forEach(listener -> listener.onActionSuccessful(action, isRoot));
         } catch (Throwable cause) {
@@ -98,11 +98,11 @@ public class ActionExecutor {
                 exec(step.getAction(), false);
             } else {
                 String content = null;
-                if (ActionStepType.DOC_JSHELL_RUN.equals(step.getType())) {
+                if (ActionStepType.DOC_JSH_EXECUTABLE.equals(step.getType())) {
                     if (step.getDoc() != null) {
                         content = step.getDoc().getContent();
                     }
-                } else if (ActionStepType.JSHELL.equals(step.getType())) {
+                } else if (ActionStepType.JSH.equals(step.getType())) {
                     content = step.getContent();
                 }
                 List<JShellEvalResult> results = driver.jshellEval(content);

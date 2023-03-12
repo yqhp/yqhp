@@ -9,7 +9,7 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum ActionStepFlag implements BaseEnum<Integer> {
+public enum ActionStepKind implements BaseEnum<Integer> {
 
     BEFORE(1),
     NORMAL(2),
@@ -20,7 +20,7 @@ public enum ActionStepFlag implements BaseEnum<Integer> {
     @JsonValue
     private final Integer value;
 
-    ActionStepFlag(Integer value) {
+    ActionStepKind(Integer value) {
         this.value = value;
     }
 }

@@ -5,7 +5,7 @@ import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.DocType;
+import com.yqhp.console.repository.enums.DocKind;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,5 +26,5 @@ public interface DocService extends IService<Doc> {
 
     List<Doc> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds);
 
-    List<Doc> listByProjectIdAndType(String projectId, DocType type);
+    List<Doc> listByProjectIdAndKind(String projectId, DocKind type);
 }

@@ -2,7 +2,7 @@ package com.yqhp.console.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.yqhp.console.repository.enums.ActionStepErrorHandler;
-import com.yqhp.console.repository.enums.ActionStepFlag;
+import com.yqhp.console.repository.enums.ActionStepKind;
 import com.yqhp.console.repository.enums.ActionStepType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,7 +30,7 @@ public class ActionStep implements Serializable {
 
     private String actionId;
 
-    private ActionStepFlag flag;
+    private ActionStepKind kind;
 
     private Integer weight;
 

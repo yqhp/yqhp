@@ -9,7 +9,7 @@ import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.DocType;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.mapper.DocMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -171,13 +171,13 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listByProjectIdAndType(String projectId, DocType type) {
+    public List<Doc> listByProjectIdAndKind(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
-        Assert.notNull(type, "docType cannot be null");
+        Assert.notNull(kind, "kind cannot be null");
 
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
         query.eq(Doc::getProjectId, projectId);
-        query.eq(Doc::getType, type);
+        query.eq(Doc::getKind, kind);
         return list(query);
     }
 

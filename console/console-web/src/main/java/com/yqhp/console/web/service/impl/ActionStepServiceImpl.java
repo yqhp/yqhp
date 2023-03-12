@@ -10,7 +10,7 @@ import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdateActionStepParam;
 import com.yqhp.console.repository.entity.ActionStep;
 import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.ActionStepFlag;
+import com.yqhp.console.repository.enums.ActionStepKind;
 import com.yqhp.console.repository.enums.ActionStepType;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStepDTO;
@@ -47,7 +47,7 @@ public class ActionStepServiceImpl
         ActionStep step = param.convertTo();
         step.setId(snowflake.nextIdStr());
 
-        Integer weight = getMaxWeightByActionIdAndFlag(param.getActionId(), param.getFlag());
+        Integer weight = getMaxWeightByActionIdAndKind(param.getActionId(), param.getKind());
         step.setWeight(weight != null ? weight + 1 : null);
 
         String currUid = CurrentUser.id();
@@ -117,9 +117,9 @@ public class ActionStepServiceImpl
         List<ActionStep> toUpdateSteps = new ArrayList<>();
         toUpdateSteps.add(fromStep);
         toUpdateSteps.addAll(
-                listByActionIdAndFlagAndWeightGeOrLe(
+                listByActionIdAndKindAndWeightGeOrLe(
                         toStep.getActionId(),
-                        toStep.getFlag(),
+                        toStep.getKind(),
                         toStep.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(s -> {
@@ -177,7 +177,7 @@ public class ActionStepServiceImpl
         if (ActionStepType.ACTION.equals(stepDTO.getType())) {
             ActionDTO actionDTO = actionService.getActionDTOById(idOfType, actionCache, docCache);
             stepDTO.setAction(actionDTO);
-        } else if (ActionStepType.DOC_JSHELL_RUN.equals(stepDTO.getType())) {
+        } else if (ActionStepType.DOC_JSH_EXECUTABLE.equals(stepDTO.getType())) {
             Doc doc;
             if (docCache.containsKey(idOfType)) {
                 doc = docCache.get(idOfType);
@@ -190,10 +190,10 @@ public class ActionStepServiceImpl
         return stepDTO;
     }
 
-    private List<ActionStep> listByActionIdAndFlagAndWeightGeOrLe(String actionId, ActionStepFlag flag, Integer weight, boolean ge) {
+    private List<ActionStep> listByActionIdAndKindAndWeightGeOrLe(String actionId, ActionStepKind kind, Integer weight, boolean ge) {
         LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
         query.eq(ActionStep::getActionId, actionId);
-        query.eq(ActionStep::getFlag, flag);
+        query.eq(ActionStep::getKind, kind);
         if (ge) {
             query.eq(ActionStep::getWeight, weight);
         } else {
@@ -202,17 +202,17 @@ public class ActionStepServiceImpl
         return list(query);
     }
 
-    private List<ActionStep> listByActionIdAndFlag(String actionId, ActionStepFlag flag) {
+    private List<ActionStep> listByActionIdAndKind(String actionId, ActionStepKind kind) {
         Assert.hasText(actionId, "actionId must has text");
-        Assert.notNull(flag, "flag cannot be null");
+        Assert.notNull(kind, "kind cannot be null");
         LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
         query.eq(ActionStep::getActionId, actionId);
-        query.eq(ActionStep::getFlag, flag);
+        query.eq(ActionStep::getKind, kind);
         return list(query);
     }
 
-    private Integer getMaxWeightByActionIdAndFlag(String actionId, ActionStepFlag flag) {
-        return listByActionIdAndFlag(actionId, flag).stream()
+    private Integer getMaxWeightByActionIdAndKind(String actionId, ActionStepKind kind) {
+        return listByActionIdAndKind(actionId, kind).stream()
                 .max(Comparator.comparing(ActionStep::getWeight))
                 .map(ActionStep::getWeight).orElse(null);
     }

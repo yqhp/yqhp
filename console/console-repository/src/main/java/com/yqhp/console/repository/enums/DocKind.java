@@ -9,17 +9,17 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum DocType implements BaseEnum<Integer> {
+public enum DocKind implements BaseEnum<Integer> {
 
-    JSH_DEFINE(1),
-    JSH_RUN(2),
+    JSH_DECLARATION(1),
+    JSH_EXECUTABLE(2),
     ;
 
     @EnumValue
     @JsonValue
     private final Integer value;
 
-    DocType(Integer value) {
+    DocKind(Integer value) {
         this.value = value;
     }
 }

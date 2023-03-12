@@ -17,8 +17,8 @@ import com.yqhp.console.model.param.UpdateProjectParam;
 import com.yqhp.console.model.param.query.ProjectPageQuery;
 import com.yqhp.console.repository.entity.Pkg;
 import com.yqhp.console.repository.entity.Project;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.DocStatus;
-import com.yqhp.console.repository.enums.DocType;
 import com.yqhp.console.repository.enums.PkgType;
 import com.yqhp.console.repository.mapper.ProjectMapper;
 import com.yqhp.console.web.common.ResourceFlags;
@@ -88,13 +88,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 CreateDocParam createDocParam = new CreateDocParam();
                 createDocParam.setProjectId(project.getId());
                 createDocParam.setPkgId(pkg.getId());
-                createDocParam.setType(DocType.JSH_DEFINE);
-                createDocParam.setName("全局变量");
+                createDocParam.setKind(DocKind.JSH_DECLARATION);
+                createDocParam.setName("G");
                 createDocParam.setStatus(DocStatus.RELEASED);
                 createDocParam.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
 
                 FieldSpec field1 = FieldSpec.builder(String.class, "PROJECT_ID")
-                        .addJavadoc("项目ID")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         .initializer("$S", project.getId())
                         .build();
