@@ -194,7 +194,7 @@ public class ActionStepServiceImpl
         query.eq(ActionStep::getActionId, actionId);
         query.eq(ActionStep::getKind, kind);
         if (ge) {
-            query.eq(ActionStep::getWeight, weight);
+            query.ge(ActionStep::getWeight, weight);
         } else {
             query.le(ActionStep::getWeight, weight);
         }
