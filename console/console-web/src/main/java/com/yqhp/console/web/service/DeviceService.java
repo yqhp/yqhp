@@ -15,11 +15,11 @@ public interface DeviceService extends IService<Device> {
 
     IPage<DeviceVO> pageBy(DevicePageQuery query);
 
-    Device updateDevice(String deviceId, UpdateDeviceParam updateDeviceParam);
+    Device updateDevice(String id, UpdateDeviceParam updateDeviceParam);
 
-    Device getDeviceById(String deviceId);
+    Device getDeviceById(String id);
 
-    void deleteDeviceById(String deviceId);
+    void deleteDeviceById(String id);
 
     void saveIfAbsent(ZkDevice zkDevice);
 }

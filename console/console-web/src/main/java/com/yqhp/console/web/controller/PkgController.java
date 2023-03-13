@@ -34,14 +34,14 @@ public class PkgController {
         pkgService.createPkg(createPkgParam);
     }
 
-    @DeleteMapping("/{pkgId}")
-    public void deletePkgById(@PathVariable String pkgId) {
-        pkgService.deletePkgById(pkgId);
+    @DeleteMapping("/{id}")
+    public void deletePkgById(@PathVariable String id) {
+        pkgService.deletePkgById(id);
     }
 
     @PutMapping("/{pkgId}")
-    public void updatePkg(@PathVariable String pkgId, @Valid @RequestBody UpdatePkgParam updatePkgParam) {
-        pkgService.updatePkg(pkgId, updatePkgParam);
+    public void updatePkg(@PathVariable String id, @Valid @RequestBody UpdatePkgParam updatePkgParam) {
+        pkgService.updatePkg(id, updatePkgParam);
     }
 
     @PutMapping("/move")

@@ -27,20 +27,20 @@ public class DeviceController {
         return deviceService.pageBy(query);
     }
 
-    @GetMapping("/{deviceId}")
-    public Device getDeviceById(@PathVariable String deviceId) {
-        return deviceService.getDeviceById(deviceId);
+    @GetMapping("/{id}")
+    public Device getDeviceById(@PathVariable String id) {
+        return deviceService.getDeviceById(id);
     }
 
     @PreAuthorize("hasAuthority('admin')")
-    @PutMapping("/{deviceId}")
-    public void updateDevice(@PathVariable String deviceId, @Valid @RequestBody UpdateDeviceParam updateDeviceParam) {
-        deviceService.updateDevice(deviceId, updateDeviceParam);
+    @PutMapping("/{id}")
+    public void updateDevice(@PathVariable String id, @Valid @RequestBody UpdateDeviceParam updateDeviceParam) {
+        deviceService.updateDevice(id, updateDeviceParam);
     }
 
     @PreAuthorize("hasAuthority('admin')")
-    @DeleteMapping("/{deviceId}")
-    public void deleteDeviceById(@PathVariable String deviceId) {
-        deviceService.deleteDeviceById(deviceId);
+    @DeleteMapping("/{id}")
+    public void deleteDeviceById(@PathVariable String id) {
+        deviceService.deleteDeviceById(id);
     }
 }

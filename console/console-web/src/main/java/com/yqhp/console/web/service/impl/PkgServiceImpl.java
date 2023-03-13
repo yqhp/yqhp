@@ -72,8 +72,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public void deletePkgById(String pkgId) {
-        Pkg pkg = getPkgById(pkgId);
+    public void deletePkgById(String id) {
+        Pkg pkg = getPkgById(id);
         if (ResourceFlags.undeletable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNDELETABLE);
         }
@@ -81,8 +81,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         List<Pkg> pkgs = listByProjectIdAndType(pkg.getProjectId(), pkg.getType());
 
         // 子孙后代 + 自己
-        Set<String> pkgIds = getDescendant(pkgId, pkgs);
-        pkgIds.add(pkgId);
+        Set<String> pkgIds = getDescendant(id, pkgs);
+        pkgIds.add(id);
 
         if (PkgType.DOC.equals(pkg.getType())) {
             // 检查目录下是否有文档
@@ -104,8 +104,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public Pkg updatePkg(String pkgId, UpdatePkgParam updatePkgParam) {
-        Pkg pkg = getPkgById(pkgId);
+    public Pkg updatePkg(String id, UpdatePkgParam updatePkgParam) {
+        Pkg pkg = getPkgById(id);
         if (ResourceFlags.unupdatable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNUPDATABLE);
         }
@@ -116,7 +116,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
         updatePkgParam.update(pkg);
         update(pkg);
-        return getById(pkgId);
+        return getById(id);
     }
 
     @Override
@@ -189,8 +189,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public Pkg getPkgById(String pkgId) {
-        return Optional.ofNullable(getById(pkgId))
+    public Pkg getPkgById(String id) {
+        return Optional.ofNullable(getById(id))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.PKG_NOT_FOUND));
     }
 
@@ -232,7 +232,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     /**
      * 获取后代id
      */
-    private Set<String> getDescendant(String pkgId, List<Pkg> pkgs) {
+    private Set<String> getDescendant(String id, List<Pkg> pkgs) {
         Set<String> descendant = new HashSet<>();
         if (CollectionUtils.isEmpty(pkgs)) {
             return descendant;
@@ -249,7 +249,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
             String parentId = pkg.getParentId();
             while (!Const.ROOT_PID.equals(parentId)) {
-                if (pkgId.equals(parentId)) {
+                if (id.equals(parentId)) {
                     descendant.add(pkg.getId());
                     break;
                 }

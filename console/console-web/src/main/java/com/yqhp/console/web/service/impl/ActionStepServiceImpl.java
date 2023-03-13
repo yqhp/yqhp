@@ -25,6 +25,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -165,15 +166,20 @@ public class ActionStepServiceImpl
                 .collect(Collectors.toList());
     }
 
-
     private ActionStepDTO toActionStepDTO(ActionStep step,
                                           Map<String, ActionDTO> actionCache,
                                           Map<String, Doc> docCache) {
         if (step == null) return null;
         ActionStepDTO stepDTO = new ActionStepDTO();
         BeanUtils.copyProperties(step, stepDTO);
+        if (ActionStepType.JSH.equals(stepDTO.getType())) {
+            return stepDTO;
+        }
 
         String idOfType = stepDTO.getIdOfType();
+        if (!StringUtils.hasText(idOfType)) {
+            return stepDTO;
+        }
         if (ActionStepType.ACTION.equals(stepDTO.getType())) {
             ActionDTO actionDTO = actionService.getActionDTOById(idOfType, actionCache, docCache);
             stepDTO.setAction(actionDTO);

@@ -84,8 +84,8 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public Device updateDevice(String deviceId, UpdateDeviceParam updateDeviceParam) {
-        Device device = getDeviceById(deviceId);
+    public Device updateDevice(String id, UpdateDeviceParam updateDeviceParam) {
+        Device device = getDeviceById(id);
         updateDeviceParam.update(device);
         device.setUpdateBy(CurrentUser.id());
         device.setUpdateTime(LocalDateTime.now());
@@ -94,18 +94,18 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             throw new ServiceException(ResponseCodeEnum.UPDATE_DEVICE_FAIL);
         }
 
-        return getById(deviceId);
+        return getById(id);
     }
 
     @Override
-    public Device getDeviceById(String deviceId) {
-        return Optional.ofNullable(getById(deviceId))
+    public Device getDeviceById(String id) {
+        return Optional.ofNullable(getById(id))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.DEVICE_NOT_FOUND));
     }
 
     @Override
-    public void deleteDeviceById(String deviceId) {
-        if (!removeById(deviceId)) {
+    public void deleteDeviceById(String id) {
+        if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_DEVICE_FAIL);
         }
     }

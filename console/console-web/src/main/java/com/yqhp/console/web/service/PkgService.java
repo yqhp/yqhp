@@ -16,13 +16,13 @@ import java.util.List;
 public interface PkgService extends IService<Pkg> {
     Pkg createPkg(CreatePkgParam createPkgParam);
 
-    void deletePkgById(String pkgId);
+    void deletePkgById(String id);
 
-    Pkg updatePkg(String pkgId, UpdatePkgParam updatePkgParam);
+    Pkg updatePkg(String id, UpdatePkgParam updatePkgParam);
 
     void move(TreeNodeMoveEvent moveEvent);
 
-    Pkg getPkgById(String pkgId);
+    Pkg getPkgById(String id);
 
     List<Tree<String>> treeBy(PkgTreeQuery query);
 }
