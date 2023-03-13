@@ -122,26 +122,26 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Pkg pkg = getPkgById(moveEvent.getFrom());
-        if (ResourceFlags.unmovable(pkg.getFlags())) {
+        Pkg from = getPkgById(moveEvent.getFrom());
+        if (ResourceFlags.unmovable(from.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
         if (moveEvent.isInner()) {
-            pkg.setParentId(moveEvent.getTo());
-            update(pkg);
+            from.setParentId(moveEvent.getTo());
+            update(from);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        Pkg toPkg = getPkgById(moveEvent.getTo());
+        Pkg to = getPkgById(moveEvent.getTo());
 
         Pkg fromPkg = new Pkg();
-        fromPkg.setId(pkg.getId());
-        fromPkg.setParentId(toPkg.getParentId());
-        fromPkg.setWeight(toPkg.getWeight());
+        fromPkg.setId(from.getId());
+        fromPkg.setParentId(to.getParentId());
+        fromPkg.setWeight(to.getWeight());
         fromPkg.setUpdateBy(currUid);
         fromPkg.setUpdateTime(now);
 
@@ -149,10 +149,10 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         toUpdatePkgs.add(fromPkg);
         toUpdatePkgs.addAll(
                 listByProjectIdAndTypeAndParentIdAndWeightGeOrLe(
-                        toPkg.getProjectId(),
-                        toPkg.getType(),
-                        toPkg.getParentId(),
-                        toPkg.getWeight(),
+                        to.getProjectId(),
+                        to.getType(),
+                        to.getParentId(),
+                        to.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(p -> {
                     if (p.getId().equals(fromPkg.getId())) {

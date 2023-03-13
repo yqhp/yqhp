@@ -104,15 +104,15 @@ public class ActionStepServiceImpl
 
     @Override
     public void move(TableRowMoveEvent moveEvent) {
-        ActionStep step = getActionStepById(moveEvent.getFrom());
-        ActionStep toStep = getActionStepById(moveEvent.getTo());
+        ActionStep from = getActionStepById(moveEvent.getFrom());
+        ActionStep to = getActionStepById(moveEvent.getTo());
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
 
         ActionStep fromStep = new ActionStep();
-        fromStep.setId(step.getId());
-        fromStep.setWeight(toStep.getWeight());
+        fromStep.setId(from.getId());
+        fromStep.setWeight(to.getWeight());
         fromStep.setUpdateBy(currUid);
         fromStep.setUpdateTime(now);
 
@@ -120,9 +120,9 @@ public class ActionStepServiceImpl
         toUpdateSteps.add(fromStep);
         toUpdateSteps.addAll(
                 listByActionIdAndKindAndWeightGeOrLe(
-                        toStep.getActionId(),
-                        toStep.getKind(),
-                        toStep.getWeight(),
+                        to.getActionId(),
+                        to.getKind(),
+                        to.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(s -> {
                     if (s.getId().equals(fromStep.getId())) {

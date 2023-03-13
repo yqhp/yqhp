@@ -82,26 +82,26 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Action action = getActionById(moveEvent.getFrom());
-        if (ResourceFlags.unmovable(action.getFlags())) {
+        Action from = getActionById(moveEvent.getFrom());
+        if (ResourceFlags.unmovable(from.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.ACTION_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
         if (moveEvent.isInner()) {
-            action.setPkgId(moveEvent.getTo());
-            update(action);
+            from.setPkgId(moveEvent.getTo());
+            update(from);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        Action toAction = getActionById(moveEvent.getTo());
+        Action to = getActionById(moveEvent.getTo());
 
         Action fromAction = new Action();
-        fromAction.setId(action.getId());
-        fromAction.setPkgId(toAction.getPkgId());
-        fromAction.setWeight(toAction.getWeight());
+        fromAction.setId(from.getId());
+        fromAction.setPkgId(to.getPkgId());
+        fromAction.setWeight(to.getWeight());
         fromAction.setUpdateBy(currUid);
         fromAction.setUpdateTime(now);
 
@@ -109,9 +109,9 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         toUpdateActions.add(fromAction);
         toUpdateActions.addAll(
                 listByProjectIdAndPkgIdAndWeightGeOrLe(
-                        toAction.getProjectId(),
-                        toAction.getPkgId(),
-                        toAction.getWeight(),
+                        to.getProjectId(),
+                        to.getPkgId(),
+                        to.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(a -> {
                     if (a.getId().equals(fromAction.getId())) {

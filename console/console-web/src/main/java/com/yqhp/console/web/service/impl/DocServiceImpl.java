@@ -78,26 +78,26 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
-        Doc doc = getDocById(moveEvent.getFrom());
-        if (ResourceFlags.unmovable(doc.getFlags())) {
+        Doc from = getDocById(moveEvent.getFrom());
+        if (ResourceFlags.unmovable(from.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNMOVABLE);
         }
 
         // 移动到某个文件夹内
         if (moveEvent.isInner()) {
-            doc.setPkgId(moveEvent.getTo());
-            update(doc);
+            from.setPkgId(moveEvent.getTo());
+            update(from);
             return;
         }
 
         String currUid = CurrentUser.id();
         LocalDateTime now = LocalDateTime.now();
-        Doc toDoc = getDocById(moveEvent.getTo());
+        Doc to = getDocById(moveEvent.getTo());
 
         Doc fromDoc = new Doc();
-        fromDoc.setId(doc.getId());
-        fromDoc.setPkgId(toDoc.getPkgId());
-        fromDoc.setWeight(toDoc.getWeight());
+        fromDoc.setId(from.getId());
+        fromDoc.setPkgId(to.getPkgId());
+        fromDoc.setWeight(to.getWeight());
         fromDoc.setUpdateBy(currUid);
         fromDoc.setUpdateTime(now);
 
@@ -105,9 +105,9 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         toUpdateDocs.add(fromDoc);
         toUpdateDocs.addAll(
                 listByProjectIdAndPkgIdAndWeightGeOrLe(
-                        toDoc.getProjectId(),
-                        toDoc.getPkgId(),
-                        toDoc.getWeight(),
+                        to.getProjectId(),
+                        to.getPkgId(),
+                        to.getWeight(),
                         moveEvent.isBefore()
                 ).stream().map(d -> {
                     if (d.getId().equals(fromDoc.getId())) {
