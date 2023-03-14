@@ -7,6 +7,8 @@ import com.yqhp.console.model.param.UpdatePlanParam;
 import com.yqhp.console.model.param.query.PlanPageQuery;
 import com.yqhp.console.repository.entity.Plan;
 
+import java.util.List;
+
 /**
  * @author jiangyitao
  */
@@ -20,6 +22,8 @@ public interface PlanService extends IService<Plan> {
     void deletePlanById(String id);
 
     Plan getPlanById(String id);
+
+    List<Plan> listByProjectId(String projectId);
 
     void exec(String id, String submitBy);
 }

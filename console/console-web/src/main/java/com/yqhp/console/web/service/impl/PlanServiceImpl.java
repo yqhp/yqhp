@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -116,6 +117,14 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     public Plan getPlanById(String id) {
         return Optional.ofNullable(getById(id))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.PLAN_NOT_FOUND));
+    }
+
+    @Override
+    public List<Plan> listByProjectId(String projectId) {
+        Assert.hasText(projectId, "projectId must has text");
+        LambdaQueryWrapper<Plan> query = new LambdaQueryWrapper<>();
+        query.eq(Plan::getProjectId, projectId);
+        return list(query);
     }
 
     @Transactional
