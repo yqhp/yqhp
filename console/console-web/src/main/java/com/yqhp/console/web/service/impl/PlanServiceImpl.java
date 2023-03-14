@@ -1,11 +1,15 @@
 package com.yqhp.console.web.service.impl;
 
 import cn.hutool.core.lang.Snowflake;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanParam;
 import com.yqhp.console.model.param.UpdatePlanParam;
+import com.yqhp.console.model.param.query.PlanPageQuery;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
@@ -50,6 +54,20 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     private PlanDeviceService planDeviceService;
     @Autowired
     private PlanActionService planActionService;
+
+    @Override
+    public IPage<Plan> pageBy(PlanPageQuery query) {
+        LambdaQueryWrapper<Plan> q = new LambdaQueryWrapper<>();
+        q.eq(Plan::getProjectId, query.getProjectId());
+        String keyword = query.getKeyword();
+        q.and(StringUtils.hasText(keyword), c -> c
+                .like(Plan::getId, keyword)
+                .or()
+                .like(Plan::getName, keyword)
+        );
+        q.orderByDesc(Plan::getId);
+        return page(new Page<>(query.getPageNumb(), query.getPageSize()), q);
+    }
 
     @Override
     public Plan createPlan(CreatePlanParam param) {
