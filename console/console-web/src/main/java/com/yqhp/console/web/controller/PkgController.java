@@ -39,7 +39,7 @@ public class PkgController {
         pkgService.deletePkgById(id);
     }
 
-    @PutMapping("/{pkgId}")
+    @PutMapping("/{id}")
     public void updatePkg(@PathVariable String id, @Valid @RequestBody UpdatePkgParam updatePkgParam) {
         pkgService.updatePkg(id, updatePkgParam);
     }
