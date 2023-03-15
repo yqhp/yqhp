@@ -183,7 +183,7 @@ public class ActionStepServiceImpl
         if (ActionStepType.ACTION.equals(stepDTO.getType())) {
             ActionDTO actionDTO = actionService.getActionDTOById(idOfType, actionCache, docCache);
             stepDTO.setAction(actionDTO);
-        } else if (ActionStepType.DOC_JSH_EXECUTABLE.equals(stepDTO.getType())) {
+        } else if (ActionStepType.DOC.equals(stepDTO.getType())) {
             Doc doc;
             if (docCache.containsKey(idOfType)) {
                 doc = docCache.get(idOfType);

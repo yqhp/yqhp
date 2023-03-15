@@ -98,7 +98,7 @@ public class ActionExecutor {
                 exec(step.getAction(), false);
             } else {
                 String content = null;
-                if (ActionStepType.DOC_JSH_EXECUTABLE.equals(step.getType())) {
+                if (ActionStepType.DOC.equals(step.getType())) {
                     if (step.getDoc() != null) {
                         content = step.getDoc().getContent();
                     }
