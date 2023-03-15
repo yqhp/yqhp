@@ -94,7 +94,7 @@ public class ActionStepServiceImpl
     }
 
     @Override
-    public List<ActionStep> listByActionId(String actionId) {
+    public List<ActionStep> listSortedByActionId(String actionId) {
         Assert.hasText(actionId, "actionId must has text");
         LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
         query.eq(ActionStep::getActionId, actionId);
@@ -147,11 +147,11 @@ public class ActionStepServiceImpl
     }
 
     @Override
-    public List<ActionStepDTO> listActionStepDTOByActionId(String actionId,
-                                                           Map<String, ActionDTO> actionCache,
-                                                           Map<String, Doc> docCache) {
+    public List<ActionStepDTO> listSortedActionStepDTOByActionId(String actionId,
+                                                                 Map<String, ActionDTO> actionCache,
+                                                                 Map<String, Doc> docCache) {
 
-        List<ActionStep> steps = listByActionId(actionId);
+        List<ActionStep> steps = listSortedByActionId(actionId);
         return toActionStepDTOs(steps, actionCache, docCache);
     }
 

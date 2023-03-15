@@ -13,9 +13,9 @@ import com.yqhp.console.web.service.PlanActionService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,27 +74,29 @@ public class PlanActionServiceImpl
     }
 
     @Override
-    public List<String> listEnabledActionIdByPlanId(String planId) {
+    public List<String> listEnabledAndSortedActionIdByPlanId(String planId) {
         Assert.hasText(planId, "planId must has text");
         LambdaQueryWrapper<PlanAction> query = new LambdaQueryWrapper<>();
         query.eq(PlanAction::getPlanId, planId)
-                .eq(PlanAction::getEnabled, 1);
+                .eq(PlanAction::getEnabled, 1)
+                .orderByAsc(PlanAction::getWeight);
         return list(query).stream()
                 .map(PlanAction::getActionId)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<PlanAction> listByPlanId(String planId) {
+    public List<PlanAction> listSortedByPlanId(String planId) {
         Assert.hasText(planId, "planId must has text");
         LambdaQueryWrapper<PlanAction> query = new LambdaQueryWrapper<>();
         query.eq(PlanAction::getPlanId, planId);
+        query.orderByAsc(PlanAction::getWeight);
         return list(query);
     }
 
     private Integer getMaxWeightByPlanId(String planId) {
-        return listByPlanId(planId).stream()
-                .max(Comparator.comparing(PlanAction::getWeight))
-                .map(PlanAction::getWeight).orElse(null);
+        List<PlanAction> planActions = listSortedByPlanId(planId);
+        PlanAction maxWeightPlanAction = CollectionUtils.lastElement(planActions);
+        return maxWeightPlanAction == null ? null : maxWeightPlanAction.getWeight();
     }
 }

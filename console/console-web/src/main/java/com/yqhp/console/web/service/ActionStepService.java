@@ -21,11 +21,11 @@ public interface ActionStepService extends IService<ActionStep> {
 
     void deleteActionStepById(String id);
 
-    List<ActionStep> listByActionId(String actionId);
+    List<ActionStep> listSortedByActionId(String actionId);
 
     void move(TableRowMoveEvent moveEvent);
 
-    List<ActionStepDTO> listActionStepDTOByActionId(String actionId,
-                                                    Map<String, ActionDTO> actionCache,
-                                                    Map<String, Doc> docCache);
+    List<ActionStepDTO> listSortedActionStepDTOByActionId(String actionId,
+                                                          Map<String, ActionDTO> actionCache,
+                                                          Map<String, Doc> docCache);
 }

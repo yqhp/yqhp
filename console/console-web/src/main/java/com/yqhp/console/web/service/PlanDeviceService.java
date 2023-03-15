@@ -17,7 +17,7 @@ public interface PlanDeviceService extends IService<PlanDevice> {
 
     PlanDevice getPlanDeviceById(String id);
 
-    List<String> listEnabledPlanDeviceIdByPlanId(String planId);
+    List<String> listEnabledAndSortedPlanDeviceIdByPlanId(String planId);
 
-    List<PlanDevice> listByPlanId(String planId);
+    List<PlanDevice> listSortedByPlanId(String planId);
 }

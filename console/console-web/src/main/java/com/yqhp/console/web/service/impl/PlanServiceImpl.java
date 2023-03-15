@@ -211,28 +211,28 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
      */
     private Map<String, List<ActionDTO>> assignDeviceTasks(Plan plan) {
         HashMap<String, List<ActionDTO>> result = new HashMap<>();
-        List<String> enabledDeviceIds = planDeviceService.listEnabledPlanDeviceIdByPlanId(plan.getId());
-        if (CollectionUtils.isEmpty(enabledDeviceIds)) {
+        List<String> deviceIds = planDeviceService.listEnabledAndSortedPlanDeviceIdByPlanId(plan.getId());
+        if (CollectionUtils.isEmpty(deviceIds)) {
             return result;
         }
-        List<String> enabledActionIds = planActionService.listEnabledActionIdByPlanId(plan.getId());
-        List<ActionDTO> actionDTOs = actionService.listActionDTOByIds(enabledActionIds);
+        List<String> actionIds = planActionService.listEnabledAndSortedActionIdByPlanId(plan.getId());
+        List<ActionDTO> actionDTOs = actionService.listActionDTOByIds(actionIds);
         if (CollectionUtils.isEmpty(actionDTOs)) {
             return result;
         }
 
         if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {
             // 兼容模式，执行同一份
-            for (String deviceId : enabledDeviceIds) {
+            for (String deviceId : deviceIds) {
                 result.put(deviceId, actionDTOs);
             }
         } else if (RunMode.EFFICIENT.equals(plan.getRunMode())) {
             // 高效模式，平均分
             int i = 0;
-            int deviceCount = enabledDeviceIds.size();
+            int deviceCount = deviceIds.size();
             for (ActionDTO action : actionDTOs) {
                 if (i == deviceCount) i = 0;
-                String deviceId = enabledDeviceIds.get(i);
+                String deviceId = deviceIds.get(i);
                 List<ActionDTO> actions = result.computeIfAbsent(deviceId, k -> new ArrayList<>());
                 actions.add(action);
                 i++;

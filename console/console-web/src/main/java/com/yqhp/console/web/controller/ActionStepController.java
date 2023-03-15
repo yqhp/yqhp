@@ -42,7 +42,7 @@ public class ActionStepController {
     }
 
     @GetMapping
-    public List<ActionStep> listByActionId(@NotBlank(message = "actionId不能为空") String actionId) {
-        return actionStepService.listByActionId(actionId);
+    public List<ActionStep> listSortedByActionId(@NotBlank(message = "actionId不能为空") String actionId) {
+        return actionStepService.listSortedByActionId(actionId);
     }
 }

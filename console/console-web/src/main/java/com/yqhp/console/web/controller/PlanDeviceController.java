@@ -36,7 +36,7 @@ public class PlanDeviceController {
     }
 
     @GetMapping
-    public List<PlanDevice> listByPlanId(@NotBlank(message = "planId不能为空") String planId) {
-        return planDeviceService.listByPlanId(planId);
+    public List<PlanDevice> listSortedByPlanId(@NotBlank(message = "planId不能为空") String planId) {
+        return planDeviceService.listSortedByPlanId(planId);
     }
 }

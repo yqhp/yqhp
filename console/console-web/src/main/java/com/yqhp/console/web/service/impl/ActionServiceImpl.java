@@ -213,7 +213,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         if (action == null) return null;
         ActionDTO actionDTO = new ActionDTO();
         BeanUtils.copyProperties(action, actionDTO);
-        actionDTO.setSteps(actionStepService.listActionStepDTOByActionId(actionDTO.getId(), actionCache, docCache));
+        actionDTO.setSteps(actionStepService.listSortedActionStepDTOByActionId(actionDTO.getId(), actionCache, docCache));
         return actionDTO;
     }
 
