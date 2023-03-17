@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreatePlanActionParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanActionParam;
 import com.yqhp.console.repository.entity.PlanAction;
 import com.yqhp.console.web.service.PlanActionService;
@@ -33,6 +34,11 @@ public class PlanActionController {
     @PutMapping("/{id}")
     public void updatePlanAction(@PathVariable String id, @Valid @RequestBody UpdatePlanActionParam param) {
         planActionService.updatePlanAction(id, param);
+    }
+
+    @PutMapping("/move")
+    public void move(@Valid @RequestBody TableRowMoveEvent moveEvent) {
+        planActionService.move(moveEvent);
     }
 
     @GetMapping

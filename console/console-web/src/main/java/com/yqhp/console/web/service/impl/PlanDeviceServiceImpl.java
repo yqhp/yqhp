@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.repository.entity.PlanDevice;
 import com.yqhp.console.repository.mapper.PlanDeviceMapper;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,6 +92,58 @@ public class PlanDeviceServiceImpl
         LambdaQueryWrapper<PlanDevice> query = new LambdaQueryWrapper<>();
         query.eq(PlanDevice::getPlanId, planId);
         query.orderByAsc(PlanDevice::getWeight);
+        return list(query);
+    }
+
+    @Override
+    public void move(TableRowMoveEvent moveEvent) {
+        PlanDevice from = getPlanDeviceById(moveEvent.getFrom());
+        PlanDevice to = getPlanDeviceById(moveEvent.getTo());
+
+        String currUid = CurrentUser.id();
+        LocalDateTime now = LocalDateTime.now();
+
+        PlanDevice fromPlanDevice = new PlanDevice();
+        fromPlanDevice.setId(from.getId());
+        fromPlanDevice.setWeight(to.getWeight());
+        fromPlanDevice.setUpdateBy(currUid);
+        fromPlanDevice.setUpdateTime(now);
+
+        List<PlanDevice> toUpdatePlanDevices = new ArrayList<>();
+        toUpdatePlanDevices.add(fromPlanDevice);
+        toUpdatePlanDevices.addAll(
+                listByPlanIdAndWeightGeOrLe(
+                        to.getPlanId(),
+                        to.getWeight(),
+                        moveEvent.isBefore()
+                ).stream()
+                        .filter(d -> !d.getId().equals(fromPlanDevice.getId()))
+                        .map(d -> {
+                            PlanDevice toUpdate = new PlanDevice();
+                            toUpdate.setId(d.getId());
+                            toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
+                            toUpdate.setUpdateBy(currUid);
+                            toUpdate.setUpdateTime(now);
+                            return toUpdate;
+                        }).collect(Collectors.toList())
+        );
+        try {
+            if (!updateBatchById(toUpdatePlanDevices)) {
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DEVICE_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
+        }
+    }
+
+    private List<PlanDevice> listByPlanIdAndWeightGeOrLe(String planId, Integer weight, boolean ge) {
+        LambdaQueryWrapper<PlanDevice> query = new LambdaQueryWrapper<>();
+        query.eq(PlanDevice::getPlanId, planId);
+        if (ge) {
+            query.ge(PlanDevice::getWeight, weight);
+        } else {
+            query.le(PlanDevice::getWeight, weight);
+        }
         return list(query);
     }
 

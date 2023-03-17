@@ -2,6 +2,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.repository.entity.PlanDevice;
 
@@ -20,4 +21,6 @@ public interface PlanDeviceService extends IService<PlanDevice> {
     List<String> listEnabledAndSortedPlanDeviceIdByPlanId(String planId);
 
     List<PlanDevice> listSortedByPlanId(String planId);
+
+    void move(TableRowMoveEvent moveEvent);
 }

@@ -124,17 +124,16 @@ public class ActionStepServiceImpl
                         to.getKind(),
                         to.getWeight(),
                         moveEvent.isBefore()
-                ).stream().map(s -> {
-                    if (s.getId().equals(fromStep.getId())) {
-                        return null;
-                    }
-                    ActionStep toUpdate = new ActionStep();
-                    toUpdate.setId(s.getId());
-                    toUpdate.setWeight(moveEvent.isBefore() ? s.getWeight() + 1 : s.getWeight() - 1);
-                    toUpdate.setUpdateBy(currUid);
-                    toUpdate.setUpdateTime(now);
-                    return toUpdate;
-                }).filter(Objects::nonNull).collect(Collectors.toList())
+                ).stream()
+                        .filter(s -> !s.getId().equals(fromStep.getId()))
+                        .map(s -> {
+                            ActionStep toUpdate = new ActionStep();
+                            toUpdate.setId(s.getId());
+                            toUpdate.setWeight(moveEvent.isBefore() ? s.getWeight() + 1 : s.getWeight() - 1);
+                            toUpdate.setUpdateBy(currUid);
+                            toUpdate.setUpdateTime(now);
+                            return toUpdate;
+                        }).collect(Collectors.toList())
         );
 
         try {

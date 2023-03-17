@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanActionParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanActionParam;
 import com.yqhp.console.repository.entity.PlanAction;
 import com.yqhp.console.repository.mapper.PlanActionMapper;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,6 +93,59 @@ public class PlanActionServiceImpl
         LambdaQueryWrapper<PlanAction> query = new LambdaQueryWrapper<>();
         query.eq(PlanAction::getPlanId, planId);
         query.orderByAsc(PlanAction::getWeight);
+        return list(query);
+    }
+
+    @Override
+    public void move(TableRowMoveEvent moveEvent) {
+        PlanAction from = getPlanActionById(moveEvent.getFrom());
+        PlanAction to = getPlanActionById(moveEvent.getTo());
+
+        String currUid = CurrentUser.id();
+        LocalDateTime now = LocalDateTime.now();
+
+        PlanAction fromPlanAction = new PlanAction();
+        fromPlanAction.setId(from.getId());
+        fromPlanAction.setWeight(to.getWeight());
+        fromPlanAction.setUpdateBy(currUid);
+        fromPlanAction.setUpdateTime(now);
+
+        List<PlanAction> toUpdatePlanActions = new ArrayList<>();
+        toUpdatePlanActions.add(fromPlanAction);
+        toUpdatePlanActions.addAll(
+                listByPlanIdAndWeightGeOrLe(
+                        to.getPlanId(),
+                        to.getWeight(),
+                        moveEvent.isBefore()
+                ).stream()
+                        .filter(a -> !a.getId().equals(fromPlanAction.getId()))
+                        .map(a -> {
+                            PlanAction toUpdate = new PlanAction();
+                            toUpdate.setId(a.getId());
+                            toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
+                            toUpdate.setUpdateBy(currUid);
+                            toUpdate.setUpdateTime(now);
+                            return toUpdate;
+                        }).collect(Collectors.toList())
+
+        );
+        try {
+            if (!updateBatchById(toUpdatePlanActions)) {
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_ACTION_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_ACTION);
+        }
+    }
+
+    private List<PlanAction> listByPlanIdAndWeightGeOrLe(String planId, Integer weight, boolean ge) {
+        LambdaQueryWrapper<PlanAction> query = new LambdaQueryWrapper<>();
+        query.eq(PlanAction::getPlanId, planId);
+        if (ge) {
+            query.ge(PlanAction::getWeight, weight);
+        } else {
+            query.le(PlanAction::getWeight, weight);
+        }
         return list(query);
     }
 

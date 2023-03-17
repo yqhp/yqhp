@@ -113,17 +113,16 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
                         to.getPkgId(),
                         to.getWeight(),
                         moveEvent.isBefore()
-                ).stream().map(a -> {
-                    if (a.getId().equals(fromAction.getId())) {
-                        return null;
-                    }
-                    Action toUpdate = new Action();
-                    toUpdate.setId(a.getId());
-                    toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
-                    toUpdate.setUpdateBy(currUid);
-                    toUpdate.setUpdateTime(now);
-                    return toUpdate;
-                }).filter(Objects::nonNull).collect(Collectors.toList())
+                ).stream()
+                        .filter(a -> !a.getId().equals(fromAction.getId()))
+                        .map(a -> {
+                            Action toUpdate = new Action();
+                            toUpdate.setId(a.getId());
+                            toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
+                            toUpdate.setUpdateBy(currUid);
+                            toUpdate.setUpdateTime(now);
+                            return toUpdate;
+                        }).collect(Collectors.toList())
         );
 
         try {

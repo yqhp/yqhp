@@ -1,6 +1,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.repository.entity.PlanDevice;
 import com.yqhp.console.web.service.PlanDeviceService;
@@ -33,6 +34,11 @@ public class PlanDeviceController {
     @PutMapping("/{id}")
     public void updatePlanDevice(@PathVariable String id, @Valid @RequestBody UpdatePlanDeviceParam param) {
         planDeviceService.updatePlanDevice(id, param);
+    }
+
+    @PutMapping("/move")
+    public void move(@Valid @RequestBody TableRowMoveEvent moveEvent) {
+        planDeviceService.move(moveEvent);
     }
 
     @GetMapping
