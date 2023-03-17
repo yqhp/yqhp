@@ -37,6 +37,11 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     public static final String APPLE_BRAND = "Apple";
 
     @Override
+    public List<DeviceVO> getAll() {
+        return list().stream().map(this::toDeviceVO).collect(Collectors.toList());
+    }
+
+    @Override
     public IPage<DeviceVO> pageBy(DevicePageQuery query) {
         LambdaQueryWrapper<Device> q = new LambdaQueryWrapper<>();
         q.eq(query.getPlatform() != null, Device::getPlatform, query.getPlatform());

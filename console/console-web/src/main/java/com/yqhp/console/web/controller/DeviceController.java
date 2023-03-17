@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author jiangyitao
@@ -21,6 +22,11 @@ public class DeviceController {
 
     @Autowired
     private DeviceService deviceService;
+
+    @GetMapping("/all")
+    public List<DeviceVO> getAll() {
+        return deviceService.getAll();
+    }
 
     @GetMapping("/page")
     public IPage<DeviceVO> pageBy(DevicePageQuery query) {

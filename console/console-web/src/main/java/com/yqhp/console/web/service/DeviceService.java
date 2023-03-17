@@ -8,10 +8,14 @@ import com.yqhp.console.model.param.query.DevicePageQuery;
 import com.yqhp.console.model.vo.DeviceVO;
 import com.yqhp.console.repository.entity.Device;
 
+import java.util.List;
+
 /**
  * @author jiangyitao
  */
 public interface DeviceService extends IService<Device> {
+
+    List<DeviceVO> getAll();
 
     IPage<DeviceVO> pageBy(DevicePageQuery query);
 
@@ -22,4 +26,5 @@ public interface DeviceService extends IService<Device> {
     void deleteDeviceById(String id);
 
     void saveIfAbsent(ZkDevice zkDevice);
+
 }
