@@ -22,8 +22,13 @@ public class PlanDeviceController {
     private PlanDeviceService planDeviceService;
 
     @PostMapping
-    public void createPlanDevice(@Valid @RequestBody CreatePlanDeviceParam param) {
-        planDeviceService.createPlanDevice(param);
+    public PlanDevice createPlanDevice(@Valid @RequestBody CreatePlanDeviceParam param) {
+        return planDeviceService.createPlanDevice(param);
+    }
+
+    @PostMapping("/batch")
+    public List<PlanDevice> createPlanDevices(@Valid @RequestBody List<CreatePlanDeviceParam> params) {
+        return planDeviceService.createPlanDevices(params);
     }
 
     @DeleteMapping("/{id}")
@@ -32,8 +37,8 @@ public class PlanDeviceController {
     }
 
     @PutMapping("/{id}")
-    public void updatePlanDevice(@PathVariable String id, @Valid @RequestBody UpdatePlanDeviceParam param) {
-        planDeviceService.updatePlanDevice(id, param);
+    public PlanDevice updatePlanDevice(@PathVariable String id, @Valid @RequestBody UpdatePlanDeviceParam param) {
+        return planDeviceService.updatePlanDevice(id, param);
     }
 
     @PutMapping("/move")

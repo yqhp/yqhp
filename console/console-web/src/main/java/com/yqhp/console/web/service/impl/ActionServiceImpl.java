@@ -48,8 +48,8 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         Action action = param.convertTo();
         action.setId(snowflake.nextIdStr());
 
-        Integer minWeight = getMinWeightByProjectId(param.getProjectId());
-        action.setWeight(minWeight != null ? minWeight - 1 : null);
+        int minWeight = getMinWeightByProjectId(param.getProjectId());
+        action.setWeight(minWeight - 1);
 
         String currUid = CurrentUser.id();
         action.setCreateBy(currUid);
@@ -95,7 +95,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         }
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
         Action to = getActionById(moveEvent.getTo());
 
         Action fromAction = new Action();
@@ -103,7 +102,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         fromAction.setPkgId(to.getPkgId());
         fromAction.setWeight(to.getWeight());
         fromAction.setUpdateBy(currUid);
-        fromAction.setUpdateTime(now);
 
         List<Action> toUpdateActions = new ArrayList<>();
         toUpdateActions.add(fromAction);
@@ -120,7 +118,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
                             toUpdate.setId(a.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
         );
@@ -235,9 +232,9 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         return list(query);
     }
 
-    private Integer getMinWeightByProjectId(String projectId) {
+    private int getMinWeightByProjectId(String projectId) {
         return listByProjectId(projectId).stream()
-                .min(Comparator.comparing(Action::getWeight))
-                .map(Action::getWeight).orElse(null);
+                .mapToInt(Action::getWeight)
+                .min().orElse(1);
     }
 }

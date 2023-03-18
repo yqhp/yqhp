@@ -28,7 +28,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,8 +51,8 @@ public class ActionStepServiceImpl
         ActionStep step = param.convertTo();
         step.setId(snowflake.nextIdStr());
 
-        Integer weight = getMaxWeightByActionIdAndKind(param.getActionId(), param.getKind());
-        step.setWeight(weight != null ? weight + 1 : null);
+        int maxWeight = getMaxWeightByActionIdAndKind(param.getActionId(), param.getKind());
+        step.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
         step.setCreateBy(currUid);
@@ -108,13 +111,11 @@ public class ActionStepServiceImpl
         ActionStep to = getActionStepById(moveEvent.getTo());
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
 
         ActionStep fromStep = new ActionStep();
         fromStep.setId(from.getId());
         fromStep.setWeight(to.getWeight());
         fromStep.setUpdateBy(currUid);
-        fromStep.setUpdateTime(now);
 
         List<ActionStep> toUpdateSteps = new ArrayList<>();
         toUpdateSteps.add(fromStep);
@@ -131,7 +132,6 @@ public class ActionStepServiceImpl
                             toUpdate.setId(s.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? s.getWeight() + 1 : s.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
         );
@@ -216,9 +216,9 @@ public class ActionStepServiceImpl
         return list(query);
     }
 
-    private Integer getMaxWeightByActionIdAndKind(String actionId, ActionStepKind kind) {
+    private int getMaxWeightByActionIdAndKind(String actionId, ActionStepKind kind) {
         return listByActionIdAndKind(actionId, kind).stream()
-                .max(Comparator.comparing(ActionStep::getWeight))
-                .map(ActionStep::getWeight).orElse(null);
+                .mapToInt(ActionStep::getWeight)
+                .max().orElse(-1);
     }
 }

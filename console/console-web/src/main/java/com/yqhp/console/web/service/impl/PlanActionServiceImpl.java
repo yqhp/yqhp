@@ -1,5 +1,6 @@
 package com.yqhp.console.web.service.impl;
 
+import cn.hutool.core.lang.Snowflake;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
@@ -11,6 +12,7 @@ import com.yqhp.console.repository.entity.PlanAction;
 import com.yqhp.console.repository.mapper.PlanActionMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.PlanActionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +30,16 @@ public class PlanActionServiceImpl
         extends ServiceImpl<PlanActionMapper, PlanAction>
         implements PlanActionService {
 
-    @Override
-    public void createPlanAction(CreatePlanActionParam param) {
-        PlanAction planAction = param.convertTo();
+    @Autowired
+    private Snowflake snowflake;
 
-        Integer weight = getMaxWeightByPlanId(param.getPlanId());
-        planAction.setWeight(weight != null ? weight + 1 : null);
+    @Override
+    public PlanAction createPlanAction(CreatePlanActionParam param) {
+        PlanAction planAction = param.convertTo();
+        planAction.setId(snowflake.nextIdStr());
+
+        int maxWeight = getMaxWeightByPlanId(param.getPlanId());
+        planAction.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
         planAction.setCreateBy(currUid);
@@ -45,10 +52,41 @@ public class PlanActionServiceImpl
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_ACTION);
         }
+
+        return getById(planAction.getId());
     }
 
     @Override
-    public void updatePlanAction(String id, UpdatePlanActionParam param) {
+    public List<PlanAction> createPlanActions(List<CreatePlanActionParam> params) {
+        if (CollectionUtils.isEmpty(params)) return new ArrayList<>();
+        String planId = params.get(0).getPlanId();
+        AtomicInteger maxWeight = new AtomicInteger(getMaxWeightByPlanId(planId));
+
+        String currUid = CurrentUser.id();
+
+        List<PlanAction> planActions = params.stream().map(param -> {
+            PlanAction planAction = param.convertTo();
+            planAction.setId(snowflake.nextIdStr());
+            planAction.setWeight(maxWeight.getAndIncrement());
+            planAction.setCreateBy(currUid);
+            planAction.setUpdateBy(currUid);
+            return planAction;
+        }).collect(Collectors.toList());
+        try {
+            if (!saveBatch(planActions)) {
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_ACTION_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_ACTION);
+        }
+
+        List<String> ids = planActions.stream()
+                .map(PlanAction::getId).collect(Collectors.toList());
+        return listByIds(ids);
+    }
+
+    @Override
+    public PlanAction updatePlanAction(String id, UpdatePlanActionParam param) {
         PlanAction planAction = getPlanActionById(id);
         param.update(planAction);
         planAction.setUpdateBy(CurrentUser.id());
@@ -60,6 +98,7 @@ public class PlanActionServiceImpl
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_ACTION);
         }
+        return getById(id);
     }
 
     @Override
@@ -102,13 +141,11 @@ public class PlanActionServiceImpl
         PlanAction to = getPlanActionById(moveEvent.getTo());
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
 
         PlanAction fromPlanAction = new PlanAction();
         fromPlanAction.setId(from.getId());
         fromPlanAction.setWeight(to.getWeight());
         fromPlanAction.setUpdateBy(currUid);
-        fromPlanAction.setUpdateTime(now);
 
         List<PlanAction> toUpdatePlanActions = new ArrayList<>();
         toUpdatePlanActions.add(fromPlanAction);
@@ -124,7 +161,6 @@ public class PlanActionServiceImpl
                             toUpdate.setId(a.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
 
@@ -149,9 +185,9 @@ public class PlanActionServiceImpl
         return list(query);
     }
 
-    private Integer getMaxWeightByPlanId(String planId) {
+    private int getMaxWeightByPlanId(String planId) {
         List<PlanAction> planActions = listSortedByPlanId(planId);
         PlanAction maxWeightPlanAction = CollectionUtils.lastElement(planActions);
-        return maxWeightPlanAction == null ? null : maxWeightPlanAction.getWeight();
+        return maxWeightPlanAction == null ? -1 : maxWeightPlanAction.getWeight();
     }
 }

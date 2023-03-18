@@ -1,5 +1,6 @@
 package com.yqhp.console.web.service.impl;
 
+import cn.hutool.core.lang.Snowflake;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
@@ -11,6 +12,7 @@ import com.yqhp.console.repository.entity.PlanDevice;
 import com.yqhp.console.repository.mapper.PlanDeviceMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.PlanDeviceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +30,16 @@ public class PlanDeviceServiceImpl
         extends ServiceImpl<PlanDeviceMapper, PlanDevice>
         implements PlanDeviceService {
 
-    @Override
-    public void createPlanDevice(CreatePlanDeviceParam param) {
-        PlanDevice planDevice = param.convertTo();
+    @Autowired
+    private Snowflake snowflake;
 
-        Integer weight = getMaxWeightByPlanId(param.getPlanId());
-        planDevice.setWeight(weight != null ? weight + 1 : null);
+    @Override
+    public PlanDevice createPlanDevice(CreatePlanDeviceParam param) {
+        PlanDevice planDevice = param.convertTo();
+        planDevice.setId(snowflake.nextIdStr());
+
+        int maxWeight = getMaxWeightByPlanId(param.getPlanId());
+        planDevice.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
         planDevice.setCreateBy(currUid);
@@ -44,10 +51,41 @@ public class PlanDeviceServiceImpl
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
         }
+
+        return getById(planDevice.getId());
     }
 
     @Override
-    public void updatePlanDevice(String id, UpdatePlanDeviceParam param) {
+    public List<PlanDevice> createPlanDevices(List<CreatePlanDeviceParam> params) {
+        if (CollectionUtils.isEmpty(params)) return new ArrayList<>();
+        String planId = params.get(0).getPlanId();
+        AtomicInteger maxWeight = new AtomicInteger(getMaxWeightByPlanId(planId));
+
+        String currUid = CurrentUser.id();
+
+        List<PlanDevice> planDevices = params.stream().map(param -> {
+            PlanDevice planDevice = param.convertTo();
+            planDevice.setId(snowflake.nextIdStr());
+            planDevice.setWeight(maxWeight.getAndIncrement());
+            planDevice.setCreateBy(currUid);
+            planDevice.setUpdateBy(currUid);
+            return planDevice;
+        }).collect(Collectors.toList());
+        try {
+            if (!saveBatch(planDevices)) {
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DEVICE_FAIL);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
+        }
+
+        List<String> ids = planDevices.stream()
+                .map(PlanDevice::getId).collect(Collectors.toList());
+        return listByIds(ids);
+    }
+
+    @Override
+    public PlanDevice updatePlanDevice(String id, UpdatePlanDeviceParam param) {
         PlanDevice planDevice = getPlanDeviceById(id);
         param.update(planDevice);
         planDevice.setUpdateBy(CurrentUser.id());
@@ -59,6 +97,7 @@ public class PlanDeviceServiceImpl
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
         }
+        return getById(id);
     }
 
     @Override
@@ -101,13 +140,11 @@ public class PlanDeviceServiceImpl
         PlanDevice to = getPlanDeviceById(moveEvent.getTo());
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
 
         PlanDevice fromPlanDevice = new PlanDevice();
         fromPlanDevice.setId(from.getId());
         fromPlanDevice.setWeight(to.getWeight());
         fromPlanDevice.setUpdateBy(currUid);
-        fromPlanDevice.setUpdateTime(now);
 
         List<PlanDevice> toUpdatePlanDevices = new ArrayList<>();
         toUpdatePlanDevices.add(fromPlanDevice);
@@ -123,7 +160,6 @@ public class PlanDeviceServiceImpl
                             toUpdate.setId(d.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
         );
@@ -147,9 +183,9 @@ public class PlanDeviceServiceImpl
         return list(query);
     }
 
-    private Integer getMaxWeightByPlanId(String planId) {
+    private int getMaxWeightByPlanId(String planId) {
         List<PlanDevice> planDevices = listSortedByPlanId(planId);
         PlanDevice maxWeightPlanDevice = CollectionUtils.lastElement(planDevices);
-        return maxWeightPlanDevice == null ? null : maxWeightPlanDevice.getWeight();
+        return maxWeightPlanDevice == null ? -1 : maxWeightPlanDevice.getWeight();
     }
 }

@@ -10,9 +10,11 @@ import java.util.List;
 
 public interface PlanDeviceService extends IService<PlanDevice> {
 
-    void createPlanDevice(CreatePlanDeviceParam param);
+    PlanDevice createPlanDevice(CreatePlanDeviceParam param);
 
-    void updatePlanDevice(String id, UpdatePlanDeviceParam param);
+    List<PlanDevice> createPlanDevices(List<CreatePlanDeviceParam> params);
+
+    PlanDevice updatePlanDevice(String id, UpdatePlanDeviceParam param);
 
     void deletePlanDeviceById(String id);
 

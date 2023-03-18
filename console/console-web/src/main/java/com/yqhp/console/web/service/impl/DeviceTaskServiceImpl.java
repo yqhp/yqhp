@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,14 +70,11 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
             return null;
         }
 
-        LocalDateTime now = LocalDateTime.now();
-
         // 更新设备任务状态
         List<DeviceTask> toUpdateTasks = tasks.stream().map(task -> {
             DeviceTask toUpdateTask = new DeviceTask();
             toUpdateTask.setId(task.getId());
             toUpdateTask.setStatus(DeviceTaskStatus.RECEIVED);
-            toUpdateTask.setUpdateTime(now);
             return toUpdateTask;
         }).collect(Collectors.toList());
         updateBatchById(toUpdateTasks);
@@ -91,7 +87,6 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
             StepExecutionRecord toUpdateRecord = new StepExecutionRecord();
             toUpdateRecord.setId(record.getId());
             toUpdateRecord.setStatus(StepExecutionStatus.RECEIVED);
-            toUpdateRecord.setUpdateTime(now);
             return toUpdateRecord;
         }).collect(Collectors.toList());
         stepExecutionRecordService.updateBatchById(toUpdateRecords);
@@ -112,8 +107,7 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
                         ActionStepDTO step = record.getStep();
                         step.setExecutionId(record.getId());
                         return step;
-                    })
-                    .collect(Collectors.toList())
+                    }).collect(Collectors.toList())
             );
             rTask.setAction(action);
             return rTask;

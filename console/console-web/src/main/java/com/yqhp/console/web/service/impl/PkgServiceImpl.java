@@ -53,8 +53,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         Pkg pkg = createPkgParam.convertTo();
         pkg.setId(snowflake.nextIdStr());
 
-        Integer minWeight = getMinWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
-        pkg.setWeight(minWeight != null ? minWeight - 1 : null);
+        int minWeight = getMinWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
+        pkg.setWeight(minWeight - 1);
 
         String currUid = CurrentUser.id();
         pkg.setCreateBy(currUid);
@@ -135,7 +135,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         }
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
         Pkg to = getPkgById(moveEvent.getTo());
 
         Pkg fromPkg = new Pkg();
@@ -143,7 +142,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         fromPkg.setParentId(to.getParentId());
         fromPkg.setWeight(to.getWeight());
         fromPkg.setUpdateBy(currUid);
-        fromPkg.setUpdateTime(now);
 
         List<Pkg> toUpdatePkgs = new ArrayList<>();
         toUpdatePkgs.add(fromPkg);
@@ -161,7 +159,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                             toUpdate.setId(p.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? p.getWeight() + 1 : p.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
         );
@@ -282,9 +279,9 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         return list(query);
     }
 
-    private Integer getMinWeightByProjectIdAndType(String projectId, PkgType type) {
+    private int getMinWeightByProjectIdAndType(String projectId, PkgType type) {
         return listByProjectIdAndType(projectId, type).stream()
-                .min(Comparator.comparing(Pkg::getWeight))
-                .map(Pkg::getWeight).orElse(null);
+                .mapToInt(Pkg::getWeight)
+                .min().orElse(1);
     }
 }

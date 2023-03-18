@@ -22,8 +22,13 @@ public class PlanActionController {
     private PlanActionService planActionService;
 
     @PostMapping
-    public void createPlanAction(@Valid @RequestBody CreatePlanActionParam param) {
-        planActionService.createPlanAction(param);
+    public PlanAction createPlanAction(@Valid @RequestBody CreatePlanActionParam param) {
+        return planActionService.createPlanAction(param);
+    }
+
+    @PostMapping("/batch")
+    public List<PlanAction> createPlanActions(@Valid @RequestBody List<CreatePlanActionParam> params) {
+        return planActionService.createPlanActions(params);
     }
 
     @DeleteMapping("/{id}")
@@ -32,8 +37,8 @@ public class PlanActionController {
     }
 
     @PutMapping("/{id}")
-    public void updatePlanAction(@PathVariable String id, @Valid @RequestBody UpdatePlanActionParam param) {
-        planActionService.updatePlanAction(id, param);
+    public PlanAction updatePlanAction(@PathVariable String id, @Valid @RequestBody UpdatePlanActionParam param) {
+        return planActionService.updatePlanAction(id, param);
     }
 
     @PutMapping("/move")

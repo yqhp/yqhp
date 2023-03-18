@@ -10,9 +10,11 @@ import java.util.List;
 
 public interface PlanActionService extends IService<PlanAction> {
 
-    void createPlanAction(CreatePlanActionParam param);
+    PlanAction createPlanAction(CreatePlanActionParam param);
 
-    void updatePlanAction(String id, UpdatePlanActionParam param);
+    List<PlanAction> createPlanActions(List<CreatePlanActionParam> params);
+
+    PlanAction updatePlanAction(String id, UpdatePlanActionParam param);
 
     void deletePlanActionById(String id);
 

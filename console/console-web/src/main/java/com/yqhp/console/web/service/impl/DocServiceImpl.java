@@ -23,7 +23,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +45,8 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         Doc doc = createDocParam.convertTo();
         doc.setId(snowflake.nextIdStr());
 
-        Integer minWeight = getMinWeightByProjectId(createDocParam.getProjectId());
-        doc.setWeight(minWeight != null ? minWeight - 1 : null);
+        int minWeight = getMinWeightByProjectId(createDocParam.getProjectId());
+        doc.setWeight(minWeight - 1);
 
         String currUid = CurrentUser.id();
         doc.setCreateBy(currUid);
@@ -91,7 +94,6 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         }
 
         String currUid = CurrentUser.id();
-        LocalDateTime now = LocalDateTime.now();
         Doc to = getDocById(moveEvent.getTo());
 
         Doc fromDoc = new Doc();
@@ -99,7 +101,6 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         fromDoc.setPkgId(to.getPkgId());
         fromDoc.setWeight(to.getWeight());
         fromDoc.setUpdateBy(currUid);
-        fromDoc.setUpdateTime(now);
 
         List<Doc> toUpdateDocs = new ArrayList<>();
         toUpdateDocs.add(fromDoc);
@@ -116,7 +117,6 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
                             toUpdate.setId(d.getId());
                             toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
-                            toUpdate.setUpdateTime(now);
                             return toUpdate;
                         }).collect(Collectors.toList())
         );
@@ -199,9 +199,9 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         return list(query);
     }
 
-    private Integer getMinWeightByProjectId(String projectId) {
+    private int getMinWeightByProjectId(String projectId) {
         return listByProjectId(projectId).stream()
-                .min(Comparator.comparing(Doc::getWeight))
-                .map(Doc::getWeight).orElse(null);
+                .mapToInt(Doc::getWeight)
+                .min().orElse(1);
     }
 }

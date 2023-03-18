@@ -154,7 +154,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         // 保存设备任务和步骤执行记录
         List<DeviceTask> deviceTasks = new ArrayList<>();
         List<StepExecutionRecord> stepExecutionRecords = new ArrayList<>();
-        LocalDateTime now = LocalDateTime.now();
         deviceActionsMap.forEach((deviceId, actions) -> {
             for (ActionDTO action : actions) {
                 DeviceTask task = new DeviceTask();
@@ -167,9 +166,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                 task.setAction(action); // 保留提交执行时的action, todo fix 保存的action写入了steps冗余的内容
                 task.setStatus(DeviceTaskStatus.TODO);
                 task.setCreateBy(createBy);
-                task.setCreateTime(now);
                 task.setUpdateBy(createBy);
-                task.setUpdateTime(now);
                 deviceTasks.add(task);
                 stepExecutionRecords.addAll(createStepExecutionRecords(task, action));
             }
@@ -199,9 +196,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             record.setStep(step);
             record.setStatus(StepExecutionStatus.TODO);
             record.setCreateBy(task.getCreateBy());
-            record.setCreateTime(task.getCreateTime());
             record.setUpdateBy(task.getUpdateBy());
-            record.setUpdateTime(task.getUpdateTime());
             return record;
         }).collect(Collectors.toList());
     }
