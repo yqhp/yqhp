@@ -7,6 +7,7 @@ import com.yqhp.agent.scrcpy.Scrcpy;
 import com.yqhp.agent.scrcpy.ScrcpyFrameClient;
 import com.yqhp.agent.scrcpy.ScrcpyOptions;
 import com.yqhp.agent.web.ws.message.Command;
+import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.common.web.util.ApplicationContextUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.Executors;
  * @author jiangyitao
  */
 @Slf4j
-public class StartScrcpyHandler extends CommandHandler<ScrcpyOptions> {
+public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
 
     private static final ExecutorService START_SCRCPY_THREAD_POOL = Executors.newCachedThreadPool();
     private static final ExecutorService SEND_SCRCPY_FRAME_THREAD_POOL = Executors.newCachedThreadPool();
@@ -35,24 +36,27 @@ public class StartScrcpyHandler extends CommandHandler<ScrcpyOptions> {
     }
 
     @Override
-    protected void handle(String uid, ScrcpyOptions options) {
-        output.info(uid, "starting scrcpy...");
+    protected void handle(Input<ScrcpyOptions> input) {
+        String uid = input.getUid();
+
+        os.info(uid, "starting scrcpy...");
         Scrcpy scrcpy = ((AndroidDeviceDriver) deviceDriver).getScrcpy();
         scrcpy.start(
                 ApplicationContextUtils.getProperty("agent.android.scrcpy-server-path"),
                 ApplicationContextUtils.getProperty("agent.android.scrcpy-version"),
-                options,
+                input.getData(),
                 LocalPortProvider.getScrcpyAvailablePort(),
                 Duration.ofSeconds(30), // start timeout
                 START_SCRCPY_THREAD_POOL
         );
-        output.ok(uid, "starting scrcpy success");
+        os.info(uid, "starting scrcpy success");
 
         SEND_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
             RemoteEndpoint.Basic remote = session.getBasicRemote();
             ScrcpyFrameClient scrcpyFrameClient = scrcpy.getScrcpyFrameClient();
-            output.info(uid, scrcpyFrameClient.getScreenSize());
+            os.info(uid, scrcpyFrameClient.getScreenSize());
             try {
+                os.ok(uid, "start sending screen frames...");
                 log.info("[{}]start sending screen frames...", deviceDriver.getDeviceId());
                 for (; ; ) {
                     remote.sendBinary(scrcpyFrameClient.readFrame());

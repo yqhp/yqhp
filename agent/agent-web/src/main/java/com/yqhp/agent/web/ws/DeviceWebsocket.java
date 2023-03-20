@@ -1,11 +1,9 @@
 package com.yqhp.agent.web.ws;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.service.DeviceService;
-import com.yqhp.agent.web.ws.message.InputMessage;
-import com.yqhp.agent.web.ws.message.OutputMessage;
-import com.yqhp.agent.web.ws.message.OutputMessageSender;
+import com.yqhp.agent.web.ws.message.Output;
+import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.agent.web.ws.message.handler.MessageHandler;
 import com.yqhp.agent.web.ws.message.handler.*;
 import lombok.extern.slf4j.Slf4j;
@@ -44,28 +42,25 @@ public class DeviceWebsocket {
         try {
             deviceDriver = deviceService.getDeviceDriverByToken(token);
         } catch (Exception e) {
-            log.warn("[{}]getDeviceDriver err, token={}", session.getId(), token, e);
-            OutputMessageSender.send(
-                    session,
-                    new OutputMessage<>()
-                            .setStatus(OutputMessage.Status.ERROR)
-                            .setMessage("invalid token: " + token)
-            );
+            Output<?> output = new Output<>();
+            output.setStatus(Output.Status.ERROR);
+            output.setMessage("invalid token: " + token);
+            OutputSender.send(session, output);
             session.close();
             return;
         }
         this.token = token;
 
         messageHandler = new MessageHandler()
-                .addCommandHandler(new StartScrcpyHandler(session, deviceDriver))
-                .addCommandHandler(new ScrcpyKeyHandler(session, deviceDriver))
-                .addCommandHandler(new ScrcpyTextHandler(session, deviceDriver))
-                .addCommandHandler(new ScrcpyTouchHandler(session, deviceDriver))
-                .addCommandHandler(new ScrcpyScrollHandler(session, deviceDriver))
-                .addCommandHandler(new ReceiveDeviceLogHandler(session, deviceDriver))
-                .addCommandHandler(new StopReceiveDeviceLogHandler(session, deviceDriver))
-                .addCommandHandler(new ReceiveAppiumLogHandler(session, deviceDriver))
-                .addCommandHandler(new StopReceiveAppiumLogHandler(session, deviceDriver));
+                .addInputHandler(new StartScrcpyHandler(session, deviceDriver))
+                .addInputHandler(new ScrcpyKeyHandler(session, deviceDriver))
+                .addInputHandler(new ScrcpyTextHandler(session, deviceDriver))
+                .addInputHandler(new ScrcpyTouchHandler(session, deviceDriver))
+                .addInputHandler(new ScrcpyScrollHandler(session, deviceDriver))
+                .addInputHandler(new ReceiveDeviceLogHandler(session, deviceDriver))
+                .addInputHandler(new StopReceiveDeviceLogHandler(session, deviceDriver))
+                .addInputHandler(new ReceiveAppiumLogHandler(session, deviceDriver))
+                .addInputHandler(new StopReceiveAppiumLogHandler(session, deviceDriver));
     }
 
     @OnClose
@@ -81,33 +76,16 @@ public class DeviceWebsocket {
 
     @OnMessage
     public void onMessage(String message) {
-        InputMessage<JsonNode> input;
-        try {
-            input = messageHandler.readMessage(message);
-        } catch (Exception e) {
-            log.warn("[{}]invalid message: {}", session.getId(), message, e);
-            OutputMessageSender.send(
-                    session,
-                    new OutputMessage<>()
-                            .setStatus(OutputMessage.Status.ERROR)
-                            .setMessage(e.getMessage())
-            );
-            return;
-        }
-
-        try {
-            messageHandler.handleMessage(input);
-        } catch (Exception e) {
-            log.warn("[{}]handleMessage err, message={}", session.getId(), message, e);
-            OutputMessageSender.send(
-                    session,
-                    new OutputMessage<>()
-                            .setStatus(OutputMessage.Status.ERROR)
-                            .setUid(input.getUid())
-                            .setCommand(input.getCommand())
-                            .setMessage(e.getMessage())
-            );
-        }
+        messageHandler.handle(message, ((input, cause) -> {
+            Output<?> output = new Output<>();
+            output.setStatus(Output.Status.ERROR);
+            output.setMessage(cause.getMessage());
+            if (input != null) {
+                output.setUid(input.getUid());
+                output.setCommand(input.getCommand());
+            }
+            OutputSender.send(session, output);
+        }));
     }
 
 }

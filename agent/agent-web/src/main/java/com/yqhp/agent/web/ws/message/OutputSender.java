@@ -9,30 +9,30 @@ import javax.websocket.Session;
  * @author jiangyitao
  */
 @Slf4j
-public class OutputMessageSender {
+public class OutputSender {
 
     private final Session session;
     private final Command command;
 
-    public OutputMessageSender(Session session, Command command) {
+    public OutputSender(Session session, Command command) {
         this.session = session;
         this.command = command;
     }
 
     public void ok(String uid, String message) {
-        send(uid, OutputMessage.Status.OK, message, null);
+        send(uid, Output.Status.OK, message, null);
     }
 
     public void info(String uid, String message) {
-        send(uid, OutputMessage.Status.INFO, message, null);
+        send(uid, Output.Status.INFO, message, null);
     }
 
     public <T> void info(String uid, T data) {
-        send(uid, OutputMessage.Status.INFO, null, data);
+        send(uid, Output.Status.INFO, null, data);
     }
 
-    public <T> void send(String uid, OutputMessage.Status status, String message, T data) {
-        OutputMessage<T> output = new OutputMessage<>();
+    public <T> void send(String uid, Output.Status status, String message, T data) {
+        Output<T> output = new Output<>();
         output.setUid(uid);
         output.setCommand(command);
         output.setStatus(status);
@@ -41,7 +41,7 @@ public class OutputMessageSender {
         send(session, output);
     }
 
-    public static <T> void send(Session session, OutputMessage<T> output) {
+    public static <T> void send(Session session, Output<T> output) {
         try {
             String text = JacksonUtils.writeValueAsString(output);
             session.getBasicRemote().sendText(text);

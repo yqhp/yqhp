@@ -18,6 +18,14 @@ public class JacksonUtils {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModules(new JavaTimeModule());
 
+    public static JsonNode readTree(String value) {
+        try {
+            return OBJECT_MAPPER.readTree(value);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     public static <T> T readValue(String value, TypeReference<T> valueTypeRef) {
         try {
             return OBJECT_MAPPER.readValue(value, valueTypeRef);

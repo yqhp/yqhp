@@ -2,13 +2,14 @@ package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.ws.message.Command;
+import com.yqhp.agent.web.ws.message.Input;
 
 import javax.websocket.Session;
 
 /**
  * @author jiangyitao
  */
-public class StopReceiveDeviceLogHandler extends CommandHandler {
+public class StopReceiveDeviceLogHandler extends DefaultInputHandler {
 
     public StopReceiveDeviceLogHandler(Session session, DeviceDriver deviceDriver) {
         super(session, deviceDriver);
@@ -20,8 +21,9 @@ public class StopReceiveDeviceLogHandler extends CommandHandler {
     }
 
     @Override
-    protected void handle(String uid, Object data) {
+    protected void handle(Input input) {
         deviceDriver.stopReceiveDeviceLog();
-        output.ok(uid, "stopped");
+        os.ok(input.getUid(), "stopped");
     }
+
 }

@@ -1,49 +1,57 @@
 package com.yqhp.agent.web.ws.message.handler;
 
+import cn.hutool.core.lang.ParameterizedTypeImpl;
+import com.alibaba.nacos.common.utils.BiConsumer;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.yqhp.agent.web.ws.message.Command;
-import com.yqhp.agent.web.ws.message.InputMessage;
+import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.common.commons.util.JacksonUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author jiangyitao
- */
 public class MessageHandler {
 
-    private final Map<Command, CommandHandler> handlers = new HashMap<>();
+    private final Map<Command, InputHandler<?>> handlers = new HashMap<>();
 
-    public MessageHandler addCommandHandler(CommandHandler messageHandler) {
-        handlers.put(messageHandler.command(), messageHandler);
+    public MessageHandler addInputHandler(InputHandler<?> handler) {
+        handlers.put(handler.command(), handler);
         return this;
     }
 
-    public InputMessage<JsonNode> readMessage(String message) {
+    public void handle(String message, BiConsumer<Input, Throwable> onError) {
         if (!StringUtils.hasText(message)) {
-            return null;
+            return;
         }
-        return JacksonUtils.readValue(message, new TypeReference<>() {
-        });
-    }
 
-    public void handleMessage(InputMessage<JsonNode> input) throws Exception {
-        if (input == null || input.getCommand() == null) return;
-        CommandHandler handler = handlers.get(input.getCommand());
-        if (handler == null) return;
+        Input input = null;
+        try {
+            input = JacksonUtils.readValue(message, Input.class);
+            if (input == null || input.getCommand() == null) {
+                throw new IllegalArgumentException("command not found");
+            }
+            InputHandler<?> handler = handlers.get(input.getCommand());
+            if (handler == null) {
+                throw new IllegalStateException("handler not found");
+            }
 
-        if (input.getData() == null) {
-            handler.handle(input.getUid(), null);
-        } else {
-            // 父类泛型
-            Class parentGeneric = (Class) ((ParameterizedType) handler.getClass()
-                    .getGenericSuperclass()).getActualTypeArguments()[0];
-            Object data = JacksonUtils.treeToValue(input.getData(), parentGeneric);
-            handler.handle(input.getUid(), data);
+            Type superclass = handler.getClass().getGenericSuperclass();
+            if (superclass instanceof ParameterizedType) {
+                // 父类范型
+                Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+                input = JacksonUtils.readValue(message, new TypeReference<>() {
+                    @Override
+                    public Type getType() {
+                        return new ParameterizedTypeImpl(new Type[]{type}, null, Input.class);
+                    }
+                });
+            }
+            handler.handle(input);
+        } catch (Throwable cause) {
+            onError.accept(input, cause);
         }
     }
 }

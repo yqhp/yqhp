@@ -2,13 +2,14 @@ package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.ws.message.Command;
+import com.yqhp.agent.web.ws.message.Input;
 
 import javax.websocket.Session;
 
 /**
  * @author jiangyitao
  */
-public class ReceiveDeviceLogHandler extends CommandHandler {
+public class ReceiveDeviceLogHandler extends DefaultInputHandler {
 
     public ReceiveDeviceLogHandler(Session session, DeviceDriver deviceDriver) {
         super(session, deviceDriver);
@@ -20,8 +21,9 @@ public class ReceiveDeviceLogHandler extends CommandHandler {
     }
 
     @Override
-    protected void handle(String uid, Object data) {
-        deviceDriver.receiveDeviceLog(log -> output.info(uid, log));
-        output.ok(uid, "receiving");
+    protected void handle(Input input) {
+        String uid = input.getUid();
+        deviceDriver.receiveDeviceLog(log -> os.info(uid, log));
+        os.ok(uid, "receiving");
     }
 }

@@ -4,6 +4,7 @@ import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.scrcpy.message.ScrollEvent;
 import com.yqhp.agent.web.ws.message.Command;
+import com.yqhp.agent.web.ws.message.Input;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.io.IOException;
 /**
  * @author jiangyitao
  */
-public class ScrcpyScrollHandler extends CommandHandler<ScrollEvent> {
+public class ScrcpyScrollHandler extends DefaultInputHandler<ScrollEvent> {
 
     public ScrcpyScrollHandler(Session session, DeviceDriver deviceDriver) {
         super(session, deviceDriver);
@@ -23,9 +24,9 @@ public class ScrcpyScrollHandler extends CommandHandler<ScrollEvent> {
     }
 
     @Override
-    protected void handle(String uid, ScrollEvent scrollEvent) throws IOException {
+    protected void handle(Input<ScrollEvent> input) throws IOException {
         ((AndroidDeviceDriver) deviceDriver).getScrcpy()
-                .getScrcpyControlClient().sendScrollEvent(scrollEvent);
+                .getScrcpyControlClient().sendScrollEvent(input.getData());
     }
 
 }

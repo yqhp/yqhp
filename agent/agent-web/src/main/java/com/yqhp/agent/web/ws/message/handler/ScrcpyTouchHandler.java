@@ -4,6 +4,7 @@ import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.scrcpy.message.TouchEvent;
 import com.yqhp.agent.web.ws.message.Command;
+import com.yqhp.agent.web.ws.message.Input;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.io.IOException;
 /**
  * @author jiangyitao
  */
-public class ScrcpyTouchHandler extends CommandHandler<TouchEvent> {
+public class ScrcpyTouchHandler extends DefaultInputHandler<TouchEvent> {
 
     public ScrcpyTouchHandler(Session session, DeviceDriver deviceDriver) {
         super(session, deviceDriver);
@@ -23,9 +24,9 @@ public class ScrcpyTouchHandler extends CommandHandler<TouchEvent> {
     }
 
     @Override
-    protected void handle(String uid, TouchEvent touchEvent) throws IOException {
+    protected void handle(Input<TouchEvent> input) throws IOException {
         ((AndroidDeviceDriver) deviceDriver).getScrcpy()
-                .getScrcpyControlClient().sendTouchEvent(touchEvent);
+                .getScrcpyControlClient().sendTouchEvent(input.getData());
     }
 
 }
