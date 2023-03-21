@@ -1,6 +1,6 @@
 package com.yqhp.agent.web.job;
 
-import com.yqhp.agent.action.ActionExecutionListenerAdapter;
+import com.yqhp.agent.action.ActionExecutionListener;
 import com.yqhp.agent.action.ActionExecutor;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.kafka.MessageProducer;
@@ -88,7 +88,7 @@ public class DeviceTaskJob {
         });
     }
 
-    class ExecutionListener extends ActionExecutionListenerAdapter {
+    class ExecutionListener implements ActionExecutionListener {
 
         private final String deviceId;
         @Setter
