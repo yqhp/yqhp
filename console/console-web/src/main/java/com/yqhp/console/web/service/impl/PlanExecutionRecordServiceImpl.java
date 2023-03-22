@@ -15,6 +15,7 @@ import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.PlanExecutionRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -32,6 +33,7 @@ public class PlanExecutionRecordServiceImpl
         extends ServiceImpl<PlanExecutionRecordMapper, PlanExecutionRecord>
         implements PlanExecutionRecordService {
 
+    @Lazy
     @Autowired
     private DeviceTaskService deviceTaskService;
 

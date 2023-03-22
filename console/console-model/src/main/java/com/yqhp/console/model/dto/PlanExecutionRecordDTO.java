@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class PlanExecutionRecordDTO extends PlanExecutionRecord
         implements OutputConverter<PlanExecutionRecordDTO, PlanExecutionRecord> {

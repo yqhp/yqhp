@@ -3,6 +3,9 @@ package com.yqhp.agent.web.ws.message.handler;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
 
+/**
+ * @author jiangyitao
+ */
 public abstract class InputHandler<T> {
     protected abstract Command command();
 

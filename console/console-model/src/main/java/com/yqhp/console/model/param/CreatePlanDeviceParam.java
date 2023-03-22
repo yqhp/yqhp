@@ -4,6 +4,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class CreatePlanDeviceParam extends UpdatePlanDeviceParam {
     @NotBlank(message = "planId不能为空")

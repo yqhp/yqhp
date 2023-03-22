@@ -7,6 +7,9 @@ import com.yqhp.console.repository.entity.PluginFile;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author jiangyitao
+ */
 public interface PluginFileService extends IService<PluginFile> {
     void createPluginFile(CreatePluginFileParam param);
 

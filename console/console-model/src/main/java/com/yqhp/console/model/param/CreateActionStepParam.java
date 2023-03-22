@@ -6,6 +6,9 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class CreateActionStepParam extends UpdateActionStepParam {
     @NotBlank(message = "projectId不能为空")

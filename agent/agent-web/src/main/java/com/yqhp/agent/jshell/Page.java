@@ -6,6 +6,9 @@ import org.openqa.selenium.support.PageFactory;
 
 import java.time.Duration;
 
+/**
+ * @author jiangyitao
+ */
 public class Page {
 
     protected final D d;

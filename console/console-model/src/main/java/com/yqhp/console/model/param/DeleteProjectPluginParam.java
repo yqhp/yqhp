@@ -4,6 +4,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class DeleteProjectPluginParam {
     @NotBlank(message = "项目不能为空")

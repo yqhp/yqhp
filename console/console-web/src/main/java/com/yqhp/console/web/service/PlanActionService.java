@@ -8,6 +8,9 @@ import com.yqhp.console.repository.entity.PlanAction;
 
 import java.util.List;
 
+/**
+ * @author jiangyitao
+ */
 public interface PlanActionService extends IService<PlanAction> {
 
     PlanAction createPlanAction(CreatePlanActionParam param);

@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class DeviceTaskDTO extends DeviceTask implements OutputConverter<DeviceTaskDTO, DeviceTask> {
     private List<StepExecutionRecord> records;

@@ -8,6 +8,9 @@ import com.yqhp.console.repository.entity.PlanDevice;
 
 import java.util.List;
 
+/**
+ * @author jiangyitao
+ */
 public interface PlanDeviceService extends IService<PlanDevice> {
 
     PlanDevice createPlanDevice(CreatePlanDeviceParam param);

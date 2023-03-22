@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author jiangyitao
+ */
 @Service
 public class PluginFileServiceImpl
         extends ServiceImpl<PluginFileMapper, PluginFile>

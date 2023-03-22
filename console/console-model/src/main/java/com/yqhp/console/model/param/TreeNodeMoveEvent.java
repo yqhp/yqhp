@@ -5,6 +5,9 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class TreeNodeMoveEvent {
     @NotBlank(message = "from不能为空")

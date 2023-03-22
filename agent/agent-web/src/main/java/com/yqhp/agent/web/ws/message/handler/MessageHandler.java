@@ -13,6 +13,9 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author jiangyitao
+ */
 public class MessageHandler {
 
     private final Map<Command, InputHandler<?>> handlers = new HashMap<>();

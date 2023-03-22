@@ -7,6 +7,9 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * @author jiangyitao
+ */
 @Data
 public class UpdatePluginFileParam implements InputConverter<PluginFile> {
     @NotBlank(message = "name不能为空")

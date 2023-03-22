@@ -5,6 +5,9 @@ import com.yqhp.agent.web.ws.message.OutputSender;
 
 import javax.websocket.Session;
 
+/**
+ * @author jiangyitao
+ */
 public abstract class DefaultInputHandler<T> extends InputHandler<T> {
 
     protected final Session session;
