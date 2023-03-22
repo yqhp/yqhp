@@ -132,10 +132,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
         Map<String, List<ActionDTO>> deviceActionsMap = assignDeviceTasks(plan);
-        if (deviceActionsMap.isEmpty()) {
-            throw new ServiceException(ResponseCodeEnum.NO_DEVICES_OR_ACTIONS);
-        }
-
         String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
 
         // 保存计划执行记录
@@ -208,12 +204,12 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         HashMap<String, List<ActionDTO>> result = new HashMap<>();
         List<String> deviceIds = planDeviceService.listEnabledAndSortedPlanDeviceIdByPlanId(plan.getId());
         if (CollectionUtils.isEmpty(deviceIds)) {
-            return result;
+            throw new ServiceException(ResponseCodeEnum.NO_DEVICES);
         }
         List<String> actionIds = planActionService.listEnabledAndSortedActionIdByPlanId(plan.getId());
         List<ActionDTO> actionDTOs = actionService.listActionDTOByIds(actionIds);
         if (CollectionUtils.isEmpty(actionDTOs)) {
-            return result;
+            throw new ServiceException(ResponseCodeEnum.NO_ACTIONS);
         }
 
         if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {

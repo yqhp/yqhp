@@ -92,8 +92,9 @@ public enum ResponseCodeEnum implements ResponseCode {
     UPDATE_PLAN_FAIL(3402, "更新计划失败，请稍后重试"),
     PLAN_NOT_FOUND(3403, "计划不存在"),
     DUPLICATE_PLAN(3404, "计划已存在"),
-    NO_DEVICES_OR_ACTIONS(3405, "无可用设备或action"),
-    NO_STEP_EXECUTION_RECORDS(3406, "无可用步骤执行记录"),
+    NO_DEVICES(3405, "无可用设备"),
+    NO_ACTIONS(3406, "无可用Action"),
+    NO_STEP_EXECUTION_RECORDS(3407, "无可用步骤执行记录"),
 
     SAVE_PLAN_DEVICE_FAIL(3500, "保存计划设备失败，请稍后重试"),
     DEL_PLAN_DEVICE_FAIL(3501, "删除计划设备失败，请稍后重试"),
