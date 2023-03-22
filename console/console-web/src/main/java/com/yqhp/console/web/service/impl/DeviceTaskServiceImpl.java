@@ -2,6 +2,7 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.console.model.dto.DeviceTaskDTO;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -116,6 +118,14 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     }
 
     @Override
+    public List<DeviceTask> listByPlanExecutionRecordId(String planExecutionRecordId) {
+        Assert.hasText(planExecutionRecordId, "planExecutionRecordId must has text");
+        LambdaQueryWrapper<DeviceTask> query = new LambdaQueryWrapper<>();
+        query.eq(DeviceTask::getPlanExecutionRecordId, planExecutionRecordId);
+        return list(query);
+    }
+
+    @Override
     public List<DeviceTask> listInPlanExecutionRecordIds(List<String> planExecutionRecordIds) {
         if (CollectionUtils.isEmpty(planExecutionRecordIds)) {
             return new ArrayList<>();
@@ -129,6 +139,26 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     public boolean isFinished(DeviceTask task) {
         return DeviceTaskStatus.SUCCESSFUL.equals(task.getStatus())
                 || DeviceTaskStatus.FAILED.equals(task.getStatus());
+    }
+
+    @Override
+    public List<DeviceTaskDTO> listDeviceTaskDTOByPlanExecutionRecordId(String planExecutionRecordId) {
+        List<DeviceTask> deviceTasks = listByPlanExecutionRecordId(planExecutionRecordId);
+        return toDeviceTaskDTOs(deviceTasks);
+    }
+
+    private List<DeviceTaskDTO> toDeviceTaskDTOs(List<DeviceTask> deviceTasks) {
+        if (CollectionUtils.isEmpty(deviceTasks)) return new ArrayList<>();
+
+        List<String> deviceTaskIds = deviceTasks.stream().map(DeviceTask::getId).collect(Collectors.toList());
+        // deviceTaskId -> List<StepExecutionRecord>
+        Map<String, List<StepExecutionRecord>> stepExecutionRecordMap = stepExecutionRecordService.listInDeviceTaskIds(deviceTaskIds)
+                .stream().collect(Collectors.groupingBy(StepExecutionRecord::getDeviceTaskId));
+        return deviceTasks.stream().map(deviceTask -> {
+            DeviceTaskDTO deviceTaskDTO = new DeviceTaskDTO().convertFrom(deviceTask);
+            deviceTaskDTO.setRecords(stepExecutionRecordMap.get(deviceTask.getId()));
+            return deviceTaskDTO;
+        }).collect(Collectors.toList());
     }
 
     private String getPlanExecutionRecordKey(String deviceId) {

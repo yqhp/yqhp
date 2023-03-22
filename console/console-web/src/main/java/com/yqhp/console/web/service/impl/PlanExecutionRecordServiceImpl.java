@@ -4,17 +4,24 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.common.web.exception.ServiceException;
+import com.yqhp.console.model.dto.DeviceTaskDTO;
+import com.yqhp.console.model.dto.PlanExecutionRecordDTO;
 import com.yqhp.console.model.param.query.PlanExecutionRecordPageQuery;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
 import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
 import com.yqhp.console.repository.mapper.PlanExecutionRecordMapper;
+import com.yqhp.console.web.enums.ResponseCodeEnum;
+import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.PlanExecutionRecordService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +31,15 @@ import java.util.stream.Collectors;
 public class PlanExecutionRecordServiceImpl
         extends ServiceImpl<PlanExecutionRecordMapper, PlanExecutionRecord>
         implements PlanExecutionRecordService {
+
+    @Autowired
+    private DeviceTaskService deviceTaskService;
+
+    @Override
+    public PlanExecutionRecord getPlanExecutionRecordById(String id) {
+        return Optional.ofNullable(getById(id))
+                .orElseThrow(() -> new ServiceException(ResponseCodeEnum.PLAN_EXECUTION_RECORD_NOT_FOUND));
+    }
 
     @Override
     public List<PlanExecutionRecord> listUncompletedRecord(LocalDateTime since) {
@@ -50,5 +66,19 @@ public class PlanExecutionRecordServiceImpl
         q.eq(query.getStatus() != null, PlanExecutionRecord::getStatus, query.getStatus());
         q.orderByDesc(PlanExecutionRecord::getId);
         return page(new Page<>(query.getPageNumb(), query.getPageSize()), q);
+    }
+
+    @Override
+    public PlanExecutionRecordDTO getPlanExecutionRecordDTOById(String id) {
+        PlanExecutionRecord planExecutionRecord = getPlanExecutionRecordById(id);
+        return toPlanExecutionRecordDTO(planExecutionRecord);
+    }
+
+    private PlanExecutionRecordDTO toPlanExecutionRecordDTO(PlanExecutionRecord planExecutionRecord) {
+        if (planExecutionRecord == null) return null;
+        PlanExecutionRecordDTO planExecutionRecordDTO = new PlanExecutionRecordDTO().convertFrom(planExecutionRecord);
+        List<DeviceTaskDTO> tasks = deviceTaskService.listDeviceTaskDTOByPlanExecutionRecordId(planExecutionRecord.getId());
+        planExecutionRecordDTO.setTasks(tasks);
+        return planExecutionRecordDTO;
     }
 }

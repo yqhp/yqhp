@@ -107,7 +107,10 @@ public enum ResponseCodeEnum implements ResponseCode {
     UPDATE_PLAN_ACTION_FAIL(3602, "更新计划Action失败，请稍后重试"),
     PLAN_ACTION_NOT_FOUND(3603, "计划Action不存在"),
     DUPLICATE_PLAN_ACTION(3604, "计划Action已存在"),
+
+    PLAN_EXECUTION_RECORD_NOT_FOUND(3901, "计划执行记录不存在"),
     ;
+
 
     private final int code;
     private final String message;

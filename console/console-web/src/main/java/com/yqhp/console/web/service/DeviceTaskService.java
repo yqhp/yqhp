@@ -1,6 +1,7 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yqhp.console.model.dto.DeviceTaskDTO;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
 import com.yqhp.console.repository.entity.DeviceTask;
 
@@ -14,7 +15,11 @@ public interface DeviceTaskService extends IService<DeviceTask> {
 
     ReceivedDeviceTasks receive(String deviceId);
 
+    List<DeviceTask> listByPlanExecutionRecordId(String planExecutionRecordId);
+
     List<DeviceTask> listInPlanExecutionRecordIds(List<String> planExecutionRecordIds);
 
     boolean isFinished(DeviceTask task);
+
+    List<DeviceTaskDTO> listDeviceTaskDTOByPlanExecutionRecordId(String planExecutionRecordId);
 }
