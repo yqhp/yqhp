@@ -67,7 +67,7 @@ public class PlanActionServiceImpl
         List<PlanAction> planActions = params.stream().map(param -> {
             PlanAction planAction = param.convertTo();
             planAction.setId(snowflake.nextIdStr());
-            planAction.setWeight(maxWeight.getAndIncrement());
+            planAction.setWeight(maxWeight.incrementAndGet());
             planAction.setCreateBy(currUid);
             planAction.setUpdateBy(currUid);
             return planAction;

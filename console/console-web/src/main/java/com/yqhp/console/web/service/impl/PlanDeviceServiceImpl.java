@@ -66,7 +66,7 @@ public class PlanDeviceServiceImpl
         List<PlanDevice> planDevices = params.stream().map(param -> {
             PlanDevice planDevice = param.convertTo();
             planDevice.setId(snowflake.nextIdStr());
-            planDevice.setWeight(maxWeight.getAndIncrement());
+            planDevice.setWeight(maxWeight.incrementAndGet());
             planDevice.setCreateBy(currUid);
             planDevice.setUpdateBy(currUid);
             return planDevice;
