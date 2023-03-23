@@ -27,7 +27,6 @@ public class UpdateDocParam implements InputConverter<Doc> {
 
     private String content;
 
-    @NotNull(message = "status不能为空")
     private DocStatus status;
 
     private Integer flags;
