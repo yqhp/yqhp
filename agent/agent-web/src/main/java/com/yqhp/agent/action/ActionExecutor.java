@@ -9,6 +9,7 @@ import com.yqhp.console.repository.enums.ActionStepType;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -91,6 +92,9 @@ public class ActionExecutor {
 
     private void execStep(ActionDTO action, ActionStepDTO step, boolean isRoot) {
         if (step == null) return;
+        if (!BooleanUtils.toBoolean(step.getEnabled())) {
+            return;
+        }
 
         try {
             listeners.forEach(listener -> listener.onStepStarted(action, step, isRoot));
