@@ -29,7 +29,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private static final String AUTH_USER_INFO_PATH = "/auth/user/info";
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private final List<String> whitePaths = List.of("/auth/token", AUTH_USER_INFO_PATH, "/agent/device/token/*");
+    private final List<String> whitePaths = List.of(
+            "/auth/token",
+            AUTH_USER_INFO_PATH,
+            "/agent/device/token/*",
+            "/console/planExecutionRecord/*/details"
+    );
 
     private final WebClient authWebClient;
 
