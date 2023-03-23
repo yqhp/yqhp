@@ -1,10 +1,13 @@
 package com.yqhp.common.kafka.message;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.model.InputConverter;
 import com.yqhp.console.repository.entity.StepExecutionRecord;
 import com.yqhp.console.repository.enums.StepExecutionStatus;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author jiangyitao
@@ -17,4 +20,5 @@ public class StepExecutionRecordMessage implements InputConverter<StepExecutionR
     private StepExecutionStatus status;
     private Long startTime;
     private Long endTime;
+    private List<JShellEvalResult> results;
 }

@@ -1,5 +1,6 @@
 package com.yqhp.agent.action;
 
+import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 
@@ -30,9 +31,9 @@ public interface ActionExecutionListener {
     default void onStepStarted(ActionDTO action, ActionStepDTO step, boolean isRoot) {
     }
 
-    default void onStepSuccessful(ActionDTO action, ActionStepDTO step, boolean isRoot) {
+    default void onStepSuccessful(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, boolean isRoot) {
     }
 
-    default void onStepFailed(ActionDTO action, ActionStepDTO step, Throwable cause, boolean isRoot) {
+    default void onStepFailed(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, Throwable cause, boolean isRoot) {
     }
 }

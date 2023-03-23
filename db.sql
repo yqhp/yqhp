@@ -322,6 +322,7 @@ CREATE TABLE `step_execution_record` (
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `start_time` bigint(20) NOT NULL DEFAULT '0',
   `end_time` bigint(20) NOT NULL DEFAULT '0',
+  `results` json,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_by` varchar(32) NOT NULL COMMENT '创建人',

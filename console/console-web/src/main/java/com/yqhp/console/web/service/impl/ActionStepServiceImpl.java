@@ -104,7 +104,7 @@ public class ActionStepServiceImpl
         Assert.hasText(actionId, "actionId must has text");
         LambdaQueryWrapper<ActionStep> query = new LambdaQueryWrapper<>();
         query.eq(ActionStep::getActionId, actionId);
-        query.orderByAsc(ActionStep::getWeight);
+        query.orderByAsc(ActionStep::getKind, ActionStep::getWeight);
         return list(query);
     }
 

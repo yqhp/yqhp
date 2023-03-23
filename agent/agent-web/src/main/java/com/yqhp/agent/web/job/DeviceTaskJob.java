@@ -6,6 +6,7 @@ import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.service.PluginService;
+import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.kafka.message.DeviceTaskMessage;
 import com.yqhp.common.kafka.message.StepExecutionRecordMessage;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
@@ -147,25 +148,27 @@ public class DeviceTaskJob {
         }
 
         @Override
-        public void onStepSuccessful(ActionDTO action, ActionStepDTO step, boolean isRoot) {
+        public void onStepSuccessful(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, boolean isRoot) {
             if (isRoot) {
                 StepExecutionRecordMessage message = new StepExecutionRecordMessage();
                 message.setId(step.getExecutionId());
                 message.setDeviceId(deviceId);
                 message.setStatus(StepExecutionStatus.SUCCESSFUL);
                 message.setEndTime(System.currentTimeMillis());
+                message.setResults(results);
                 producer.sendStepExecutionRecordMessage(message);
             }
         }
 
         @Override
-        public void onStepFailed(ActionDTO action, ActionStepDTO step, Throwable cause, boolean isRoot) {
+        public void onStepFailed(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, Throwable cause, boolean isRoot) {
             if (isRoot) {
                 StepExecutionRecordMessage message = new StepExecutionRecordMessage();
                 message.setId(step.getExecutionId());
                 message.setDeviceId(deviceId);
                 message.setStatus(StepExecutionStatus.FAILED);
                 message.setEndTime(System.currentTimeMillis());
+                message.setResults(results);
                 producer.sendStepExecutionRecordMessage(message);
             }
         }

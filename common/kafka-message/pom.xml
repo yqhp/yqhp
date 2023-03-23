@@ -21,6 +21,10 @@
             <groupId>com.yqhp</groupId>
             <artifactId>console-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yqhp</groupId>
+            <artifactId>common-jshell</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

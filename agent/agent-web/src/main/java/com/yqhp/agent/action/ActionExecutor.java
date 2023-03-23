@@ -96,6 +96,7 @@ public class ActionExecutor {
             return;
         }
 
+        List<JShellEvalResult> results = null;
         try {
             listeners.forEach(listener -> listener.onStepStarted(action, step, isRoot));
             if (ActionStepType.ACTION.equals(step.getType())) {
@@ -109,15 +110,21 @@ public class ActionExecutor {
                 } else if (ActionStepType.JSH.equals(step.getType())) {
                     content = step.getContent();
                 }
-                List<JShellEvalResult> results = driver.jshellEval(content);
+                results = driver.jshellEval(content);
                 boolean stepFailed = results.stream().anyMatch(JShellEvalResult::isFailed);
                 if (stepFailed) {
                     throw new ActionStepExecutionException(results);
                 }
             }
-            listeners.forEach(listener -> listener.onStepSuccessful(action, step, isRoot));
+            // 由于results不能定义成final 不能用forEach
+            for (ActionExecutionListener listener : listeners) {
+                listener.onStepSuccessful(action, step, results, isRoot);
+            }
         } catch (Throwable cause) {
-            listeners.forEach(listener -> listener.onStepFailed(action, step, cause, isRoot));
+            // 由于results不能定义成final 不能用forEach
+            for (ActionExecutionListener listener : listeners) {
+                listener.onStepFailed(action, step, results, cause, isRoot);
+            }
             throw cause;
         }
     }
