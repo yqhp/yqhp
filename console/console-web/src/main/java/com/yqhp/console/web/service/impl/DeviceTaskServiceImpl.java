@@ -104,13 +104,13 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
             rTask.setId(task.getId());
             ActionDTO action = new ActionDTO();
             BeanUtils.copyProperties(task.getAction(), action);
-            action.setSteps(recordsMap.get(task.getId()).stream()
-                    .map(record -> {
+            List<ActionStepDTO> steps = recordsMap.computeIfAbsent(task.getId(), key -> new ArrayList<>())
+                    .stream().map(record -> {
                         ActionStepDTO step = record.getStep();
                         step.setExecutionId(record.getId());
                         return step;
-                    }).collect(Collectors.toList())
-            );
+                    }).collect(Collectors.toList());
+            action.setSteps(steps);
             rTask.setAction(action);
             return rTask;
         }).collect(Collectors.toList()));
