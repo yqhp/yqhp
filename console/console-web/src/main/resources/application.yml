@@ -2,6 +2,11 @@ server:
   port: 8887
   servlet:
     context-path: /console
+  tomcat:
+    accept-count: 1000 # Maximum queue length for incoming connection requests when all possible request processing threads are in use
+    threads:
+      max: 1000 # Maximum amount of worker threads.
+      min-spare: 10 # Minimum amount of worker threads.
 
 spring:
   application:
@@ -16,13 +21,13 @@ spring:
       group-id: console
       enable-auto-commit: true
       max-poll-records: 1000
-#    properties:
-#      security:
-#        protocol: SASL_PLAINTEXT
-#      sasl:
-#        mechanism: PLAIN
-#        jaas:
-#          config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin@123";'
+  #    properties:
+  #      security:
+  #        protocol: SASL_PLAINTEXT
+  #      sasl:
+  #        mechanism: PLAIN
+  #        jaas:
+  #          config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin@123";'
 
   datasource:
     url: jdbc:mysql://${CONSOLE_MYSQL_HOST:127.0.0.1:3306}/console?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8

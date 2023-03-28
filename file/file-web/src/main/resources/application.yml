@@ -2,6 +2,11 @@ server:
   port: 8866
   servlet:
     context-path: /oss
+  tomcat:
+    accept-count: 1000 # Maximum queue length for incoming connection requests when all possible request processing threads are in use
+    threads:
+      max: 1000 # Maximum amount of worker threads.
+      min-spare: 10 # Minimum amount of worker threads.
 
 spring:
   application:
