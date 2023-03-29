@@ -87,9 +87,7 @@ public class Scrcpy {
         try {
             scrcpyFrameClient.connect(localPort, timeout, scrcpyOptions);
             scrcpyControlClient.connect(localPort);
-            if (scrcpyOptions.isSendDeviceMeta()) {
-                scrcpyFrameClient.readDeviceMeta();
-            }
+            scrcpyFrameClient.readDeviceMeta();
         } catch (ScrcpyException e) {
             stop();
             throw e;

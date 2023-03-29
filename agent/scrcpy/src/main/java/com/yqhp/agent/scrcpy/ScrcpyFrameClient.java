@@ -55,7 +55,7 @@ public class ScrcpyFrameClient {
 
         long timeoutMs = System.currentTimeMillis() + readTimeout.toMillis();
 
-        while (frameInputStream.read() != 0) { // scrcpy协议: 读到0，代表连接成功
+        while (scrcpyOptions.isSendDummyByte() && frameInputStream.read() != 0) { // 读到0，代表连接成功
             frameInputStream.close();
             frameSocket.close();
 
@@ -64,7 +64,7 @@ public class ScrcpyFrameClient {
             }
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 log.warn("Interrupted", e);
             }
@@ -114,16 +114,18 @@ public class ScrcpyFrameClient {
     }
 
     void readDeviceMeta() throws IOException {
-        // deviceName 64字节，暂时用不到，忽略
-        for (int i = 0; i < 64; i++) {
-            frameInputStream.read();
-        }
+        if (scrcpyOptions.isSendDeviceMeta()) {
+            // deviceName 64字节，暂时用不到，忽略
+            for (int i = 0; i < 64; i++) {
+                frameInputStream.read();
+            }
 
-        // width height 2字节
-        int width = frameInputStream.read() << 8 | frameInputStream.read();
-        int height = frameInputStream.read() << 8 | frameInputStream.read();
-        log.info("[{}]scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
-        screenSize = new Size(width, height);
+            // width height 2字节
+            int width = frameInputStream.read() << 8 | frameInputStream.read();
+            int height = frameInputStream.read() << 8 | frameInputStream.read();
+            log.info("[{}]scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
+            screenSize = new Size(width, height);
+        }
     }
 
     public ByteBuffer readFrame() throws IOException {
