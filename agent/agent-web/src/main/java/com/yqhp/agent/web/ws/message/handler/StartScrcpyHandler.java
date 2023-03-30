@@ -13,9 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
+import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * @author jiangyitao
@@ -24,7 +27,7 @@ import java.util.concurrent.Executors;
 public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
 
     private static final ExecutorService START_SCRCPY_THREAD_POOL = Executors.newCachedThreadPool();
-    private static final ExecutorService SEND_SCRCPY_FRAME_THREAD_POOL = Executors.newCachedThreadPool();
+    private static final ExecutorService READ_SCRCPY_FRAME_THREAD_POOL = Executors.newCachedThreadPool();
 
     public StartScrcpyHandler(Session session, DeviceDriver deviceDriver) {
         super(session, deviceDriver);
@@ -51,20 +54,37 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
         );
         os.info(uid, "starting scrcpy success");
 
-        SEND_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
+        ScrcpyFrameClient scrcpyFrameClient = scrcpy.getScrcpyFrameClient();
+        os.info(uid, scrcpyFrameClient.getScreenSize());
+
+        final BlockingQueue<ByteBuffer> blockingQueue = new SynchronousQueue<>();
+        Thread sendFrameThread = new Thread(() -> {
             RemoteEndpoint.Basic remote = session.getBasicRemote();
-            ScrcpyFrameClient scrcpyFrameClient = scrcpy.getScrcpyFrameClient();
-            os.info(uid, scrcpyFrameClient.getScreenSize());
             try {
-                os.ok(uid, "start sending screen frames...");
-                log.info("[{}]start sending screen frames...", deviceDriver.getDeviceId());
-                for (; ; ) {
-                    remote.sendBinary(scrcpyFrameClient.readFrame());
+                os.ok(uid, "start sending frames...");
+                log.info("[{}]start sending frames...", deviceDriver.getDeviceId());
+                while (!Thread.interrupted()) {
+                    ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
+                    remote.sendBinary(frame);
                 }
+                log.info("[{}]stop sending frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop sending screen frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
+                log.info("[{}]stop sending frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
             }
         });
+        READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
+            try {
+                log.info("[{}]start reading frames", deviceDriver.getDeviceId());
+                for (; ; ) {
+                    blockingQueue.put(scrcpyFrameClient.readFrame());
+                }
+            } catch (Throwable cause) {
+                log.info("[{}]stop reading frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
+            } finally {
+                sendFrameThread.interrupt();
+            }
+        });
+        sendFrameThread.start();
     }
 
 }
