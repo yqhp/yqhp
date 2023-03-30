@@ -1,7 +1,6 @@
 package com.yqhp.agent.web.ws.message.handler;
 
 import cn.hutool.core.lang.ParameterizedTypeImpl;
-import com.alibaba.nacos.common.utils.BiConsumer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
@@ -12,6 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * @author jiangyitao
