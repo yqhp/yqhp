@@ -2,7 +2,6 @@ package com.yqhp.agent.scrcpy;
 
 import com.android.ddmlib.IDevice;
 import com.yqhp.agent.scrcpy.message.KeyEvent;
-import com.yqhp.agent.scrcpy.message.Position;
 import com.yqhp.agent.scrcpy.message.ScrollEvent;
 import com.yqhp.agent.scrcpy.message.TouchEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +71,10 @@ public class ScrcpyControlClient {
         touchEventBuffer.put(INJECT_TOUCH_EVENT);
         touchEventBuffer.put(event.getAction());
         touchEventBuffer.putLong(event.getPointerId());
-        setPosition(touchEventBuffer, event.getPosition());
+        touchEventBuffer.putInt(event.getX());
+        touchEventBuffer.putInt(event.getY());
+        touchEventBuffer.putShort(event.getWidth());
+        touchEventBuffer.putShort(event.getHeight());
         touchEventBuffer.putShort(event.getPressure());
         touchEventBuffer.putInt(event.getButtons());
 
@@ -107,19 +109,15 @@ public class ScrcpyControlClient {
         scrollEventBuffer.rewind();
 
         scrollEventBuffer.put(INJECT_SCROLL_EVENT);
-        setPosition(scrollEventBuffer, event.getPosition());
+        scrollEventBuffer.putInt(event.getX());
+        scrollEventBuffer.putInt(event.getY());
+        scrollEventBuffer.putShort(event.getWidth());
+        scrollEventBuffer.putShort(event.getHeight());
         scrollEventBuffer.putInt(event.getDeltaX());
         scrollEventBuffer.putInt(event.getDeltaY());
         scrollEventBuffer.putInt(event.getButtons());
 
         controlOutputStream.write(scrollEventBuffer.array());
-    }
-
-    private void setPosition(ByteBuffer buffer, Position position) {
-        buffer.putInt(position.getX());
-        buffer.putInt(position.getY());
-        buffer.putShort(position.getWidth());
-        buffer.putShort(position.getHeight());
     }
 
 }

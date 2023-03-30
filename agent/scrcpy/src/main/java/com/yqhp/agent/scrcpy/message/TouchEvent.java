@@ -12,7 +12,10 @@ public class TouchEvent {
      */
     private byte action;
     private long pointerId;
-    private Position position;
+    private int x;
+    private int y;
+    private short width;
+    private short height;
     private short pressure;
     private int buttons;
 }

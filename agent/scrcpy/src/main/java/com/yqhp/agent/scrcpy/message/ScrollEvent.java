@@ -7,7 +7,10 @@ import lombok.Data;
  */
 @Data
 public class ScrollEvent {
-    private Position position;
+    private int x;
+    private int y;
+    private short width;
+    private short height;
     private int deltaX;
     private int deltaY;
     private int buttons;
