@@ -36,8 +36,8 @@ agent:
   android:
     enabled: true
     adb-path:
-    scrcpy-version: 1.23
-    scrcpy-server-path: ${agent.baseDir}/vendor/scrcpy/scrcpy-server
+    scrcpy-version: 1.25
+    scrcpy-server-path: ${agent.baseDir}/vendor/scrcpy/scrcpy-server-v1.25
   iOS:
     realDevice:
       enabled: false

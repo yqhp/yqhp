@@ -11,7 +11,7 @@ public class ScrollEvent {
     private int y;
     private short width;
     private short height;
-    private int deltaX;
-    private int deltaY;
+    private short scrollX;
+    private short scrollY;
     private int buttons;
 }

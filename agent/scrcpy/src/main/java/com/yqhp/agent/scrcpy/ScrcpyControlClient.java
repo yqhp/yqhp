@@ -26,7 +26,7 @@ public class ScrcpyControlClient {
 
     private final ByteBuffer touchEventBuffer = ByteBuffer.allocate(28);
     private final ByteBuffer keyEventBuffer = ByteBuffer.allocate(14);
-    private final ByteBuffer scrollEventBuffer = ByteBuffer.allocate(25);
+    private final ByteBuffer scrollEventBuffer = ByteBuffer.allocate(21);
 
     private Socket controlSocket;
     private OutputStream controlOutputStream;
@@ -113,8 +113,8 @@ public class ScrcpyControlClient {
         scrollEventBuffer.putInt(event.getY());
         scrollEventBuffer.putShort(event.getWidth());
         scrollEventBuffer.putShort(event.getHeight());
-        scrollEventBuffer.putInt(event.getDeltaX());
-        scrollEventBuffer.putInt(event.getDeltaY());
+        scrollEventBuffer.putShort(event.getScrollX());
+        scrollEventBuffer.putShort(event.getScrollY());
         scrollEventBuffer.putInt(event.getButtons());
 
         controlOutputStream.write(scrollEventBuffer.array());
