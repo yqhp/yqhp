@@ -13,4 +13,5 @@ public enum Command {
     STOP_RECEIVE_DEVICE_LOG,
     RECEIVE_APPIUM_LOG,
     STOP_RECEIVE_APPIUM_LOG,
+    JSHELL_EVAL,
 }

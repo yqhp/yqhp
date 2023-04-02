@@ -178,7 +178,7 @@ public abstract class DeviceDriver {
                     log.info("[{}]init jshell context...", device.getId());
                     jshellContext = new JShellContext();
                     jshellContext.injectVar(new D(this));
-                    log.info("[{}]init jshell context success", device.getId());
+                    log.info("[{}]init jshell context completed", device.getId());
                 }
             }
         }
@@ -187,6 +187,10 @@ public abstract class DeviceDriver {
 
     public List<JShellEvalResult> jshellEval(String input) {
         return getOrCreateJShellContext().getJShellTool().eval(input);
+    }
+
+    public List<JShellEvalResult> jshellEval(String input, Consumer<JShellEvalResult> consumer) {
+        return getOrCreateJShellContext().getJShellTool().eval(input, consumer);
     }
 
     public List<String> jshellCompletionSuggestions(String input) {

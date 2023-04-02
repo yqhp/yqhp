@@ -7,6 +7,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,7 @@ public class JShellTool {
     private Locale locale = Locale.getDefault();
 
     private List<JShellEvalResult> results;
-    private JShellEvalResult result;
+    private StringBuilder error;
 
     public JShellTool(JShell shell) {
         Validate.notNull(shell);
@@ -32,18 +33,22 @@ public class JShellTool {
     }
 
     public synchronized List<JShellEvalResult> eval(String in) {
+        return eval(in, null);
+    }
+
+    public synchronized List<JShellEvalResult> eval(String in, Consumer<JShellEvalResult> consumer) {
         results = new ArrayList<>();
         String input = in;
         while (StringUtils.isNotEmpty(input)) {
-            input = processInput(input);
+            input = processInput(input, consumer);
         }
         return results;
     }
 
-    private String processInput(String input) {
+    private String processInput(String input, Consumer<JShellEvalResult> consumer) {
         SourceCodeAnalysis.CompletionInfo info = analysis.analyzeCompletion(input);
         String source = info.source();
-        if (StringUtils.isNotEmpty(source) && processSource(trimEnd(source))) {
+        if (StringUtils.isNotEmpty(source) && processSource(trimEnd(source), consumer)) {
             return info.remaining();
         }
         return "";
@@ -64,12 +69,13 @@ public class JShellTool {
         }
     }
 
-    private boolean processSource(String source) {
+    private boolean processSource(String source, Consumer<JShellEvalResult> consumer) {
         // ~~~ 记录代码执行信息 ~~~ by jiangyitao
-        result = new JShellEvalResult();
+        JShellEvalResult result = new JShellEvalResult();
         results.add(result);
         result.setSource(source);
-        result.setError(new StringBuilder());
+        error = new StringBuilder();
+        result.setError(error);
 
         boolean failed = false;
         result.setEvalStart(System.currentTimeMillis());
@@ -79,6 +85,7 @@ public class JShellTool {
             failed |= handleEvent(e);
         }
         result.setFailed(failed);
+        if (consumer != null) consumer.accept(result);
         return !failed;
     }
 
@@ -365,7 +372,7 @@ public class JShellTool {
      */
     void error(String format, Object... args) {
 //        (interactiveModeBegun ? cmdout : cmderr).printf(prefixError(format), args);
-        result.getError().append(new Formatter().format(prefixError(format), args)); // ~~~ 记录代码执行信息 ~~~ by jiangyitao
+        error.append(new Formatter().format(prefixError(format), args)); // ~~~ 记录代码执行信息 ~~~ by jiangyitao
     }
 
     final Feedback feedback = new Feedback();

@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.springframework.util.Assert;
 
-import java.util.Optional;
-
 /**
  * @author jiangyitao
  */
@@ -69,7 +67,6 @@ public class D implements JShellVar {
     }
 
     public AppiumDriver appiumDriver() {
-        return Optional.ofNullable(deviceDriver.getAppiumDriver())
-                .orElseThrow(() -> new IllegalStateException("appiumDriver is null"));
+        return deviceDriver.getOrCreateAppiumDriver();
     }
 }

@@ -60,7 +60,8 @@ public class DeviceWebsocket {
                 .addInputHandler(new ReceiveDeviceLogHandler(session, deviceDriver))
                 .addInputHandler(new StopReceiveDeviceLogHandler(session, deviceDriver))
                 .addInputHandler(new ReceiveAppiumLogHandler(session, deviceDriver))
-                .addInputHandler(new StopReceiveAppiumLogHandler(session, deviceDriver));
+                .addInputHandler(new StopReceiveAppiumLogHandler(session, deviceDriver))
+                .addInputHandler(new JShellEvalHandler(session, deviceDriver));
     }
 
     @OnClose
