@@ -40,7 +40,7 @@ public class D implements JShellVar {
     public synchronized D init() {
         if (inited) return this;
         capability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds = 24hour
-        deviceDriver.createAppiumDriver();
+        deviceDriver.getOrCreateAppiumDriver();
         inited = true;
         return this;
     }

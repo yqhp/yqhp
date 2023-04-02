@@ -3,17 +3,13 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.jshell.D;
-import com.yqhp.common.jshell.JShellConst;
 import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.common.jshell.JShellTool;
 import com.yqhp.common.web.util.ApplicationContextUtils;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
-import jdk.jshell.JShell;
 import jdk.jshell.SourceCodeAnalysis;
-import jdk.jshell.execution.LocalExecutionControlProvider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +46,7 @@ public abstract class DeviceDriver {
     private ByteArrayOutputStream appiumLogBuffer;
     private OutputStream appiumLogOutput;
 
-    private volatile JShell jshell;
-    private volatile JShellTool jshellTool;
-    private JShellContext jshellContext;
+    private volatile JShellContext jshellContext;
 
     public DeviceDriver(Device device) {
         this.device = device;
@@ -72,7 +66,7 @@ public abstract class DeviceDriver {
 
     public abstract void stopReceiveDeviceLog();
 
-    public synchronized AppiumDriverLocalService startAppiumService() {
+    public synchronized AppiumDriverLocalService getOrStartAppiumService() {
         if (appiumServiceIsRunning()) {
             return appiumService;
         }
@@ -118,7 +112,7 @@ public abstract class DeviceDriver {
                 }
             }
         };
-        startAppiumService().addOutPutStream(appiumLogOutput);
+        getOrStartAppiumService().addOutPutStream(appiumLogOutput);
     }
 
     public synchronized void stopReceiveAppiumLog() {
@@ -143,7 +137,7 @@ public abstract class DeviceDriver {
 
     public synchronized AppiumDriver refreshAppiumDriver() {
         quitAppiumDriver();
-        return createAppiumDriver();
+        return getOrCreateAppiumDriver();
     }
 
     public void setCapability(String key, Object value) {
@@ -153,12 +147,12 @@ public abstract class DeviceDriver {
         capabilities.setCapability(key, value);
     }
 
-    public synchronized AppiumDriver createAppiumDriver() {
+    public synchronized AppiumDriver getOrCreateAppiumDriver() {
         if (appiumDriver != null) return appiumDriver;
         if (capabilities == null) capabilities = new DesiredCapabilities();
 
         log.info("[{}]creating appium driver, capabilities: {}", device.getId(), capabilities);
-        appiumDriver = newAppiumDriver(startAppiumService().getUrl(), capabilities);
+        appiumDriver = newAppiumDriver(getOrStartAppiumService().getUrl(), capabilities);
         log.info("[{}]create appium driver completed, capabilities: {}", device.getId(), capabilities);
         return appiumDriver;
     }
@@ -177,49 +171,27 @@ public abstract class DeviceDriver {
 
     protected abstract AppiumDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities);
 
-    public JShell getJShell() {
-        if (jshell == null) {
+    public JShellContext getOrCreateJShellContext() {
+        if (jshellContext == null) {
             synchronized (DeviceDriver.class) {
-                if (jshell == null) {
-                    log.info("[{}]start initializing jshell", device.getId());
-                    JShell.Builder builder = JShell.builder()
-                            .executionEngine(new LocalExecutionControlProvider(), null);
-                    jshell = builder.build();
-                    for (String defaultImport : JShellConst.DEFAULT_IMPORTS) {
-                        log.info("[{}]jshell eval: {}", device.getId(), defaultImport);
-                        jshell.eval(defaultImport);
-                    }
-                    for (String printing : JShellConst.PRINTINGS) {
-                        log.info("[{}]jshell eval: {}", device.getId(), printing);
-                        jshell.eval(printing);
-                    }
-
-                    jshellContext = new JShellContext(jshell);
-                    D d = new D(this);
-                    log.info("[{}]jshell context injectVar: {}", device.getId(), d.getName());
-                    jshellContext.injectVar(d);
-
-                    log.info("[{}]initialize jshell completed", device.getId());
+                if (jshellContext == null) {
+                    log.info("[{}]init jshell context...", device.getId());
+                    jshellContext = new JShellContext();
+                    jshellContext.injectVar(new D(this));
+                    log.info("[{}]init jshell context success", device.getId());
                 }
             }
         }
-        return jshell;
+        return jshellContext;
     }
 
     public List<JShellEvalResult> jshellEval(String input) {
-        if (jshellTool == null) {
-            synchronized (DeviceDriver.class) {
-                if (jshellTool == null) {
-                    jshellTool = new JShellTool(getJShell());
-                }
-            }
-        }
-        return jshellTool.eval(input);
+        return getOrCreateJShellContext().getJShellTool().eval(input);
     }
 
     public List<String> jshellCompletionSuggestions(String input) {
         if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getJShell().sourceCodeAnalysis()
+        return getOrCreateJShellContext().getJshell().sourceCodeAnalysis()
                 .completionSuggestions(input, input.length(), new int[]{-1}).stream()
                 .filter(SourceCodeAnalysis.Suggestion::matchesType)
                 .map(SourceCodeAnalysis.Suggestion::continuation)
@@ -229,7 +201,7 @@ public abstract class DeviceDriver {
 
     public List<String> jshellDocs(String input) {
         if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getJShell().sourceCodeAnalysis()
+        return getOrCreateJShellContext().getJshell().sourceCodeAnalysis()
                 .documentation(input, input.length(), false).stream()
                 .map(SourceCodeAnalysis.Documentation::signature)
                 .collect(Collectors.toList());
@@ -246,21 +218,13 @@ public abstract class DeviceDriver {
 
     public void jshellAddToClasspath(String path) {
         Assert.hasText(path, "path must has text");
-        getJShell().addToClasspath(path);
+        getOrCreateJShellContext().getJshell().addToClasspath(path);
     }
 
     public synchronized void closeJShell() {
         if (jshellContext != null) {
             jshellContext.close();
             jshellContext = null;
-        }
-        if (jshellTool != null) {
-            jshellTool = null;
-        }
-        if (jshell != null) {
-            log.info("[{}]close jshell", device.getId());
-            jshell.close();
-            jshell = null;
         }
     }
 
