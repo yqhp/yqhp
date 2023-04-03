@@ -12,7 +12,6 @@ import lombok.Getter;
 public enum PkgType implements BaseEnum<Integer> {
 
     DOC(1),
-    ACTION(2),
     ;
 
     @EnumValue

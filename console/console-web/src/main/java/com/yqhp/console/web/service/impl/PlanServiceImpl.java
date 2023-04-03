@@ -11,11 +11,13 @@ import com.yqhp.console.model.param.CreatePlanParam;
 import com.yqhp.console.model.param.UpdatePlanParam;
 import com.yqhp.console.model.param.query.PlanPageQuery;
 import com.yqhp.console.repository.entity.DeviceTask;
+import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
-import com.yqhp.console.repository.entity.StepExecutionRecord;
-import com.yqhp.console.repository.enums.*;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
+import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
+import com.yqhp.console.repository.enums.RunMode;
 import com.yqhp.console.repository.mapper.PlanMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.*;
@@ -42,11 +44,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Autowired
     private PlanExecutionRecordService planExecutionRecordService;
     @Autowired
-    private ActionService actionService;
-    @Autowired
     private DeviceTaskService deviceTaskService;
-    @Autowired
-    private StepExecutionRecordService stepExecutionRecordService;
     @Autowired
     private PluginService pluginService;
     @Autowired
@@ -54,7 +52,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Autowired
     private PlanDeviceService planDeviceService;
     @Autowired
-    private PlanActionService planActionService;
+    private PlanDocService planDocService;
 
     @Override
     public IPage<Plan> pageBy(PlanPageQuery query) {
@@ -131,7 +129,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Override
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
-        Map<String, List<ActionDTO>> deviceActionsMap = assignDeviceTasks(plan);
+        // 分配设备任务
+        Map<String, List<Doc>> deviceDocsMap = assignDeviceTasks(plan);
         String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
 
         // 保存计划执行记录
@@ -147,85 +146,59 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         planExecutionRecord.setUpdateBy(createBy);
         planExecutionRecordService.save(planExecutionRecord);
 
-        // 保存设备任务和步骤执行记录
+        // 保存设备任务
         List<DeviceTask> deviceTasks = new ArrayList<>();
-        List<StepExecutionRecord> stepExecutionRecords = new ArrayList<>();
-        deviceActionsMap.forEach((deviceId, actions) -> {
-            for (ActionDTO action : actions) {
-                DeviceTask task = new DeviceTask();
-                task.setId(snowflake.nextIdStr());
-                task.setProjectId(plan.getProjectId());
-                task.setPlanId(plan.getId());
-                task.setPlanExecutionRecordId(planExecutionRecord.getId());
-                task.setDeviceId(deviceId);
-                task.setActionId(action.getId());
-                task.setAction(action); // 保留提交执行时的action, todo fix 保存的action写入了steps冗余的内容
-                task.setStatus(DeviceTaskStatus.TODO);
-                task.setCreateBy(createBy);
-                task.setUpdateBy(createBy);
-                deviceTasks.add(task);
-                stepExecutionRecords.addAll(createStepExecutionRecords(task, action));
-            }
-        });
-        if (stepExecutionRecords.isEmpty()) {
-            throw new ServiceException(ResponseCodeEnum.NO_STEP_EXECUTION_RECORDS);
-        }
+        deviceDocsMap.forEach((deviceId, docs) ->
+                deviceTasks.addAll(docs.stream().map((doc) -> {
+                    DeviceTask task = new DeviceTask();
+                    task.setId(snowflake.nextIdStr());
+                    task.setProjectId(plan.getProjectId());
+                    task.setPlanId(plan.getId());
+                    task.setPlanExecutionRecordId(planExecutionRecord.getId());
+                    task.setDeviceId(deviceId);
+                    task.setDocId(doc.getId());
+                    task.setDoc(doc); // 保留提交执行时的doc
+                    task.setStatus(DeviceTaskStatus.TODO);
+                    task.setCreateBy(createBy);
+                    task.setUpdateBy(createBy);
+                    return task;
+                }).collect(Collectors.toList()))
+        );
         deviceTaskService.saveBatch(deviceTasks);
-        stepExecutionRecordService.saveBatch(stepExecutionRecords);
 
-        for (String deviceId : deviceActionsMap.keySet()) {
-            deviceTaskService.cachePlanExecutionRecordIdForDevice(deviceId, planExecutionRecord.getId());
+        for (String deviceId : deviceDocsMap.keySet()) {
+            deviceTaskService.cachePlanExecutionRecordForDevice(deviceId, planExecutionRecord.getId());
         }
-    }
-
-    private List<StepExecutionRecord> createStepExecutionRecords(DeviceTask task, ActionDTO action) {
-        if (CollectionUtils.isEmpty(action.getSteps())) {
-            return new ArrayList<>();
-        }
-        return action.getSteps().stream().map(step -> {
-            StepExecutionRecord record = new StepExecutionRecord();
-            record.setId(snowflake.nextIdStr());
-            record.setDeviceTaskId(task.getId());
-            record.setDeviceId(task.getDeviceId());
-            record.setActionId(action.getId());
-            record.setStepId(step.getId());
-            record.setStep(step);
-            record.setStatus(StepExecutionStatus.TODO);
-            record.setCreateBy(task.getCreateBy());
-            record.setUpdateBy(task.getUpdateBy());
-            return record;
-        }).collect(Collectors.toList());
     }
 
     /**
      * @return deviceId -> v
      */
-    private Map<String, List<ActionDTO>> assignDeviceTasks(Plan plan) {
-        HashMap<String, List<ActionDTO>> result = new HashMap<>();
+    private Map<String, List<Doc>> assignDeviceTasks(Plan plan) {
+        HashMap<String, List<Doc>> result = new HashMap<>();
         List<String> deviceIds = planDeviceService.listEnabledAndSortedPlanDeviceIdByPlanId(plan.getId());
         if (CollectionUtils.isEmpty(deviceIds)) {
             throw new ServiceException(ResponseCodeEnum.NO_DEVICES);
         }
-        List<String> actionIds = planActionService.listEnabledAndSortedActionIdByPlanId(plan.getId());
-        List<ActionDTO> actionDTOs = actionService.listActionDTOByIds(actionIds);
-        if (CollectionUtils.isEmpty(actionDTOs)) {
-            throw new ServiceException(ResponseCodeEnum.NO_ACTIONS);
+        List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
+        List<Doc> docs = docService.listByIds(docIds);
+        if (CollectionUtils.isEmpty(docs)) {
+            throw new ServiceException(ResponseCodeEnum.NO_DOCS);
         }
 
         if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {
             // 兼容模式，执行同一份
             for (String deviceId : deviceIds) {
-                result.put(deviceId, actionDTOs);
+                result.put(deviceId, docs);
             }
         } else if (RunMode.EFFICIENT.equals(plan.getRunMode())) {
             // 高效模式，平均分
             int i = 0;
             int deviceCount = deviceIds.size();
-            for (ActionDTO action : actionDTOs) {
+            for (Doc doc : docs) {
                 if (i == deviceCount) i = 0;
                 String deviceId = deviceIds.get(i);
-                List<ActionDTO> actions = result.computeIfAbsent(deviceId, k -> new ArrayList<>());
-                actions.add(action);
+                result.computeIfAbsent(deviceId, k -> new ArrayList<>()).add(doc);
                 i++;
             }
         }

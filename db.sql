@@ -194,44 +194,6 @@ CREATE TABLE `doc` (
   KEY `idx_pkg_id` (`pkg_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文档';
 
-CREATE TABLE `action` (
-  `id` varchar(32) NOT NULL,
-  `project_id` varchar(32) NOT NULL,
-  `pkg_id` varchar(32) NOT NULL DEFAULT '0',
-  `weight` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(128) NOT NULL,
-  `description` varchar(256) NOT NULL DEFAULT '' COMMENT '描述',
-  `status` tinyint(4) NOT NULL DEFAULT '1',
-  `flags` int(11) NOT NULL DEFAULT '1',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_by` varchar(32) NOT NULL COMMENT '创建人',
-  `update_by` varchar(32) NOT NULL COMMENT '更新人',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_project_id_pkg_id_name` (`project_id`,`pkg_id`,`name`) USING BTREE,
-  KEY `idx_pkg_id` (`pkg_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `action_step` (
-    `id` varchar(32) NOT NULL,
-    `project_id` varchar(32) NOT NULL,
-    `action_id` varchar(32) NOT NULL,
-    `kind` tinyint(4) NOT NULL DEFAULT '2',
-    `weight` int(11) NOT NULL DEFAULT '0',
-    `type` tinyint(4) NOT NULL,
-    `id_of_type` varchar(32) NOT NULL DEFAULT '',
-    `name` varchar(32) NOT NULL DEFAULT '',
-    `content` longtext,
-    `error_handler` tinyint(4) NOT NULL,
-    `enabled` tinyint(4) NOT NULL DEFAULT '1',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `create_by` varchar(32) NOT NULL COMMENT '创建人',
-    `update_by` varchar(32) NOT NULL COMMENT '更新人',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `idx_action_id` (`action_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `plan` (
   `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
@@ -260,10 +222,10 @@ CREATE TABLE `plan_device` (
     UNIQUE KEY `uk_plan_id_device_id` (`plan_id`, `device_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `plan_action` (
+CREATE TABLE `plan_doc` (
     `id` varchar(32) NOT NULL,
     `plan_id` varchar(128) NOT NULL,
-    `action_id` varchar(128) NOT NULL,
+    `doc_id` varchar(128) NOT NULL,
     `weight` int(11) NOT NULL DEFAULT '0',
     `enabled` tinyint(4) NOT NULL DEFAULT '1',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -271,7 +233,7 @@ CREATE TABLE `plan_action` (
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_action_id` (`plan_id`, `action_id`) USING BTREE
+    UNIQUE KEY `uk_plan_id_doc_id` (`plan_id`, `doc_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `plan_execution_record` (
@@ -299,26 +261,8 @@ CREATE TABLE `device_task` (
   `plan_id` varchar(32) NOT NULL,
   `plan_execution_record_id` varchar(32) NOT NULL,
   `device_id` varchar(128) NOT NULL,
-  `action_id` varchar(128) NOT NULL,
-  `action` json,
-  `status` tinyint(4) NOT NULL DEFAULT '0',
-  `start_time` bigint(20) NOT NULL DEFAULT '0',
-  `end_time` bigint(20) NOT NULL DEFAULT '0',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_by` varchar(32) NOT NULL COMMENT '创建人',
-  `update_by` varchar(32) NOT NULL COMMENT '更新人',
-  PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_plan_execution_record_id` (`plan_execution_record_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `step_execution_record` (
-  `id` varchar(32) NOT NULL,
-  `device_task_id` varchar(32) NOT NULL,
-  `device_id` varchar(128) NOT NULL,
-  `action_id` varchar(128) NOT NULL,
-  `step_id` varchar(128) NOT NULL,
-  `step` json,
+  `doc_id` varchar(128) NOT NULL,
+  `doc` json,
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `start_time` bigint(20) NOT NULL DEFAULT '0',
   `end_time` bigint(20) NOT NULL DEFAULT '0',
@@ -328,7 +272,7 @@ CREATE TABLE `step_execution_record` (
   `create_by` varchar(32) NOT NULL COMMENT '创建人',
   `update_by` varchar(32) NOT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_device_task_id` (`device_task_id`) USING BTREE
+  KEY `idx_plan_execution_record_id` (`plan_execution_record_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `view` (

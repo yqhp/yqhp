@@ -4,7 +4,6 @@ import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.file.model.OSSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,10 +77,5 @@ public class DeviceController {
     public List<String> jshellDocs(@RequestHeader("deviceToken") String token,
                                    @NotBlank(message = "input不能为空") String input) {
         return deviceService.jshellDocs(token, input);
-    }
-
-    @PostMapping
-    public void execAction(@RequestHeader("deviceToken") String token, @RequestBody ActionDTO action) {
-        deviceService.execAction(token, action);
     }
 }

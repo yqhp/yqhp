@@ -1,6 +1,5 @@
 package com.yqhp.agent.web.service.impl;
 
-import com.yqhp.agent.action.ActionExecutor;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.devicediscovery.ios.IOSEmulator;
@@ -16,7 +15,6 @@ import com.yqhp.common.zkdevice.ZkDeviceManager;
 import com.yqhp.common.zookeeper.ZkTemplate;
 import com.yqhp.console.repository.enums.DevicePlatform;
 import com.yqhp.console.repository.enums.DeviceType;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
 import com.yqhp.file.model.OSSFile;
 import com.yqhp.file.rpc.FileRpc;
 import lombok.extern.slf4j.Slf4j;
@@ -242,13 +240,6 @@ public class DeviceServiceImpl implements DeviceService {
     public List<String> jshellDocs(String token, String input) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
         return deviceDriver.jshellDocs(input);
-    }
-
-    @Override
-    public void execAction(String token, ActionDTO action) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        // todo 异常响应
-        new ActionExecutor(deviceDriver).exec(action);
     }
 
     private String createDeviceToken(String deviceId) {

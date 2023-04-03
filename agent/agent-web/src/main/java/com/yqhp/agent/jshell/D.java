@@ -48,16 +48,20 @@ public class D implements JShellVar {
         return this;
     }
 
-    public D sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException ignore) {
-        }
+    public D sleep(long ms) throws InterruptedException {
+        Thread.sleep(ms);
         return this;
     }
 
     public D clickId(String id) {
         appiumDriver().findElement(By.id(id)).click();
+        return this;
+    }
+
+    public D clickText(String text) {
+        Assert.hasText(text, "text cannot be empty");
+        By by = By.xpath("//*[contains(@text,'" + text + "')]");
+        appiumDriver().findElement(by).click();
         return this;
     }
 

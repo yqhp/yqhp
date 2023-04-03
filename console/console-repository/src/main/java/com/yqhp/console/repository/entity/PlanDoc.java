@@ -1,9 +1,6 @@
 package com.yqhp.console.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.yqhp.console.repository.enums.ActionStepErrorHandler;
-import com.yqhp.console.repository.enums.ActionStepKind;
-import com.yqhp.console.repository.enums.ActionStepType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,30 +16,18 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActionStep implements Serializable {
+public class PlanDoc implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id")
     private String id;
 
-    private String projectId;
+    private String planId;
 
-    private String actionId;
-
-    private ActionStepKind kind;
+    private String docId;
 
     private Integer weight;
-
-    private ActionStepType type;
-
-    private String idOfType;
-
-    private String name;
-
-    private String content;
-
-    private ActionStepErrorHandler errorHandler;
 
     private Integer enabled;
 

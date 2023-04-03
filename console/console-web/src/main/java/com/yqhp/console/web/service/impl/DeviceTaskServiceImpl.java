@@ -2,21 +2,14 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yqhp.console.model.dto.DeviceTaskDTO;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
-import com.yqhp.console.repository.entity.StepExecutionRecord;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
-import com.yqhp.console.repository.enums.StepExecutionStatus;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.mapper.DeviceTaskMapper;
 import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.PlanExecutionRecordService;
-import com.yqhp.console.web.service.StepExecutionRecordService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,7 +19,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -41,17 +33,12 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private PlanExecutionRecordService planExecutionRecordService;
-    @Autowired
-    private StepExecutionRecordService stepExecutionRecordService;
 
     @Override
-    public void cachePlanExecutionRecordIdForDevice(String deviceId, String planExecutionRecordId) {
+    public void cachePlanExecutionRecordForDevice(String deviceId, String planExecutionRecordId) {
         redisTemplate.opsForList().leftPush(getPlanExecutionRecordKey(deviceId), planExecutionRecordId);
     }
 
-    /**
-     * 领取测试任务
-     */
     @Transactional
     @Override
     public ReceivedDeviceTasks receive(String deviceId) {
@@ -81,39 +68,9 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
         }).collect(Collectors.toList());
         updateBatchById(toUpdateTasks);
 
-        List<String> deviceTaskIds = tasks.stream().map(DeviceTask::getId).collect(Collectors.toList());
-
-        // 更新步骤执行记录状态
-        List<StepExecutionRecord> stepExecutionRecords = stepExecutionRecordService.listInDeviceTaskIds(deviceTaskIds);
-        List<StepExecutionRecord> toUpdateRecords = stepExecutionRecords.stream().map(record -> {
-            StepExecutionRecord toUpdateRecord = new StepExecutionRecord();
-            toUpdateRecord.setId(record.getId());
-            toUpdateRecord.setStatus(StepExecutionStatus.RECEIVED);
-            return toUpdateRecord;
-        }).collect(Collectors.toList());
-        stepExecutionRecordService.updateBatchById(toUpdateRecords);
-
-        // taskId -> records
-        Map<String, List<StepExecutionRecord>> recordsMap = stepExecutionRecords.stream()
-                .collect(Collectors.groupingBy(StepExecutionRecord::getDeviceTaskId));
-
         ReceivedDeviceTasks received = new ReceivedDeviceTasks();
         received.setPlanExecutionRecord(planExecutionRecord);
-        received.setTasks(tasks.stream().map(task -> {
-            ReceivedDeviceTasks.Task rTask = new ReceivedDeviceTasks.Task();
-            rTask.setId(task.getId());
-            ActionDTO action = new ActionDTO();
-            BeanUtils.copyProperties(task.getAction(), action);
-            List<ActionStepDTO> steps = recordsMap.computeIfAbsent(task.getId(), key -> new ArrayList<>())
-                    .stream().map(record -> {
-                        ActionStepDTO step = record.getStep();
-                        step.setExecutionId(record.getId());
-                        return step;
-                    }).collect(Collectors.toList());
-            action.setSteps(steps);
-            rTask.setAction(action);
-            return rTask;
-        }).collect(Collectors.toList()));
+        received.setTasks(tasks);
         return received;
     }
 
@@ -139,26 +96,6 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     public boolean isFinished(DeviceTask task) {
         return DeviceTaskStatus.SUCCESSFUL.equals(task.getStatus())
                 || DeviceTaskStatus.FAILED.equals(task.getStatus());
-    }
-
-    @Override
-    public List<DeviceTaskDTO> listDeviceTaskDTOByPlanExecutionRecordId(String planExecutionRecordId) {
-        List<DeviceTask> deviceTasks = listByPlanExecutionRecordId(planExecutionRecordId);
-        return toDeviceTaskDTOs(deviceTasks);
-    }
-
-    private List<DeviceTaskDTO> toDeviceTaskDTOs(List<DeviceTask> deviceTasks) {
-        if (CollectionUtils.isEmpty(deviceTasks)) return new ArrayList<>();
-
-        List<String> deviceTaskIds = deviceTasks.stream().map(DeviceTask::getId).collect(Collectors.toList());
-        // deviceTaskId -> List<StepExecutionRecord>
-        Map<String, List<StepExecutionRecord>> stepExecutionRecordMap = stepExecutionRecordService.listInDeviceTaskIds(deviceTaskIds)
-                .stream().collect(Collectors.groupingBy(StepExecutionRecord::getDeviceTaskId));
-        return deviceTasks.stream().map(deviceTask -> {
-            DeviceTaskDTO deviceTaskDTO = new DeviceTaskDTO().convertFrom(deviceTask);
-            deviceTaskDTO.setRecords(stepExecutionRecordMap.get(deviceTask.getId()));
-            return deviceTaskDTO;
-        }).collect(Collectors.toList());
     }
 
     private String getPlanExecutionRecordKey(String deviceId) {

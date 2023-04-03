@@ -1,7 +1,7 @@
 package com.yqhp.console.model.vo;
 
+import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -11,12 +11,6 @@ import java.util.List;
  */
 @Data
 public class ReceivedDeviceTasks {
-    private List<Task> tasks;
+    private List<DeviceTask> tasks;
     private PlanExecutionRecord planExecutionRecord;
-
-    @Data
-    public static class Task {
-        private String id;
-        private ActionDTO action;
-    }
 }

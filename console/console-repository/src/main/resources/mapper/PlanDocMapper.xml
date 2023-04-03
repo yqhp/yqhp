@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yqhp.console.repository.mapper.PlanActionMapper">
+<mapper namespace="com.yqhp.console.repository.mapper.PlanDocMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.PlanAction">
+    <resultMap id="BaseResultMap" type="com.yqhp.console.repository.entity.PlanDoc">
         <id column="id" property="id" />
         <result column="plan_id" property="planId" />
-        <result column="action_id" property="actionId" />
+        <result column="doc_id" property="docId" />
         <result column="weight" property="weight" />
         <result column="enabled" property="enabled" />
         <result column="create_time" property="createTime" />

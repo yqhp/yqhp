@@ -1,20 +1,17 @@
 package com.yqhp.agent.web.job;
 
-import com.yqhp.agent.action.ActionExecutionListener;
-import com.yqhp.agent.action.ActionExecutor;
+import com.yqhp.agent.doc.DocExecutionListener;
+import com.yqhp.agent.doc.DocExecutor;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.kafka.message.DeviceTaskMessage;
-import com.yqhp.common.kafka.message.StepExecutionRecordMessage;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
+import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
-import com.yqhp.console.repository.enums.StepExecutionStatus;
-import com.yqhp.console.repository.jsonfield.ActionDTO;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.rpc.DeviceTaskRpc;
 import lombok.Setter;
@@ -74,103 +71,59 @@ public class DeviceTaskJob {
                     driver.jshellEval(doc.getContent());
                 }
                 // 执行任务
-                ActionExecutor executor = new ActionExecutor(driver);
-                ExecutionListener listener = new ExecutionListener(driver.getDeviceId());
+                DocExecutor executor = new DocExecutor(driver);
+                DocExecutionListenerImpl listener = new DocExecutionListenerImpl(driver.getDeviceId());
                 executor.addListener(listener);
-                for (ReceivedDeviceTasks.Task task : received.getTasks()) {
+                for (DeviceTask task : received.getTasks()) {
                     listener.setTaskId(task.getId());
-                    executor.execQuietly(task.getAction());
+                    executor.execQuietly(task.getDoc());
                 }
             } catch (Throwable cause) {
-                log.error("{}", driver.getDeviceId(), cause);
+                log.error("unexpected error, deviceId={}", driver.getDeviceId(), cause);
             } finally {
                 deviceService.unlockDevice(token);
             }
         });
     }
 
-    class ExecutionListener implements ActionExecutionListener {
+    class DocExecutionListenerImpl implements DocExecutionListener {
 
         private final String deviceId;
         @Setter
         private String taskId;
 
-        ExecutionListener(String deviceId) {
+        DocExecutionListenerImpl(String deviceId) {
             this.deviceId = deviceId;
         }
 
         @Override
-        public void onActionStarted(ActionDTO action, boolean isRoot) {
-            if (isRoot) {
-                DeviceTaskMessage message = new DeviceTaskMessage();
-                message.setId(taskId);
-                message.setDeviceId(deviceId);
-                message.setStatus(DeviceTaskStatus.STARTED);
-                message.setStartTime(System.currentTimeMillis());
-                producer.sendDeviceTaskMessage(message);
-            }
+        public void onStarted(Doc doc) {
+            DeviceTaskMessage message = new DeviceTaskMessage();
+            message.setId(taskId);
+            message.setDeviceId(deviceId);
+            message.setStatus(DeviceTaskStatus.STARTED);
+            message.setStartTime(System.currentTimeMillis());
+            producer.sendDeviceTaskMessage(message);
         }
 
         @Override
-        public void onActionSuccessful(ActionDTO action, boolean isRoot) {
-            if (isRoot) {
-                DeviceTaskMessage message = new DeviceTaskMessage();
-                message.setId(taskId);
-                message.setDeviceId(deviceId);
-                message.setStatus(DeviceTaskStatus.SUCCESSFUL);
-                message.setEndTime(System.currentTimeMillis());
-                producer.sendDeviceTaskMessage(message);
-            }
+        public void onSuccessful(Doc doc, List<JShellEvalResult> results) {
+            DeviceTaskMessage message = new DeviceTaskMessage();
+            message.setId(taskId);
+            message.setDeviceId(deviceId);
+            message.setStatus(DeviceTaskStatus.SUCCESSFUL);
+            message.setEndTime(System.currentTimeMillis());
+            producer.sendDeviceTaskMessage(message);
         }
 
         @Override
-        public void onActionFailed(ActionDTO action, Throwable cause, boolean isRoot) {
-            if (isRoot) {
-                DeviceTaskMessage message = new DeviceTaskMessage();
-                message.setId(taskId);
-                message.setDeviceId(deviceId);
-                message.setStatus(DeviceTaskStatus.FAILED);
-                message.setEndTime(System.currentTimeMillis());
-                producer.sendDeviceTaskMessage(message);
-            }
-        }
-
-        @Override
-        public void onStepStarted(ActionDTO action, ActionStepDTO step, boolean isRoot) {
-            if (isRoot) {
-                StepExecutionRecordMessage message = new StepExecutionRecordMessage();
-                message.setId(step.getExecutionId());
-                message.setDeviceId(deviceId);
-                message.setStatus(StepExecutionStatus.STARTED);
-                message.setStartTime(System.currentTimeMillis());
-                producer.sendStepExecutionRecordMessage(message);
-            }
-        }
-
-        @Override
-        public void onStepSuccessful(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, boolean isRoot) {
-            if (isRoot) {
-                StepExecutionRecordMessage message = new StepExecutionRecordMessage();
-                message.setId(step.getExecutionId());
-                message.setDeviceId(deviceId);
-                message.setStatus(StepExecutionStatus.SUCCESSFUL);
-                message.setEndTime(System.currentTimeMillis());
-                message.setResults(results);
-                producer.sendStepExecutionRecordMessage(message);
-            }
-        }
-
-        @Override
-        public void onStepFailed(ActionDTO action, ActionStepDTO step, List<JShellEvalResult> results, Throwable cause, boolean isRoot) {
-            if (isRoot) {
-                StepExecutionRecordMessage message = new StepExecutionRecordMessage();
-                message.setId(step.getExecutionId());
-                message.setDeviceId(deviceId);
-                message.setStatus(StepExecutionStatus.FAILED);
-                message.setEndTime(System.currentTimeMillis());
-                message.setResults(results);
-                producer.sendStepExecutionRecordMessage(message);
-            }
+        public void onFailed(Doc doc, List<JShellEvalResult> results, Throwable cause) {
+            DeviceTaskMessage message = new DeviceTaskMessage();
+            message.setId(taskId);
+            message.setDeviceId(deviceId);
+            message.setStatus(DeviceTaskStatus.FAILED);
+            message.setEndTime(System.currentTimeMillis());
+            producer.sendDeviceTaskMessage(message);
         }
     }
 

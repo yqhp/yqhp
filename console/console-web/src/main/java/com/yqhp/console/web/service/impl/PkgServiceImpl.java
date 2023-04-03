@@ -13,7 +13,6 @@ import com.yqhp.console.model.param.CreatePkgParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdatePkgParam;
 import com.yqhp.console.model.param.query.PkgTreeQuery;
-import com.yqhp.console.repository.entity.Action;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.entity.Pkg;
 import com.yqhp.console.repository.enums.PkgType;
@@ -21,7 +20,6 @@ import com.yqhp.console.repository.mapper.PkgMapper;
 import com.yqhp.console.web.common.Const;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
-import com.yqhp.console.web.service.ActionService;
 import com.yqhp.console.web.service.DocService;
 import com.yqhp.console.web.service.PkgService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +41,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
     @Autowired
     private DocService docService;
-    @Autowired
-    private ActionService actionService;
     @Autowired
     private Snowflake snowflake;
 
@@ -89,12 +85,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
             List<Doc> docs = docService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!docs.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_DOCS_NOT_EMPTY);
-            }
-        } else if (PkgType.ACTION.equals(pkg.getType())) {
-            // 检查目录下是否有action
-            List<Action> actions = actionService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
-            if (!actions.isEmpty()) {
-                throw new ServiceException(ResponseCodeEnum.PKG_ACTIONS_NOT_EMPTY);
             }
         }
 
@@ -211,14 +201,6 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                     return node;
                 }).collect(Collectors.toList());
                 nodes.addAll(docNodes);
-            } else if (PkgType.ACTION.equals(query.getType())) {
-                List<Action> actions = actionService.listByProjectIdAndInPkgIds(query.getProjectId(), pkgIds);
-                List<TreeNode<String>> actionNodes = actions.stream().map(action -> {
-                    TreeNode<String> node = new TreeNode<>(action.getId(), action.getPkgId(), action.getName(), action.getWeight());
-                    node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.ACTION, action).toMap());
-                    return node;
-                }).collect(Collectors.toList());
-                nodes.addAll(actionNodes);
             }
         }
 

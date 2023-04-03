@@ -2,14 +2,14 @@ package com.yqhp.console.repository.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.common.mybatis.typehandler.JacksonTypeHandler;
-import com.yqhp.console.repository.jsonfield.ActionStepDTO;
+import com.yqhp.console.repository.entity.Doc;
 
 /**
  * @author jiangyitao
  */
-public class ActionStepDTOTypeHandler extends JacksonTypeHandler<ActionStepDTO> {
+public class DocTypeHandler extends JacksonTypeHandler<Doc> {
     @Override
-    protected TypeReference<ActionStepDTO> typeReference() {
+    protected TypeReference<Doc> typeReference() {
         return new TypeReference<>() {
         };
     }

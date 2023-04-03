@@ -23,6 +23,5 @@ public class TreeNodeExtra<T> {
     public enum Type {
         PKG,
         DOC,
-        ACTION,
     }
 }

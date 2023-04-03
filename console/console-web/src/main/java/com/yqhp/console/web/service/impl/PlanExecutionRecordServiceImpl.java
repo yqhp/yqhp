@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.dto.DeviceTaskDTO;
 import com.yqhp.console.model.dto.PlanExecutionRecordDTO;
 import com.yqhp.console.model.param.query.PlanExecutionRecordPageQuery;
+import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.PlanExecutionRecord;
 import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
 import com.yqhp.console.repository.mapper.PlanExecutionRecordMapper;
@@ -79,7 +79,7 @@ public class PlanExecutionRecordServiceImpl
     private PlanExecutionRecordDTO toPlanExecutionRecordDTO(PlanExecutionRecord planExecutionRecord) {
         if (planExecutionRecord == null) return null;
         PlanExecutionRecordDTO planExecutionRecordDTO = new PlanExecutionRecordDTO().convertFrom(planExecutionRecord);
-        List<DeviceTaskDTO> tasks = deviceTaskService.listDeviceTaskDTOByPlanExecutionRecordId(planExecutionRecord.getId());
+        List<DeviceTask> tasks = deviceTaskService.listByPlanExecutionRecordId(planExecutionRecord.getId());
         planExecutionRecordDTO.setTasks(tasks);
         return planExecutionRecordDTO;
     }

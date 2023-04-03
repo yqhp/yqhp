@@ -1,7 +1,7 @@
 package com.yqhp.console.repository.mapper;
 
-import com.yqhp.console.repository.entity.Action;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yqhp.console.repository.entity.PlanDoc;
 
 /**
  * <p>
@@ -10,6 +10,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  *
  * @author mybatis-plus generator
  */
-public interface ActionMapper extends BaseMapper<Action> {
+public interface PlanDocMapper extends BaseMapper<PlanDoc> {
 
 }

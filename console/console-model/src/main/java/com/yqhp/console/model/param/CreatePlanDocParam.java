@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
  * @author jiangyitao
  */
 @Data
-public class CreatePlanActionParam extends UpdatePlanActionParam {
+public class CreatePlanDocParam extends UpdatePlanDocParam {
     @NotBlank(message = "planId不能为空")
     private String planId;
 }
