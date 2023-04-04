@@ -113,6 +113,7 @@ public class DeviceTaskJob {
             message.setDeviceId(deviceId);
             message.setStatus(DeviceTaskStatus.SUCCESSFUL);
             message.setEndTime(System.currentTimeMillis());
+            message.setResults(results);
             producer.sendDeviceTaskMessage(message);
         }
 
@@ -123,6 +124,7 @@ public class DeviceTaskJob {
             message.setDeviceId(deviceId);
             message.setStatus(DeviceTaskStatus.FAILED);
             message.setEndTime(System.currentTimeMillis());
+            message.setResults(results);
             producer.sendDeviceTaskMessage(message);
         }
     }
