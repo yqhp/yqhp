@@ -181,7 +181,10 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             throw new ServiceException(ResponseCodeEnum.NO_DEVICES);
         }
         List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        List<Doc> docs = docService.listInIds(docIds);
+        // 查出来的有可能乱序，重新排一下
+        List<Doc> docs = docService.listInIds(docIds).stream()
+                .sorted(Comparator.comparingInt(doc -> docIds.indexOf(doc.getId())))
+                .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(docs)) {
             throw new ServiceException(ResponseCodeEnum.NO_DOCS);
         }
