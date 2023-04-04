@@ -181,7 +181,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             throw new ServiceException(ResponseCodeEnum.NO_DEVICES);
         }
         List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        List<Doc> docs = docService.listByIds(docIds);
+        List<Doc> docs = docService.listInIds(docIds);
         if (CollectionUtils.isEmpty(docs)) {
             throw new ServiceException(ResponseCodeEnum.NO_DOCS);
         }
