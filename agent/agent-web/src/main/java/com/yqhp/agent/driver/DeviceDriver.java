@@ -186,16 +186,16 @@ public abstract class DeviceDriver {
     }
 
     public List<JShellEvalResult> jshellEval(String input) {
-        return getOrCreateJShellContext().getJShellTool().eval(input);
+        return getOrCreateJShellContext().getJShellX().eval(input);
     }
 
     public List<JShellEvalResult> jshellEval(String input, Consumer<JShellEvalResult> consumer) {
-        return getOrCreateJShellContext().getJShellTool().eval(input, consumer);
+        return getOrCreateJShellContext().getJShellX().eval(input, consumer);
     }
 
     public List<String> jshellCompletionSuggestions(String input) {
         if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getOrCreateJShellContext().getJshell().sourceCodeAnalysis()
+        return getOrCreateJShellContext().getJShellX().getJShell().sourceCodeAnalysis()
                 .completionSuggestions(input, input.length(), new int[]{-1}).stream()
                 .filter(SourceCodeAnalysis.Suggestion::matchesType)
                 .map(SourceCodeAnalysis.Suggestion::continuation)
@@ -205,7 +205,7 @@ public abstract class DeviceDriver {
 
     public List<String> jshellDocs(String input) {
         if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getOrCreateJShellContext().getJshell().sourceCodeAnalysis()
+        return getOrCreateJShellContext().getJShellX().getJShell().sourceCodeAnalysis()
                 .documentation(input, input.length(), false).stream()
                 .map(SourceCodeAnalysis.Documentation::signature)
                 .collect(Collectors.toList());
@@ -222,7 +222,7 @@ public abstract class DeviceDriver {
 
     public void jshellAddToClasspath(String path) {
         Assert.hasText(path, "path must has text");
-        getOrCreateJShellContext().getJshell().addToClasspath(path);
+        getOrCreateJShellContext().getJShellX().getJShell().addToClasspath(path);
     }
 
     public synchronized void closeJShell() {

@@ -3,13 +3,16 @@ package com.yqhp.console.repository.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.typehandler.DocTypeHandler;
+import com.yqhp.console.repository.typehandler.JShellEvalResultsTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -46,6 +49,9 @@ public class DeviceTask implements Serializable {
     private Long startTime;
 
     private Long endTime;
+
+    @TableField(typeHandler = JShellEvalResultsTypeHandler.class)
+    private List<JShellEvalResult> results;
 
     /**
      * 创建时间
