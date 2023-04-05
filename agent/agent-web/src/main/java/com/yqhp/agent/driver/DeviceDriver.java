@@ -9,7 +9,6 @@ import com.yqhp.common.web.util.ApplicationContextUtils;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
-import jdk.jshell.SourceCodeAnalysis;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
@@ -193,22 +190,12 @@ public abstract class DeviceDriver {
         return getOrCreateJShellContext().getJShellX().eval(input, consumer);
     }
 
-    public List<String> jshellCompletionSuggestions(String input) {
-        if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getOrCreateJShellContext().getJShellX().getJShell().sourceCodeAnalysis()
-                .completionSuggestions(input, input.length(), new int[]{-1}).stream()
-                .filter(SourceCodeAnalysis.Suggestion::matchesType)
-                .map(SourceCodeAnalysis.Suggestion::continuation)
-                .distinct()
-                .collect(Collectors.toList());
+    public List<String> jshellSuggestions(String input) {
+        return getOrCreateJShellContext().getJShellX().suggestions(input);
     }
 
-    public List<String> jshellDocs(String input) {
-        if (StringUtils.isBlank(input)) return new ArrayList<>();
-        return getOrCreateJShellContext().getJShellX().getJShell().sourceCodeAnalysis()
-                .documentation(input, input.length(), false).stream()
-                .map(SourceCodeAnalysis.Documentation::signature)
-                .collect(Collectors.toList());
+    public List<String> jshellDocumentation(String input) {
+        return getOrCreateJShellContext().getJShellX().documentation(input);
     }
 
     public void jshellAddToClasspath(List<File> files) {

@@ -45,7 +45,7 @@ public class DocExecutor {
             listeners.forEach(listener -> listener.onSuccessful(doc, results));
         } catch (Throwable cause) {
             if (cause instanceof DocExecutionException) {
-                listeners.forEach(listener -> listener.onFailed(doc, ((DocExecutionException) cause).getResults(), null));
+                listeners.forEach(listener -> listener.onFailed(doc, ((DocExecutionException) cause).getResults(), cause));
             } else {
                 listeners.forEach(listener -> listener.onFailed(doc, null, cause));
             }

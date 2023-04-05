@@ -2,6 +2,7 @@ package com.yqhp.common.jshell;
 
 import jdk.jshell.*;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -20,6 +22,7 @@ public class JShellX implements Closeable {
 
     @Getter
     private final JShell jShell;
+    @Getter
     private final SourceCodeAnalysis codeAnalysis;
 
     public JShellX() {
@@ -173,5 +176,32 @@ public class JShellX implements Closeable {
             }
         }
         toDisplay.add(sb.toString());
+    }
+
+    public List<String> suggestions(String input) {
+        if (StringUtils.isBlank(input)) {
+            return new ArrayList<>();
+        }
+
+        List<SourceCodeAnalysis.Suggestion> suggestions = codeAnalysis
+                .completionSuggestions(input, input.length(), new int[]{-1});
+        return suggestions.stream()
+                .filter(SourceCodeAnalysis.Suggestion::matchesType)
+                .map(SourceCodeAnalysis.Suggestion::continuation)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> documentation(String input) {
+        if (StringUtils.isBlank(input)) {
+            return new ArrayList<>();
+        }
+
+        return codeAnalysis.documentation(input, input.length(), true).stream()
+                .map(doc -> {
+                    String signature = doc.signature();
+                    String javadoc = doc.javadoc();
+                    return StringUtils.isBlank(javadoc) ? signature : signature + '\n' + javadoc;
+                }).collect(Collectors.toList());
     }
 }

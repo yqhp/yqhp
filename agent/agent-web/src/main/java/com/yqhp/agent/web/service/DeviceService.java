@@ -3,7 +3,6 @@ package com.yqhp.agent.web.service;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.DeviceInfo;
-import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.file.model.OSSFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,10 +37,4 @@ public interface DeviceService {
     OSSFile screenshotById(String deviceId, boolean isTmpFile);
 
     DeviceInfo getDeviceInfo(String deviceId);
-
-    List<JShellEvalResult> jshellEval(String token, String input);
-
-    List<String> jshellCompletionSuggestions(String token, String input);
-
-    List<String> jshellDocs(String token, String input);
 }

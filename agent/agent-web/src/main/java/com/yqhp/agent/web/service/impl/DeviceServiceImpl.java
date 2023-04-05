@@ -7,7 +7,6 @@ import com.yqhp.agent.devicediscovery.ios.IOSRealDevice;
 import com.yqhp.agent.driver.*;
 import com.yqhp.agent.web.enums.ResponseCodeEnum;
 import com.yqhp.agent.web.service.DeviceService;
-import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.common.web.util.MultipartFileUtils;
 import com.yqhp.common.zkdevice.ZkDevice;
@@ -222,24 +221,6 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceInfo getDeviceInfo(String deviceId) {
         DeviceDriver deviceDriver = getDeviceDriverById(deviceId);
         return deviceDriver.getDeviceInfo();
-    }
-
-    @Override
-    public List<JShellEvalResult> jshellEval(String token, String input) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        return deviceDriver.jshellEval(input);
-    }
-
-    @Override
-    public List<String> jshellCompletionSuggestions(String token, String input) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        return deviceDriver.jshellCompletionSuggestions(input);
-    }
-
-    @Override
-    public List<String> jshellDocs(String token, String input) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        return deviceDriver.jshellDocs(input);
     }
 
     private String createDeviceToken(String deviceId) {

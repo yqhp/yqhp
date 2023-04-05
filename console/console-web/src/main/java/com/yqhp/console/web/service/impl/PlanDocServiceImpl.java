@@ -158,11 +158,11 @@ public class PlanDocServiceImpl
                         to.getWeight(),
                         moveEvent.isBefore()
                 ).stream()
-                        .filter(a -> !a.getId().equals(fromPlanDoc.getId()))
-                        .map(a -> {
+                        .filter(d -> !d.getId().equals(fromPlanDoc.getId()))
+                        .map(d -> {
                             PlanDoc toUpdate = new PlanDoc();
-                            toUpdate.setId(a.getId());
-                            toUpdate.setWeight(moveEvent.isBefore() ? a.getWeight() + 1 : a.getWeight() - 1);
+                            toUpdate.setId(d.getId());
+                            toUpdate.setWeight(moveEvent.isBefore() ? d.getWeight() + 1 : d.getWeight() - 1);
                             toUpdate.setUpdateBy(currUid);
                             return toUpdate;
                         }).collect(Collectors.toList())

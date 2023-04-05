@@ -61,7 +61,9 @@ public class DeviceWebsocket {
                 .addInputHandler(new StopReceiveDeviceLogHandler(session, deviceDriver))
                 .addInputHandler(new ReceiveAppiumLogHandler(session, deviceDriver))
                 .addInputHandler(new StopReceiveAppiumLogHandler(session, deviceDriver))
-                .addInputHandler(new JShellEvalHandler(session, deviceDriver));
+                .addInputHandler(new JShellEvalHandler(session, deviceDriver))
+                .addInputHandler(new JShellSuggestionsHandler(session, deviceDriver))
+                .addInputHandler(new JShellDocumentationHandler(session, deviceDriver));
     }
 
     @OnClose

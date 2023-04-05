@@ -2,6 +2,7 @@ package com.yqhp.common.commons.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.io.File;
@@ -22,7 +23,13 @@ public class FileUtils {
     }
 
     public static File downloadAsTempFile(String url) throws IOException {
-        String suffix = FilenameUtils.getSuffix(url);
+        return downloadAsTempFile(url, null);
+    }
+
+    public static File downloadAsTempFile(String url, String suffix) throws IOException {
+        if (StringUtils.isBlank(suffix)) {
+            suffix = FilenameUtils.getSuffix(url);
+        }
         File tempFile = Files.createTempFile(null, suffix).toFile();
         download(url, tempFile);
         return tempFile;
