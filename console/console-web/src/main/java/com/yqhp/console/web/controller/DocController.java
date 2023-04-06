@@ -32,6 +32,11 @@ public class DocController {
         return docService.createDoc(createDocParam);
     }
 
+    @GetMapping("/{id}/copy")
+    public Doc copy(@PathVariable String id) {
+        return docService.copy(id);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteDocById(@PathVariable String id) {
         docService.deleteDocById(id);

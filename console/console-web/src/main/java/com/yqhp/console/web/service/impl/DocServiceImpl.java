@@ -15,6 +15,7 @@ import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DocService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,15 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_DOC);
         }
         return getById(doc.getId());
+    }
+
+    @Override
+    public Doc copy(String id) {
+        Doc from = getDocById(id);
+        CreateDocParam to = new CreateDocParam();
+        BeanUtils.copyProperties(from, to);
+        to.setName(from.getName() + "_" + System.currentTimeMillis());
+        return createDoc(to);
     }
 
     @Override

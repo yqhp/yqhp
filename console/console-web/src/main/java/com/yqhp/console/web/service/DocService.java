@@ -16,6 +16,8 @@ import java.util.List;
 public interface DocService extends IService<Doc> {
     Doc createDoc(CreateDocParam createDocParam);
 
+    Doc copy(String id);
+
     Doc updateDoc(String id, UpdateDocParam updateDocParam);
 
     void move(TreeNodeMoveEvent moveEvent);
