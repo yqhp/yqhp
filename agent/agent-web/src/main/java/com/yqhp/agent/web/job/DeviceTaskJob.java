@@ -62,7 +62,7 @@ public class DeviceTaskJob {
                 // 加载插件
                 List<PluginDTO> plugins = received.getPlanExecutionRecord().getPlugins();
                 for (PluginDTO plugin : plugins) {
-                    List<File> files = pluginService.getFiles(plugin);
+                    List<File> files = pluginService.downloadIfAbsent(plugin);
                     driver.jshellAddToClasspath(files);
                 }
                 // 执行define代码

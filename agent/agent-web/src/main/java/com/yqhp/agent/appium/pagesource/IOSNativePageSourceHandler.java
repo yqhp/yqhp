@@ -1,7 +1,6 @@
 package com.yqhp.agent.appium.pagesource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 import java.util.List;
@@ -32,28 +31,14 @@ public class IOSNativePageSourceHandler extends XmlPageSourceHandler {
         } else {
             element.setName("node");
 
-            Attribute xAttr = element.attribute("x");
-            String startX = xAttr.getValue();
-            element.remove(xAttr);
-
-            Attribute yAttr = element.attribute("y");
-            String startY = yAttr.getValue();
-            element.remove(yAttr);
-
-            Attribute widthAttr = element.attribute("width");
-            String width = widthAttr.getValue();
-            element.remove(widthAttr);
-
-            Attribute heightAttr = element.attribute("height");
-            String height = heightAttr.getValue();
-            element.remove(heightAttr);
-
+            String startX = element.attribute("x").getValue();
+            String startY = element.attribute("y").getValue();
+            String width = element.attribute("width").getValue();
+            String height = element.attribute("height").getValue();
             int endX = Integer.parseInt(startX) + Integer.parseInt(width);
             int endY = Integer.parseInt(startY) + Integer.parseInt(height);
-
             String bounds = String.format("[%s,%s][%d,%d]", startX, startY, endX, endY);
             element.addAttribute("bounds", bounds);
-
             // todo
             // 前端el-tree
             // defaultProps: {

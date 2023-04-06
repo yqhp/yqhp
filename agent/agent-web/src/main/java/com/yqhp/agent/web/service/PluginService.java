@@ -10,5 +10,5 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface PluginService {
-    List<File> getFiles(PluginDTO plugin) throws IOException;
+    List<File> downloadIfAbsent(PluginDTO plugin) throws IOException;
 }

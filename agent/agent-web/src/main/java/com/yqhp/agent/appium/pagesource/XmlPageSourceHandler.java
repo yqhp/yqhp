@@ -18,22 +18,20 @@ public abstract class XmlPageSourceHandler {
 
     protected abstract void handleElement(Element element);
 
-    public JSONObject xml2JSON(String pageSource) {
+    public JSONObject toJSON(String pageSource) {
         if (!StringUtils.hasText(pageSource)) {
             return null;
         }
 
-        byte[] pageSourceBytes = pageSource.getBytes(StandardCharsets.UTF_8);
-        try (InputStream in = new ByteArrayInputStream(pageSourceBytes)) {
+        byte[] bytes = pageSource.getBytes(StandardCharsets.UTF_8);
+        try (InputStream in = new ByteArrayInputStream(bytes)) {
             SAXReader saxReader = new SAXReader();
             saxReader.setEncoding("UTF-8");
-
             Document document = saxReader.read(in);
             handleElement(document.getRootElement());
-
             return XML.toJSONObject(document.asXML());
         } catch (Exception e) {
-            throw new XML2JSONException(e);
+            throw new XmlToJSONException(e);
         }
     }
 }

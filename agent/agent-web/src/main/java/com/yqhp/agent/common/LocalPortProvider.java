@@ -53,8 +53,8 @@ public class LocalPortProvider {
 
         int res = -1;
         for (; ; ) {
-            boolean currPortAvailable = NetUtil.isUsableLocalPort(curr);
-            if (currPortAvailable) {
+            boolean available = NetUtil.isUsableLocalPort(curr);
+            if (available) {
                 res = curr;
             }
             curr++;
@@ -63,7 +63,7 @@ public class LocalPortProvider {
                 curr = min;
             }
 
-            if (currPortAvailable) {
+            if (available) {
                 ports[2] = curr;
                 return res;
             }

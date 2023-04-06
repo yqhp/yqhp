@@ -33,7 +33,7 @@ public class PluginServiceImpl implements PluginService {
     }
 
     @Override
-    public List<File> getFiles(PluginDTO plugin) throws IOException {
+    public List<File> downloadIfAbsent(PluginDTO plugin) throws IOException {
         if (plugin == null || CollectionUtils.isEmpty(plugin.getFiles())) {
             return new ArrayList<>();
         }
@@ -54,7 +54,7 @@ public class PluginServiceImpl implements PluginService {
                     FileUtils.download(fileInfo.getUrl(), tmpFile);
                     log.info("[plugin][{}]{} download completed", plugin.getName(), tmpFile);
                     if (!tmpFile.renameTo(file)) {
-                        throw new IOException(tmpFile + "renameTo" + file + " fail");
+                        throw new IOException(tmpFile + " renameTo " + file + " fail");
                     }
                     log.info("[plugin][{}]rename {} -> {}", plugin.getName(), tmpFile, file);
                 }
