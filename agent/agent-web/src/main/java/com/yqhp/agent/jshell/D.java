@@ -16,7 +16,6 @@ import org.springframework.util.Assert;
 @Slf4j
 public class D implements JShellVar {
 
-    private boolean inited = false;
     private final DeviceDriver deviceDriver;
 
     public D(DeviceDriver deviceDriver) {
@@ -34,12 +33,12 @@ public class D implements JShellVar {
         return this;
     }
 
-    public synchronized D init() {
-        appiumDriver();
+    public D init() {
+        appium();
         return this;
     }
 
-    public synchronized D refresh() {
+    public D refresh() {
         deviceDriver.refreshAppiumDriver();
         return this;
     }
@@ -50,23 +49,23 @@ public class D implements JShellVar {
     }
 
     public D clickId(String id) {
-        appiumDriver().findElement(By.id(id)).click();
+        appium().findElement(By.id(id)).click();
         return this;
     }
 
     public D clickText(String text) {
         Assert.hasText(text, "text cannot be empty");
         By by = By.xpath("//*[contains(@text,'" + text + "')]");
-        appiumDriver().findElement(by).click();
+        appium().findElement(by).click();
         return this;
     }
 
     public D back() {
-        ((AndroidDriver) appiumDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
+        ((AndroidDriver) appium()).pressKey(new KeyEvent(AndroidKey.BACK));
         return this;
     }
 
-    public AppiumDriver appiumDriver() {
+    public AppiumDriver appium() {
         return deviceDriver.getOrCreateAppiumDriver();
     }
 }

@@ -5,6 +5,7 @@ import com.yqhp.console.model.param.CreatePluginParam;
 import com.yqhp.console.model.param.UpdatePluginParam;
 import com.yqhp.console.model.param.query.PluginPageQuery;
 import com.yqhp.console.repository.entity.Plugin;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.web.service.PluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,11 @@ public class PluginController {
     @GetMapping
     public List<Plugin> listByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
         return pluginService.listByProjectId(projectId);
+    }
+
+    @GetMapping("/dto")
+    public List<PluginDTO> listPluginDTOByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
+        return pluginService.listPluginDTOByProjectId(projectId);
     }
 
     @PreAuthorize("hasAuthority('admin')")
