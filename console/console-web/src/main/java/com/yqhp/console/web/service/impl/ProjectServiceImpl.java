@@ -5,10 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.TypeSpec;
 import com.yqhp.auth.model.CurrentUser;
+import com.yqhp.common.jshell.JShellConst;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.CreatePkgParam;
@@ -34,8 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.lang.model.element.Modifier;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,31 +79,15 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             createPkgParam.setFlags(ResourceFlags.ALL_LIMITS);
             Pkg pkg = pkgService.createPkg(createPkgParam);
 
-            // 创建全局变量类
-            if (DefaultPkg.COMMON.equals(defaultPkg)) {
+            if (DefaultPkg.INIT.equals(defaultPkg)) {
                 CreateDocParam createDocParam = new CreateDocParam();
                 createDocParam.setProjectId(project.getId());
                 createDocParam.setPkgId(pkg.getId());
                 createDocParam.setKind(DocKind.JSH_DECLARATION);
-                createDocParam.setName("G");
+                createDocParam.setName("默认导入");
+                createDocParam.setContent(String.join("\n", JShellConst.DEFAULT_IMPORTS));
                 createDocParam.setStatus(DocStatus.RELEASED);
                 createDocParam.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
-
-                FieldSpec field1 = FieldSpec.builder(String.class, "PROJECT_ID")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                        .initializer("$S", project.getId())
-                        .build();
-                FieldSpec field2 = FieldSpec.builder(Duration.class, "PO_DURATION")
-                        .addJavadoc("PO模式：等待元素出现的超时时间")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                        .initializer(CodeBlock.of("java.time.Duration.ofMillis(2000)"))
-                        .build();
-                TypeSpec type = TypeSpec.classBuilder("G")
-                        .addModifiers(Modifier.PUBLIC)
-                        .addField(field1).addField(field2)
-                        .build();
-                createDocParam.setContent(type.toString());
-
                 docService.createDoc(createDocParam);
             }
         }

@@ -32,9 +32,6 @@ public class JShellX implements Closeable {
                 .executionEngine(new LocalXExecutionControlProvider(), new HashMap<>())
                 .build();
         codeAnalysis = jShell.sourceCodeAnalysis();
-        for (String defaultImport : JShellConst.DEFAULT_IMPORTS) {
-            jShell.eval(defaultImport);
-        }
     }
 
     @Override
@@ -110,12 +107,14 @@ public class JShellX implements Closeable {
             } else if (snippetEvent.exception() != null) {
                 snippetRecord.setFailed(true);
                 JShellException exception = snippetEvent.exception();
-                String exceptionText = exception.getMessage() == null ? "" : exception.getMessage();
+                String exceptionText = exception.getMessage();
                 if (exception instanceof EvalException) {
                     EvalException evalException = (EvalException) exception;
-                    exceptionText = evalException.getExceptionClassName() + ": " + exceptionText;
+                    exceptionText = StringUtils.isBlank(exceptionText)
+                            ? evalException.getExceptionClassName()
+                            : evalException.getExceptionClassName() + ": " + exceptionText;
                 }
-                snippetRecord.setException(exceptionText);
+                snippetRecord.setException(exceptionText == null ? "" : exceptionText);
             }
         }
 

@@ -7,8 +7,7 @@ import lombok.Getter;
  */
 public enum DefaultPkg {
 
-    COMMON("common"),
-    PAGE("page"),
+    INIT("init"),
     ;
 
     @Getter
