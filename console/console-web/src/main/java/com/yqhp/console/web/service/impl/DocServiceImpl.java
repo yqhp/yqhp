@@ -45,8 +45,8 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         Doc doc = createDocParam.convertTo();
         doc.setId(snowflake.nextIdStr());
 
-        int minWeight = getMinWeightByProjectId(createDocParam.getProjectId());
-        doc.setWeight(minWeight - 1);
+        int maxWeight = getMaxWeightByProjectId(createDocParam.getProjectId());
+        doc.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
         doc.setCreateBy(currUid);
@@ -170,13 +170,14 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listByProjectIdAndKind(String projectId, DocKind kind) {
+    public List<Doc> listSortedDocByProjectIdAndKind(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(kind, "kind cannot be null");
 
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
         query.eq(Doc::getProjectId, projectId);
         query.eq(Doc::getKind, kind);
+        query.orderByAsc(Doc::getWeight);
         return list(query);
     }
 
@@ -207,9 +208,9 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         return list(query);
     }
 
-    private int getMinWeightByProjectId(String projectId) {
+    private int getMaxWeightByProjectId(String projectId) {
         return listByProjectId(projectId).stream()
                 .mapToInt(Doc::getWeight)
-                .min().orElse(1);
+                .max().orElse(-1);
     }
 }

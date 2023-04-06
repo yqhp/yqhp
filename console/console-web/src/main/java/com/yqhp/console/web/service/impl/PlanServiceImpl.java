@@ -140,7 +140,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         planExecutionRecord.setPlanId(plan.getId());
         planExecutionRecord.setPlan(plan); // 保留提交执行时的计划
         planExecutionRecord.setPlugins(pluginService.listPluginDTOByProjectId(plan.getProjectId())); // 保留提交执行时的项目插件
-        planExecutionRecord.setDocs(docService.listByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_DECLARATION)); // 保留提交执行时的JSH_DECLARATION
+        planExecutionRecord.setDocs(docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_DECLARATION)); // 保留提交执行时的JSH_DECLARATION
         planExecutionRecord.setStatus(PlanExecutionRecordStatus.UNCOMPLETED);
         planExecutionRecord.setCreateBy(createBy);
         planExecutionRecord.setUpdateBy(createBy);

@@ -49,8 +49,8 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         Pkg pkg = createPkgParam.convertTo();
         pkg.setId(snowflake.nextIdStr());
 
-        int minWeight = getMinWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
-        pkg.setWeight(minWeight - 1);
+        int maxWeight = getMaxWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
+        pkg.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
         pkg.setCreateBy(currUid);
@@ -261,9 +261,9 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         return list(query);
     }
 
-    private int getMinWeightByProjectIdAndType(String projectId, PkgType type) {
+    private int getMaxWeightByProjectIdAndType(String projectId, PkgType type) {
         return listByProjectIdAndType(projectId, type).stream()
                 .mapToInt(Pkg::getWeight)
-                .min().orElse(1);
+                .max().orElse(-1);
     }
 }
