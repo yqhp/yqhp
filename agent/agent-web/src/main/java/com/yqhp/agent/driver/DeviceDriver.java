@@ -7,6 +7,7 @@ import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.util.ApplicationContextUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import lombok.Getter;
@@ -145,8 +146,15 @@ public abstract class DeviceDriver {
     }
 
     public synchronized AppiumDriver getOrCreateAppiumDriver() {
-        if (appiumDriver != null) return appiumDriver;
-        if (capabilities == null) capabilities = new DesiredCapabilities();
+        if (appiumDriver != null) {
+            return appiumDriver;
+        }
+        if (capabilities == null) {
+            capabilities = new DesiredCapabilities();
+        }
+        if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
+            capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
+        }
 
         log.info("[{}]creating appium driver, capabilities: {}", device.getId(), capabilities);
         appiumDriver = newAppiumDriver(getOrStartAppiumService().getUrl(), capabilities);
