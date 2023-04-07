@@ -43,8 +43,11 @@ public class D implements JShellVar {
         return this;
     }
 
-    public D sleep(long ms) throws InterruptedException {
-        Thread.sleep(ms);
+    public D sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ignore) {
+        }
         return this;
     }
 

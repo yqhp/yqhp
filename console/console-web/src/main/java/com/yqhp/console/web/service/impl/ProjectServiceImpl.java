@@ -19,6 +19,7 @@ import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.DocStatus;
 import com.yqhp.console.repository.enums.PkgType;
 import com.yqhp.console.repository.mapper.ProjectMapper;
+import com.yqhp.console.web.common.Const;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.DefaultPkg;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -80,15 +81,25 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             Pkg pkg = pkgService.createPkg(createPkgParam);
 
             if (DefaultPkg.INIT.equals(defaultPkg)) {
-                CreateDocParam createDocParam = new CreateDocParam();
-                createDocParam.setProjectId(project.getId());
-                createDocParam.setPkgId(pkg.getId());
-                createDocParam.setKind(DocKind.JSH_DECLARATION);
-                createDocParam.setName("默认导入");
-                createDocParam.setContent(String.join("\n", JShellConst.DEFAULT_IMPORTS));
-                createDocParam.setStatus(DocStatus.RELEASED);
-                createDocParam.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
-                docService.createDoc(createDocParam);
+                CreateDocParam d1 = new CreateDocParam();
+                d1.setProjectId(project.getId());
+                d1.setPkgId(pkg.getId());
+                d1.setKind(DocKind.JSH_DECLARATION);
+                d1.setName("默认导入");
+                d1.setContent(String.join("\n", JShellConst.DEFAULT_IMPORTS));
+                d1.setStatus(DocStatus.RELEASED);
+                d1.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
+                docService.createDoc(d1);
+
+                CreateDocParam d2 = new CreateDocParam();
+                d2.setProjectId(project.getId());
+                d2.setPkgId(pkg.getId());
+                d2.setKind(DocKind.JSH_DECLARATION);
+                d2.setName("Appium导入");
+                d2.setContent(String.join("\n", Const.APPIUM_IMPORTS));
+                d2.setStatus(DocStatus.RELEASED);
+                d2.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
+                docService.createDoc(d2);
             }
         }
 
