@@ -22,7 +22,7 @@ public class JShellEvalHandler extends DefaultInputHandler<String> {
 
     @Override
     protected void handle(Input<String> input) {
-        deviceDriver.jshellEval(input.getData(), (result) ->
+        deviceDriver.jshellAnalysisAndEval(input.getData(), (result) ->
                 os.info(input.getUid(), result)
         );
     }

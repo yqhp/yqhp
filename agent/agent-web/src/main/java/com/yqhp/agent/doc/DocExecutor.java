@@ -39,7 +39,7 @@ public class DocExecutor {
         if (doc == null) return;
         listeners.forEach(listener -> listener.onStarted(doc));
         try {
-            List<JShellEvalResult> results = driver.jshellEval(doc.getContent());
+            List<JShellEvalResult> results = driver.jshellAnalysisAndEval(doc.getContent());
             boolean failed = results.stream().anyMatch(JShellEvalResult::isFailed);
             if (failed) throw new DocExecutionException(results);
             listeners.forEach(listener -> listener.onSuccessful(doc, results));

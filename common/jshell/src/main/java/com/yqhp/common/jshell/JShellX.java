@@ -39,39 +39,43 @@ public class JShellX implements Closeable {
         jShell.close();
     }
 
-    public List<JShellEvalResult> eval(String input) {
-        return eval(input, null);
+    public List<JShellEvalResult> analysisAndEval(String input) {
+        return analysisAndEval(input, null);
     }
 
-    public List<JShellEvalResult> eval(String input, Consumer<JShellEvalResult> consumer) {
+    public List<JShellEvalResult> analysisAndEval(String input, Consumer<JShellEvalResult> consumer) {
         List<JShellEvalResult> results = new ArrayList<>();
         List<String> sources = analysis(input);
         for (String source : sources) {
-            JShellEvalResult result = new JShellEvalResult();
+            JShellEvalResult result = eval(source, consumer);
             results.add(result);
-            result.setSource(source);
-            result.setEvalStart(System.currentTimeMillis());
-            List<SnippetEvent> events = jShell.eval(source);
-            result.setEvalEnd(System.currentTimeMillis());
-            handleEvents(events, result);
-            if (consumer != null) consumer.accept(result);
             if (result.isFailed()) break; // 失败不继续执行
         }
         return results;
     }
 
+    public JShellEvalResult eval(String source) {
+        return eval(source, null);
+    }
+
+    public JShellEvalResult eval(String source, Consumer<JShellEvalResult> consumer) {
+        JShellEvalResult result = new JShellEvalResult();
+        result.setSource(source);
+        result.setEvalStart(System.currentTimeMillis());
+        List<SnippetEvent> events = jShell.eval(source);
+        result.setEvalEnd(System.currentTimeMillis());
+        handleEvents(events, result);
+        if (consumer != null) consumer.accept(result);
+        return result;
+    }
+
     private List<String> analysis(String input) {
         List<String> sources = new ArrayList<>();
         if (input == null) return sources;
-        SourceCodeAnalysis.CompletionInfo completionInfo = codeAnalysis.analyzeCompletion(input);
-        while (!completionInfo.remaining().isEmpty() && completionInfo.source() != null) {
+        while (!input.isEmpty()) {
+            SourceCodeAnalysis.CompletionInfo completionInfo = codeAnalysis.analyzeCompletion(input);
             sources.add(completionInfo.source());
-            completionInfo = codeAnalysis.analyzeCompletion(completionInfo.remaining());
-        }
-        if (completionInfo.source() != null) {
-            sources.add(completionInfo.source());
-        } else if (completionInfo.remaining() != null) {
-            sources.add(completionInfo.remaining());
+            input = completionInfo.remaining();
         }
         return sources;
     }

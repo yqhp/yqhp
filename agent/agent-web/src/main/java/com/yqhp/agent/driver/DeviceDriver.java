@@ -190,12 +190,20 @@ public abstract class DeviceDriver {
         return jshellContext;
     }
 
-    public List<JShellEvalResult> jshellEval(String input) {
+    public JShellEvalResult jshellEval(String input) {
         return getOrCreateJShellContext().getJShellX().eval(input);
     }
 
-    public List<JShellEvalResult> jshellEval(String input, Consumer<JShellEvalResult> consumer) {
+    public JShellEvalResult jshellEval(String input, Consumer<JShellEvalResult> consumer) {
         return getOrCreateJShellContext().getJShellX().eval(input, consumer);
+    }
+
+    public List<JShellEvalResult> jshellAnalysisAndEval(String input) {
+        return getOrCreateJShellContext().getJShellX().analysisAndEval(input);
+    }
+
+    public List<JShellEvalResult> jshellAnalysisAndEval(String input, Consumer<JShellEvalResult> consumer) {
+        return getOrCreateJShellContext().getJShellX().analysisAndEval(input, consumer);
     }
 
     public List<String> jshellSuggestions(String input) {
