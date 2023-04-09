@@ -10,6 +10,7 @@ public class Const {
 
     public static final Set<String> APPIUM_IMPORTS = Set.of(
             "import org.openqa.selenium.WebElement;",
+            "import org.openqa.selenium.By;",
             "import org.openqa.selenium.support.PageFactory;",
             "import io.appium.java_client.pagefactory.AppiumFieldDecorator;",
             "import io.appium.java_client.pagefactory.AndroidFindBy;",

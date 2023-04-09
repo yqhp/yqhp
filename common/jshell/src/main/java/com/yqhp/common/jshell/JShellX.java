@@ -74,8 +74,12 @@ public class JShellX implements Closeable {
         if (input == null) return sources;
         while (!input.isEmpty()) {
             SourceCodeAnalysis.CompletionInfo completionInfo = codeAnalysis.analyzeCompletion(input);
+            String source = completionInfo.source();
+            if (source == null) {
+                break;
+            }
             // 必须移除开头的换行，否则会出现莫名其妙的问题。比如: \n import xxx，会把之前执行过的变量变成了null
-            sources.add(completionInfo.source().trim());
+            sources.add(source.trim());
             input = completionInfo.remaining();
         }
         return sources;
