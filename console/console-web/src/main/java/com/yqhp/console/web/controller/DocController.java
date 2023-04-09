@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author jiangyitao
@@ -45,6 +46,11 @@ public class DocController {
     @PutMapping("/{id}")
     public Doc updateDoc(@PathVariable String id, @Valid @RequestBody UpdateDocParam updateDocParam) {
         return docService.updateDoc(id, updateDocParam);
+    }
+
+    @PutMapping("/{id}/content")
+    public void updateContent(@PathVariable String id, @NotNull(message = "content不能为null") String content) {
+        docService.updateContent(id, content);
     }
 
     @PutMapping("/move")

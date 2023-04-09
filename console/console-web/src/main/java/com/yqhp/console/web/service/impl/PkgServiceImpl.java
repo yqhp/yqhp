@@ -197,6 +197,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
                 List<Doc> docs = docService.listByProjectIdAndInPkgIds(query.getProjectId(), pkgIds);
                 List<TreeNode<String>> docNodes = docs.stream().map(doc -> {
                     TreeNode<String> node = new TreeNode<>(doc.getId(), doc.getPkgId(), doc.getName(), doc.getWeight());
+                    doc.setContent(null); // 移除content内容，减少响应体大小
                     node.setExtra(new TreeNodeExtra<>(TreeNodeExtra.Type.DOC, doc).toMap());
                     return node;
                 }).collect(Collectors.toList());

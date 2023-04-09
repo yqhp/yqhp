@@ -89,6 +89,18 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
+    public void updateContent(String id, String content) {
+        Doc doc = getDocById(id);
+        if (ResourceFlags.unupdatable(doc.getFlags())) {
+            throw new ServiceException(ResponseCodeEnum.DOC_UNUPDATABLE);
+        }
+        Doc toUpdate = new Doc();
+        toUpdate.setId(id);
+        toUpdate.setContent(content);
+        update(toUpdate);
+    }
+
+    @Override
     @Transactional
     public void move(TreeNodeMoveEvent moveEvent) {
         Doc from = getDocById(moveEvent.getFrom());

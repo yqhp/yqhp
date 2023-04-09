@@ -20,6 +20,8 @@ public interface DocService extends IService<Doc> {
 
     Doc updateDoc(String id, UpdateDocParam updateDocParam);
 
+    void updateContent(String id, String content);
+
     void move(TreeNodeMoveEvent moveEvent);
 
     void deleteDocById(String id);
