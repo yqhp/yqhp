@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public enum DocKind implements BaseEnum<Integer> {
 
-    JSH_DECLARATION(1),
-    JSH_EXECUTABLE(2),
+    JSH_INIT(1),
+    JSH_ACTION(2),
     ;
 
     @EnumValue
