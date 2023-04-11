@@ -16,19 +16,17 @@ public interface DeviceService {
 
     void offline(String deviceId);
 
+    String lockDevice(String deviceId, String user);
+
+    void unlockDevice(String token);
+
+    boolean isDeviceLocked(String deviceId);
+
     List<DeviceDriver> getUnlockedDeviceDrivers();
 
     DeviceDriver getDeviceDriverById(String deviceId);
 
-    void checkExists(String deviceId);
-
-    String lockDevice(String deviceId, String user);
-
-    boolean isDeviceLocked(String deviceId);
-
     DeviceDriver getDeviceDriverByToken(String token);
-
-    void unlockDevice(String token);
 
     void installAppByToken(String token, MultipartFile app);
 

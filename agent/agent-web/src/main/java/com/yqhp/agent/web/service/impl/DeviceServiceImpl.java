@@ -101,15 +101,55 @@ public class DeviceServiceImpl implements DeviceService {
             return;
         }
 
-        DEVICE_DRIVERS.put(device.getId(), deviceDriver);
         zkDeviceManager.create(zkDevice);
+        DEVICE_DRIVERS.put(device.getId(), deviceDriver);
     }
 
     @Override
     public void offline(String deviceId) {
-        DeviceDriver removedDeviceDriver = DEVICE_DRIVERS.remove(deviceId);
-        LOCKED_DEVICE_DRIVERS.values().remove(removedDeviceDriver);
         zkDeviceManager.delete(location, deviceId);
+        DEVICE_DRIVERS.remove(deviceId);
+    }
+
+    @Override
+    public String lockDevice(String deviceId, String user) {
+        Assert.hasText(deviceId, "deviceId must has text");
+        Assert.hasText(user, "user must has text");
+
+        // 防止并发锁定同一个设备
+        synchronized (deviceId.intern()) {
+            if (isDeviceLocked(deviceId)) {
+                throw new ServiceException(ResponseCodeEnum.DEVICE_LOCKED);
+            }
+            String token = createDeviceToken(deviceId);
+            ZkDevice zkDevice = zkDeviceManager.get(location, deviceId);
+            zkDevice.setLocked(true);
+            zkDevice.setLockUser(user);
+            zkDevice.setLockToken(token);
+            zkDevice.setLockTime(LocalDateTime.now());
+            zkDeviceManager.update(zkDevice);
+            LOCKED_DEVICE_DRIVERS.put(token, getDeviceDriverById(deviceId));
+            log.info("[{}]locked by {}, token={}", deviceId, user, token);
+            return token;
+        }
+    }
+
+    @Override
+    public void unlockDevice(String token) {
+        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
+        deviceDriver.release();
+        ZkDevice zkDevice = zkDeviceManager.get(location, deviceDriver.getDeviceId());
+        zkDevice.setLocked(false);
+        zkDevice.setUnlockTime(LocalDateTime.now());
+        zkDeviceManager.update(zkDevice);
+        LOCKED_DEVICE_DRIVERS.remove(token);
+        log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
+    }
+
+    @Override
+    public boolean isDeviceLocked(String deviceId) {
+        return LOCKED_DEVICE_DRIVERS.values().stream()
+                .anyMatch(d -> d.getDeviceId().equals(deviceId));
     }
 
     @Override
@@ -128,47 +168,9 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public void checkExists(String deviceId) {
-        getDeviceDriverById(deviceId);
-    }
-
-    @Override
-    public String lockDevice(String deviceId, String user) {
-        Assert.hasText(deviceId, "deviceId must has text");
-        Assert.hasText(user, "user must has text");
-
-        // 防止并发锁定同一个设备
-        synchronized (deviceId.intern()) {
-            if (isDeviceLocked(deviceId)) {
-                throw new ServiceException(ResponseCodeEnum.DEVICE_LOCKED);
-            }
-
-            String token = createDeviceToken(deviceId);
-            lock(deviceId, user, token);
-            log.info("[{}]locked by {}, token={}", deviceId, user, token);
-            return token;
-        }
-    }
-
-    @Override
-    public boolean isDeviceLocked(String deviceId) {
-        checkExists(deviceId);
-        return LOCKED_DEVICE_DRIVERS.values().stream()
-                .anyMatch(d -> d.getDeviceId().equals(deviceId));
-    }
-
-    @Override
     public DeviceDriver getDeviceDriverByToken(String token) {
         return Optional.ofNullable(LOCKED_DEVICE_DRIVERS.get(token))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.INVALID_DEVICE_TOKEN));
-    }
-
-    @Override
-    public void unlockDevice(String token) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        deviceDriver.release();
-        unlock(deviceDriver.getDeviceId(), token);
-        log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
     }
 
     @Override
@@ -226,23 +228,5 @@ public class DeviceServiceImpl implements DeviceService {
     private String createDeviceToken(String deviceId) {
         String data = System.currentTimeMillis() + RandomStringUtils.randomAlphanumeric(8) + deviceId;
         return DigestUtils.md5DigestAsHex(data.getBytes());
-    }
-
-    private void lock(String deviceId, String lockUser, String lockToken) {
-        ZkDevice zkDevice = zkDeviceManager.get(location, deviceId);
-        zkDevice.setLocked(true);
-        zkDevice.setLockUser(lockUser);
-        zkDevice.setLockToken(lockToken);
-        zkDevice.setLockTime(LocalDateTime.now());
-        zkDeviceManager.update(zkDevice);
-        LOCKED_DEVICE_DRIVERS.put(lockToken, getDeviceDriverById(deviceId));
-    }
-
-    private void unlock(String deviceId, String lockToken) {
-        ZkDevice zkDevice = zkDeviceManager.get(location, deviceId);
-        zkDevice.setLocked(false);
-        zkDevice.setUnlockTime(LocalDateTime.now());
-        zkDeviceManager.update(zkDevice);
-        LOCKED_DEVICE_DRIVERS.remove(lockToken);
     }
 }
