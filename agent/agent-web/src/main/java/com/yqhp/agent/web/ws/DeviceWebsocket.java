@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 
 /**
  * @author jiangyitao
@@ -30,27 +29,14 @@ public class DeviceWebsocket {
         DeviceWebsocket.deviceService = deviceService;
     }
 
-    private Session session;
     private String token;
     private MessageHandler messageHandler;
 
     @OnOpen
-    public void onOpen(@PathParam("token") String token, Session session) throws IOException {
+    public void onOpen(@PathParam("token") String token, Session session) {
         log.info("[{}]onOpen, token={}", session.getId(), token);
-        this.session = session;
-        DeviceDriver deviceDriver;
-        try {
-            deviceDriver = deviceService.getDeviceDriverByToken(token);
-        } catch (Exception e) {
-            Output<?> output = new Output<>();
-            output.setStatus(Output.Status.ERROR);
-            output.setMessage("invalid token: " + token);
-            OutputSender.send(session, output);
-            session.close();
-            return;
-        }
+        DeviceDriver deviceDriver = deviceService.getDeviceDriverByToken(token);
         this.token = token;
-
         messageHandler = new MessageHandler()
                 .addInputHandler(new StartScrcpyHandler(session, deviceDriver))
                 .addInputHandler(new ScrcpyKeyHandler(session, deviceDriver))
@@ -67,18 +53,22 @@ public class DeviceWebsocket {
     }
 
     @OnClose
-    public void onClose() {
+    public void onClose(Session session) {
         log.info("[{}]onClose", session.getId());
         if (token != null) deviceService.unlockDevice(token);
     }
 
     @OnError
-    public void onError(Throwable cause) {
+    public void onError(Throwable cause, Session session) {
         log.error("[{}]onError", session.getId(), cause);
+        Output<?> output = new Output<>();
+        output.setStatus(Output.Status.ERROR);
+        output.setMessage(cause.getMessage());
+        OutputSender.send(session, output);
     }
 
     @OnMessage
-    public void onMessage(String message) {
+    public void onMessage(String message, Session session) {
         messageHandler.handle(message, ((input, cause) -> {
             Output<?> output = new Output<>();
             output.setStatus(Output.Status.ERROR);
