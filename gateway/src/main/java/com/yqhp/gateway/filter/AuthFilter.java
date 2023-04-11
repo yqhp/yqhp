@@ -32,7 +32,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private final List<String> whitePaths = List.of(
             "/auth/token",
             AUTH_USER_INFO_PATH,
-            "/agent/device/token/*",
+            "/agent/device/token/**",
             "/console/planExecutionRecord/*/details"
     );
 

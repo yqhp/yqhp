@@ -5,68 +5,67 @@ import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.ws.message.Output;
 import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.agent.web.ws.message.handler.MessageHandler;
-import com.yqhp.agent.web.ws.message.handler.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
 
 /**
  * @author jiangyitao
  */
 @Slf4j
-@Controller // 注意: 每个会话都是一个新实例
-@ServerEndpoint(value = "/device/token/{token}")
 public class DeviceWebsocket {
 
-    private static DeviceService deviceService;
+    public static DeviceService deviceService;
 
     @Autowired
-    public void setStaticField(DeviceService deviceService) {
+    public void setDeviceService(DeviceService deviceService) {
         DeviceWebsocket.deviceService = deviceService;
     }
 
-    private String token;
-    private MessageHandler messageHandler;
+    protected DeviceDriver deviceDriver;
+    protected String token;
+    protected MessageHandler messageHandler;
 
+    /**
+     * 注意，子类Override需要带上@OnOpen才能生效
+     */
     @OnOpen
     public void onOpen(@PathParam("token") String token, Session session) {
-        log.info("[{}]onOpen, token={}", session.getId(), token);
-        DeviceDriver deviceDriver = deviceService.getDeviceDriverByToken(token);
+        log.info("[{}]onOpen, token:{}", session.getId(), token);
+        deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
         this.token = token;
-        messageHandler = new MessageHandler()
-                .addInputHandler(new StartScrcpyHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyKeyHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyTextHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyTouchHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyScrollHandler(session, deviceDriver))
-                .addInputHandler(new ReceiveDeviceLogHandler(session, deviceDriver))
-                .addInputHandler(new StopReceiveDeviceLogHandler(session, deviceDriver))
-                .addInputHandler(new ReceiveAppiumLogHandler(session, deviceDriver))
-                .addInputHandler(new StopReceiveAppiumLogHandler(session, deviceDriver))
-                .addInputHandler(new JShellEvalHandler(session, deviceDriver))
-                .addInputHandler(new JShellSuggestionsHandler(session, deviceDriver))
-                .addInputHandler(new JShellDocumentationHandler(session, deviceDriver));
+        deviceDriver.addWsSession(session);
+        messageHandler = new MessageHandler();
     }
 
-    @OnClose
-    public void onClose(Session session) {
-        log.info("[{}]onClose", session.getId());
-        if (token != null) deviceService.unlockDevice(token);
-    }
-
+    /**
+     * 注意，子类Override需要带上@OnError注解生效
+     */
     @OnError
     public void onError(Throwable cause, Session session) {
-        log.error("[{}]onError", session.getId(), cause);
+        log.warn("[{}]onError, cause:{}", session.getId(), cause.getMessage());
         Output<?> output = new Output<>();
         output.setStatus(Output.Status.ERROR);
         output.setMessage(cause.getMessage());
         OutputSender.send(session, output);
     }
 
+    /**
+     * 注意，子类Override需要带上@OnClose才能生效
+     */
+    @OnClose
+    public void onClose(Session session) {
+        log.info("[{}]onClose", session.getId());
+        if (deviceDriver != null) {
+            deviceDriver.removeWsSession(session);
+        }
+    }
+
+    /**
+     * 注意，子类Override需要带上@OnMessage才能生效
+     */
     @OnMessage
     public void onMessage(String message, Session session) {
         messageHandler.handle(message, ((input, cause) -> {
@@ -80,5 +79,4 @@ public class DeviceWebsocket {
             OutputSender.send(session, output);
         }));
     }
-
 }

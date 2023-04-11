@@ -18,12 +18,15 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import javax.websocket.Session;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -45,6 +48,8 @@ public abstract class DeviceDriver {
     private OutputStream appiumLogOutput;
 
     private volatile JShellContext jshellContext;
+
+    private final Set<Session> wsSessions = new HashSet<>();
 
     public DeviceDriver(Device device) {
         this.device = device;
@@ -98,6 +103,7 @@ public abstract class DeviceDriver {
             throw new IllegalStateException("receiving");
         }
 
+        log.info("[{}]receive appium log", device.getId());
         appiumLogBuffer = new ByteArrayOutputStream();
         appiumLogOutput = new OutputStream() {
             @Override
@@ -115,6 +121,7 @@ public abstract class DeviceDriver {
 
     public synchronized void stopReceiveAppiumLog() {
         if (appiumLogOutput != null) {
+            log.info("[{}]stop receive appium log", device.getId());
             if (appiumService != null) {
                 appiumService.removeOutPutStream(appiumLogOutput);
             }
@@ -228,18 +235,44 @@ public abstract class DeviceDriver {
         getOrCreateJShellContext().getJShellX().getJShell().addToClasspath(path);
     }
 
-    public synchronized void closeJShell() {
+    public synchronized void closeJShellContext() {
         if (jshellContext != null) {
+            log.info("[{}]close jshell context", device.getId());
             jshellContext.close();
             jshellContext = null;
         }
     }
 
+    public void addWsSession(Session session) {
+        wsSessions.add(session);
+    }
+
+    public void removeWsSession(Session session) {
+        wsSessions.remove(session);
+    }
+
     public void release() {
+        closeAndClearWsSessions();
         stopReceiveDeviceLog();
         stopReceiveAppiumLog();
         quitAppiumDriver();
         stopAppiumService();
-        closeJShell();
+        closeJShellContext();
+    }
+
+    private synchronized void closeAndClearWsSessions() {
+        if (!wsSessions.isEmpty()) {
+            log.info("[{}]close and clear ws sessions", device.getId());
+            for (Session session : wsSessions) {
+                if (session != null && session.isOpen()) {
+                    try {
+                        session.close();
+                    } catch (Exception e) {
+                        log.warn("close session={} err", session.getId(), e);
+                    }
+                }
+            }
+            wsSessions.clear();
+        }
     }
 }
