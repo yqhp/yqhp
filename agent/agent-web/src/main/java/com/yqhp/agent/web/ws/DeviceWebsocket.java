@@ -36,7 +36,6 @@ public class DeviceWebsocket {
         log.info("[{}]onOpen, token:{}", session.getId(), token);
         deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
         this.token = token;
-        deviceDriver.addWsSession(session);
         messageHandler = new MessageHandler();
     }
 
@@ -58,9 +57,6 @@ public class DeviceWebsocket {
     @OnClose
     public void onClose(Session session) {
         log.info("[{}]onClose", session.getId());
-        if (deviceDriver != null) {
-            deviceDriver.removeWsSession(session);
-        }
     }
 
     /**

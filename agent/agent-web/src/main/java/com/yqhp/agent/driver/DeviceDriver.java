@@ -18,15 +18,12 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import javax.websocket.Session;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -48,8 +45,6 @@ public abstract class DeviceDriver {
     private OutputStream appiumLogOutput;
 
     private volatile JShellContext jshellContext;
-
-    private final Set<Session> wsSessions = new HashSet<>();
 
     public DeviceDriver(Device device) {
         this.device = device;
@@ -243,36 +238,11 @@ public abstract class DeviceDriver {
         }
     }
 
-    public void addWsSession(Session session) {
-        wsSessions.add(session);
-    }
-
-    public void removeWsSession(Session session) {
-        wsSessions.remove(session);
-    }
-
     public void release() {
-        closeAndClearWsSessions();
         stopReceiveDeviceLog();
         stopReceiveAppiumLog();
         quitAppiumDriver();
         stopAppiumService();
         closeJShellContext();
-    }
-
-    private synchronized void closeAndClearWsSessions() {
-        if (!wsSessions.isEmpty()) {
-            log.info("[{}]close and clear ws sessions", device.getId());
-            for (Session session : wsSessions) {
-                if (session != null && session.isOpen()) {
-                    try {
-                        session.close();
-                    } catch (Exception e) {
-                        log.warn("close session={} err", session.getId(), e);
-                    }
-                }
-            }
-            wsSessions.clear();
-        }
     }
 }
