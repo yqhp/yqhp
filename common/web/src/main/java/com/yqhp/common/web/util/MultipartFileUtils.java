@@ -30,7 +30,6 @@ public class MultipartFileUtils {
              OutputStream out = fileItem.getOutputStream()) {
             IOUtils.copy(in, out);
         }
-
         return new CommonsMultipartFile(fileItem);
     }
 

@@ -5,7 +5,6 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.android.ddmlib.RawImage;
 import com.yqhp.common.commons.model.Size;
-import com.yqhp.common.commons.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -23,17 +22,6 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class AndroidUtils {
-
-    public static void installAppFromUrl(IDevice iDevice, String apkUrl) throws IOException {
-        File apkFile = FileUtils.downloadAsTempFile(apkUrl);
-        try {
-            installApp(iDevice, apkFile);
-        } finally {
-            if (!apkFile.delete()) {
-                log.warn("delete {} fail", apkFile);
-            }
-        }
-    }
 
     public static void installApp(IDevice iDevice, File apkFile) {
         installApp(iDevice, apkFile, true);

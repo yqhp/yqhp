@@ -41,7 +41,7 @@ public class PluginServiceImpl implements PluginService {
         synchronized (plugin.getId().intern()) {
             File pluginDir = new File(baseDirectory, plugin.getId());
             if (!pluginDir.exists() && !pluginDir.mkdir()) {
-                throw new IllegalStateException("mk plugin dir fail, dir=" + pluginDir);
+                throw new IOException("mk plugin dir fail, dir=" + pluginDir);
             }
 
             List<File> files = new ArrayList<>(plugin.getFiles().size());

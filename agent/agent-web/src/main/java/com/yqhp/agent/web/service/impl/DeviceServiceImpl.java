@@ -17,13 +17,13 @@ import com.yqhp.console.repository.enums.DeviceType;
 import com.yqhp.file.model.OSSFile;
 import com.yqhp.file.rpc.FileRpc;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -227,6 +227,6 @@ public class DeviceServiceImpl implements DeviceService {
 
     private String createDeviceToken(String deviceId) {
         String data = System.currentTimeMillis() + RandomStringUtils.randomAlphanumeric(8) + deviceId;
-        return DigestUtils.md5DigestAsHex(data.getBytes());
+        return DigestUtils.md5Hex(data);
     }
 }
