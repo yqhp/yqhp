@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+
 /**
  * @author jiangyitao
  */
@@ -66,6 +68,14 @@ public class D implements JShellVar {
     public D back() {
         ((AndroidDriver) appium()).pressKey(new KeyEvent(AndroidKey.BACK));
         return this;
+    }
+
+    public void install(String url) {
+        try {
+            deviceDriver.installApp(url);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AppiumDriver appium() {

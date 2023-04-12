@@ -22,6 +22,15 @@ public class FileUtils {
         return DigestUtils.md5Hex(new FileInputStream(file));
     }
 
+    public static File downloadIfAbsent(String url) throws IOException {
+        String filename = org.apache.commons.io.FilenameUtils.getName(url);
+        return downloadIfAbsent(url, filename);
+    }
+
+    public static File downloadIfAbsent(String url, String filename) throws IOException {
+        return downloadIfAbsent(url, filename, null);
+    }
+
     /**
      * 可以保证相同url只下载一次，该方法支持多线程调用。
      *

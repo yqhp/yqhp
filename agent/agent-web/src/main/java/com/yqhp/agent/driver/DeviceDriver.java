@@ -3,6 +3,7 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.jshell.D;
+import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.util.ApplicationContextUtils;
@@ -52,6 +53,11 @@ public abstract class DeviceDriver {
 
     public String getDeviceId() {
         return device.getId();
+    }
+
+    public void installApp(String url) throws IOException {
+        File app = FileUtils.downloadIfAbsent(url);
+        installApp(app);
     }
 
     public abstract void installApp(File app);
