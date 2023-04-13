@@ -11,6 +11,7 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,11 @@ public abstract class DeviceDriver {
             return appiumService;
         }
         int port = LocalPortProvider.getAppiumServiceAvailablePort();
-        AppiumServiceBuilder builder = new AppiumServiceBuilder().usingPort(port);
+        AppiumServiceBuilder builder = new AppiumServiceBuilder()
+                .usingPort(port)
+//                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
+                .withArgument(GeneralServerFlag.LOG_TIMESTAMP, "")
+                .withArgument(GeneralServerFlag.LOCAL_TIMEZONE, "");
         String appiumJsPath = ApplicationContextUtils.getProperty("agent.appium.js-path");
         if (StringUtils.isNotBlank(appiumJsPath)) {
             builder.withAppiumJS(new File(appiumJsPath));
