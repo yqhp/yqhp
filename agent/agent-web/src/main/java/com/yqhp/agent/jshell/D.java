@@ -68,8 +68,8 @@ public class D implements JShellVar {
      * @since 0.0.1
      */
     @SneakyThrows
-    public D sleep(long ms) {
-        Thread.sleep(ms);
+    public D sleep(long millis) {
+        Thread.sleep(millis);
         return this;
     }
 
