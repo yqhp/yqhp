@@ -12,11 +12,11 @@ import com.yqhp.console.model.param.UpdatePlanParam;
 import com.yqhp.console.model.param.query.PlanPageQuery;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Doc;
+import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.entity.Plan;
-import com.yqhp.console.repository.entity.PlanExecutionRecord;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.enums.DocKind;
-import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionRecordStatus;
 import com.yqhp.console.repository.enums.RunMode;
 import com.yqhp.console.repository.mapper.PlanMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -42,7 +42,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Autowired
     private Snowflake snowflake;
     @Autowired
-    private PlanExecutionRecordService planExecutionRecordService;
+    private ExecutionRecordService executionRecordService;
     @Autowired
     private DeviceTaskService deviceTaskService;
     @Autowired
@@ -134,17 +134,17 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
 
         // 保存计划执行记录
-        PlanExecutionRecord planExecutionRecord = new PlanExecutionRecord();
-        planExecutionRecord.setId(snowflake.nextIdStr());
-        planExecutionRecord.setProjectId(plan.getProjectId());
-        planExecutionRecord.setPlanId(plan.getId());
-        planExecutionRecord.setPlan(plan); // 保留提交执行时的计划
-        planExecutionRecord.setPlugins(pluginService.listPluginDTOByProjectId(plan.getProjectId())); // 保留提交执行时的项目插件
-        planExecutionRecord.setDocs(docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT)); // 保留提交执行时的JSH_INIT
-        planExecutionRecord.setStatus(PlanExecutionRecordStatus.UNCOMPLETED);
-        planExecutionRecord.setCreateBy(createBy);
-        planExecutionRecord.setUpdateBy(createBy);
-        planExecutionRecordService.save(planExecutionRecord);
+        ExecutionRecord executionRecord = new ExecutionRecord();
+        executionRecord.setId(snowflake.nextIdStr());
+        executionRecord.setProjectId(plan.getProjectId());
+        executionRecord.setPlanId(plan.getId());
+        executionRecord.setPlan(plan); // 保留提交执行时的计划
+        executionRecord.setPlugins(pluginService.listPluginDTOByProjectId(plan.getProjectId())); // 保留提交执行时的项目插件
+        executionRecord.setDocs(docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT)); // 保留提交执行时的JSH_INIT
+        executionRecord.setStatus(ExecutionRecordStatus.UNCOMPLETED);
+        executionRecord.setCreateBy(createBy);
+        executionRecord.setUpdateBy(createBy);
+        executionRecordService.save(executionRecord);
 
         // 保存设备任务
         List<DeviceTask> deviceTasks = new ArrayList<>();
@@ -154,7 +154,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                     task.setId(snowflake.nextIdStr());
                     task.setProjectId(plan.getProjectId());
                     task.setPlanId(plan.getId());
-                    task.setPlanExecutionRecordId(planExecutionRecord.getId());
+                    task.setExecutionRecordId(executionRecord.getId());
                     task.setDeviceId(deviceId);
                     task.setDocId(doc.getId());
                     task.setDoc(doc); // 保留提交执行时的doc
@@ -167,7 +167,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         deviceTaskService.saveBatch(deviceTasks);
 
         for (String deviceId : deviceDocsMap.keySet()) {
-            deviceTaskService.cachePlanExecutionRecordForDevice(deviceId, planExecutionRecord.getId());
+            deviceTaskService.cacheExecutionRecordForDevice(deviceId, executionRecord.getId());
         }
     }
 

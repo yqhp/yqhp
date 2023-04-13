@@ -1,7 +1,7 @@
 package com.yqhp.console.repository.mapper;
 
-import com.yqhp.console.repository.entity.PlanExecutionRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yqhp.console.repository.entity.ExecutionRecord;
 
 /**
  * <p>
@@ -10,6 +10,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  *
  * @author mybatis-plus generator
  */
-public interface PlanExecutionRecordMapper extends BaseMapper<PlanExecutionRecord> {
+public interface ExecutionRecordMapper extends BaseMapper<ExecutionRecord> {
 
 }

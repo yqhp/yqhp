@@ -6,11 +6,13 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
+import java.time.Duration;
 
 /**
  * @author jiangyitao
@@ -30,54 +32,88 @@ public class D implements JShellVar {
         return "d";
     }
 
+    /**
+     * @since 0.0.1
+     */
     public D capability(String key, Object value) {
         deviceDriver.setCapability(key, value);
         return this;
     }
 
+    /**
+     * @since 0.0.1
+     */
     public D init() {
         appium();
         return this;
     }
 
+    /**
+     * @since 0.0.1
+     */
     public D refresh() {
         deviceDriver.refreshAppiumDriver();
         return this;
     }
 
+    /**
+     * @since 0.0.1
+     */
+    public D implicitlyWait(long millis) {
+        appium().manage().timeouts().implicitlyWait(Duration.ofMillis(millis));
+        return this;
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    @SneakyThrows
     public D sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException ignore) {
-        }
+        Thread.sleep(ms);
         return this;
     }
 
-    public D clickId(String id) {
-        appium().findElement(By.id(id)).click();
-        return this;
+    /**
+     * @since 0.0.1
+     */
+    public WebElement id(String id) {
+        return appium().findElement(By.id(id));
     }
 
-    public D clickText(String text) {
-        Assert.hasText(text, "text cannot be empty");
-        By by = By.xpath("//*[contains(@text,'" + text + "')]");
-        appium().findElement(by).click();
-        return this;
+    /**
+     * @since 0.0.1
+     */
+    public WebElement xpath(String xpath) {
+        return appium().findElement(By.xpath(xpath));
     }
 
+    /**
+     * @since 0.0.1
+     */
+    public WebElement text(String text) {
+        Assert.hasText(text, "text must has text");
+        return xpath("//*[@text='" + text + "']");
+    }
+
+    /**
+     * @since 0.0.1
+     */
     public D back() {
         ((AndroidDriver) appium()).pressKey(new KeyEvent(AndroidKey.BACK));
         return this;
     }
 
+    /**
+     * @since 0.0.1
+     */
+    @SneakyThrows
     public void install(String url) {
-        try {
-            deviceDriver.installApp(url);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        deviceDriver.installApp(url);
     }
 
+    /**
+     * @since 0.0.1
+     */
     public AppiumDriver appium() {
         return deviceDriver.getOrCreateAppiumDriver();
     }

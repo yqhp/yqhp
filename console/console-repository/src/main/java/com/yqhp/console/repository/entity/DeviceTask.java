@@ -35,7 +35,7 @@ public class DeviceTask implements Serializable {
 
     private String planId;
 
-    private String planExecutionRecordId;
+    private String executionRecordId;
 
     private String deviceId;
 

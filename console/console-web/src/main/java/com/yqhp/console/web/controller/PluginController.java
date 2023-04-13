@@ -32,7 +32,7 @@ public class PluginController {
         return pluginService.listByProjectId(projectId);
     }
 
-    @GetMapping("/dto")
+    @GetMapping("/details")
     public List<PluginDTO> listPluginDTOByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
         return pluginService.listPluginDTOByProjectId(projectId);
     }

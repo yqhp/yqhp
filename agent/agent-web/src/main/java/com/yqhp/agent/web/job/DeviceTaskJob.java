@@ -56,17 +56,17 @@ public class DeviceTaskJob {
             ReceivedDeviceTasks received = deviceTaskRpc.receive(driver.getDeviceId());
             if (received == null) return;
 
-            String planName = received.getPlanExecutionRecord().getPlan().getName();
+            String planName = received.getExecutionRecord().getPlan().getName();
             String token = deviceService.lockDevice(driver.getDeviceId(), planName);
             try {
                 // 加载插件
-                List<PluginDTO> plugins = received.getPlanExecutionRecord().getPlugins();
+                List<PluginDTO> plugins = received.getExecutionRecord().getPlugins();
                 for (PluginDTO plugin : plugins) {
                     List<File> files = pluginService.downloadIfAbsent(plugin);
                     driver.jshellAddToClasspath(files);
                 }
                 // 执行define代码
-                List<Doc> docs = received.getPlanExecutionRecord().getDocs();
+                List<Doc> docs = received.getExecutionRecord().getDocs();
                 for (Doc doc : docs) {
                     driver.jshellAnalysisAndEval(doc.getContent());
                 }

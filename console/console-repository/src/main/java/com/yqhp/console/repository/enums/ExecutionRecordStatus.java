@@ -9,7 +9,7 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum PlanExecutionRecordStatus implements BaseEnum<Integer> {
+public enum ExecutionRecordStatus implements BaseEnum<Integer> {
 
     UNCOMPLETED(0),
     COMPLETED(1),
@@ -19,7 +19,7 @@ public enum PlanExecutionRecordStatus implements BaseEnum<Integer> {
     @JsonValue
     private final Integer value;
 
-    PlanExecutionRecordStatus(Integer value) {
+    ExecutionRecordStatus(Integer value) {
         this.value = value;
     }
 }

@@ -4,13 +4,16 @@ import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.web.service.DocService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author jiangyitao
@@ -26,6 +29,11 @@ public class DocController {
     @GetMapping("/{id}")
     public Doc getDocById(@PathVariable String id) {
         return docService.getDocById(id);
+    }
+
+    @GetMapping("/sorted/jshInit")
+    public List<Doc> listSortedJshInitDocByProjectId(@NotBlank(message = "projectId不能为空") String projectId) {
+        return docService.listSortedDocByProjectIdAndKind(projectId, DocKind.JSH_INIT);
     }
 
     @PostMapping

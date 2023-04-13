@@ -10,13 +10,13 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface DeviceTaskService extends IService<DeviceTask> {
-    void cachePlanExecutionRecordForDevice(String deviceId, String planExecutionRecordId);
+    void cacheExecutionRecordForDevice(String deviceId, String executionRecordId);
 
     ReceivedDeviceTasks receive(String deviceId);
 
-    List<DeviceTask> listByPlanExecutionRecordId(String planExecutionRecordId);
+    List<DeviceTask> listByExecutionRecordId(String executionRecordId);
 
-    List<DeviceTask> listInPlanExecutionRecordIds(List<String> planExecutionRecordIds);
+    List<DeviceTask> listInExecutionRecordIds(List<String> executionRecordIds);
 
     boolean isFinished(DeviceTask task);
 }

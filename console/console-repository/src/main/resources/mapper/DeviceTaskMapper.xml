@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="project_id" property="projectId" />
         <result column="plan_id" property="planId" />
-        <result column="plan_execution_record_id" property="planExecutionRecordId" />
+        <result column="execution_record_id" property="executionRecordId" />
         <result column="device_id" property="deviceId" />
         <result column="doc_id" property="docId" />
         <result column="doc" property="doc" typeHandler="com.yqhp.console.repository.typehandler.DocTypeHandler" />

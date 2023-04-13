@@ -3,7 +3,7 @@ package com.yqhp.console.repository.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.yqhp.console.repository.enums.PlanExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionRecordStatus;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.repository.typehandler.DocsTypeHandler;
 import com.yqhp.console.repository.typehandler.PlanTypeHandler;
@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName(autoResultMap = true)
-public class PlanExecutionRecord implements Serializable {
+public class ExecutionRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class PlanExecutionRecord implements Serializable {
     @TableField(typeHandler = DocsTypeHandler.class)
     private List<Doc> docs;
 
-    private PlanExecutionRecordStatus status;
+    private ExecutionRecordStatus status;
 
     private Long startTime;
 

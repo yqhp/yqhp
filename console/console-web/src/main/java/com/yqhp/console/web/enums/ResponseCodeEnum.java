@@ -90,7 +90,7 @@ public enum ResponseCodeEnum implements ResponseCode {
     PLAN_DOC_NOT_FOUND(3603, "计划Doc不存在"),
     DUPLICATE_PLAN_DOC(3604, "计划Doc已存在"),
 
-    PLAN_EXECUTION_RECORD_NOT_FOUND(3901, "计划执行记录不存在"),
+    EXECUTION_RECORD_NOT_FOUND(3901, "执行记录不存在"),
     ;
 
 

@@ -33,7 +33,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/auth/token",
             AUTH_USER_INFO_PATH,
             "/agent/device/token/**",
-            "/console/planExecutionRecord/*/details"
+            "/console/executionRecord/*/details"
     );
 
     private final WebClient authWebClient;
