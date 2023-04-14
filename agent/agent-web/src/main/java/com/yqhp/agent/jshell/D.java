@@ -10,6 +10,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
 
 import java.time.Duration;
@@ -77,14 +79,28 @@ public class D implements JShellVar {
      * @since 0.0.1
      */
     public WebElement id(String id) {
-        return appium().findElement(By.id(id));
+        return find(By.id(id));
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public WebElement id(String id, long millis) {
+        return find(By.id(id), Duration.ofMillis(millis));
     }
 
     /**
      * @since 0.0.1
      */
     public WebElement xpath(String xpath) {
-        return appium().findElement(By.xpath(xpath));
+        return find(By.xpath(xpath));
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public WebElement xpath(String xpath, long millis) {
+        return find(By.xpath(xpath), Duration.ofMillis(millis));
     }
 
     /**
@@ -93,6 +109,29 @@ public class D implements JShellVar {
     public WebElement text(String text) {
         Assert.hasText(text, "text must has text");
         return xpath("//*[@text='" + text + "']");
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public WebElement text(String text, long millis) {
+        Assert.hasText(text, "text must has text");
+        return xpath("//*[@text='" + text + "']", millis);
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public WebElement find(By by) {
+        return appium().findElement(by);
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public WebElement find(By by, Duration timeout) {
+        WebDriverWait wait = new WebDriverWait(appium(), timeout);
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
     /**
