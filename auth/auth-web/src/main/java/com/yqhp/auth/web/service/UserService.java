@@ -30,6 +30,8 @@ public interface UserService extends IService<User> {
 
     User getUserById(String userId);
 
+    UserVO getUserVOById(String userId);
+
     User getUserByUsername(String username);
 
     UserInfo getUserInfoByUsername(String username);

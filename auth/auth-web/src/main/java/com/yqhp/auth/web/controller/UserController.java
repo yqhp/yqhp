@@ -88,6 +88,11 @@ public class UserController {
         userService.changePassword(oldPassword, newPassword);
     }
 
+    @GetMapping("/{userId}")
+    public UserVO getUserVOById(@PathVariable String userId) {
+        return userService.getUserVOById(userId);
+    }
+
     @PostMapping("/users")
     public List<UserVO> listUserVOByIds(@RequestBody Set<String> userIds) {
         return userService.listUserVOByIds(userIds);

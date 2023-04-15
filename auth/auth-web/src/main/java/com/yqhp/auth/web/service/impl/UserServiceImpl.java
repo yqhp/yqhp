@@ -134,6 +134,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public UserVO getUserVOById(String userId) {
+        return toUserVO(getUserById(userId));
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getUsername, username);

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static jdk.jshell.SourceCodeAnalysis.*;
 
 /**
  * @author jiangyitao
@@ -23,7 +24,7 @@ public class JShellX implements Closeable {
     @Getter
     private final JShell jShell;
     @Getter
-    private final SourceCodeAnalysis codeAnalysis;
+    private SourceCodeAnalysis codeAnalysis;
 
     public JShellX() {
         this.jShell = JShell.builder()
@@ -36,6 +37,7 @@ public class JShellX implements Closeable {
 
     @Override
     public void close() {
+        codeAnalysis = null;
         jShell.close();
     }
 
@@ -45,11 +47,24 @@ public class JShellX implements Closeable {
 
     public List<JShellEvalResult> analysisAndEval(String input, Consumer<JShellEvalResult> consumer) {
         List<JShellEvalResult> results = new ArrayList<>();
-        List<String> sources = analysis(input);
-        for (String source : sources) {
-            JShellEvalResult result = eval(source, consumer);
+        if (StringUtils.isEmpty(input)) {
+            return results;
+        }
+
+        CompletionInfo info = codeAnalysis.analyzeCompletion(input);
+        while (info.completeness().isComplete()) {
+            JShellEvalResult result = eval(info.source(), consumer);
             results.add(result);
-            if (result.isFailed()) break; // 失败不继续执行
+            if (result.isFailed()) {
+                // 执行失败，不继续分析执行
+                return results;
+            }
+            info = codeAnalysis.analyzeCompletion(info.remaining());
+        }
+
+        if (info.completeness() != Completeness.EMPTY) {
+            JShellEvalResult result = eval(info.remaining(), consumer);
+            results.add(result);
         }
         return results;
     }
@@ -59,6 +74,9 @@ public class JShellX implements Closeable {
     }
 
     public JShellEvalResult eval(String source, Consumer<JShellEvalResult> consumer) {
+        if (source == null) return null;
+        // 必须移除开头的换行，否则会出现莫名其妙的问题。比如: \n import xxx，会把之前执行过的变量变成了null
+        source = source.trim();
         JShellEvalResult result = new JShellEvalResult();
         result.setSource(source);
         result.setEvalStart(System.currentTimeMillis());
@@ -67,22 +85,6 @@ public class JShellX implements Closeable {
         handleEvents(events, result);
         if (consumer != null) consumer.accept(result);
         return result;
-    }
-
-    private List<String> analysis(String input) {
-        List<String> sources = new ArrayList<>();
-        if (input == null) return sources;
-        while (!input.isEmpty()) {
-            SourceCodeAnalysis.CompletionInfo completionInfo = codeAnalysis.analyzeCompletion(input);
-            String source = completionInfo.source();
-            if (source == null) {
-                break;
-            }
-            // 必须移除开头的换行，否则会出现莫名其妙的问题。比如: \n import xxx，会把之前执行过的变量变成了null
-            sources.add(source.trim());
-            input = completionInfo.remaining();
-        }
-        return sources;
     }
 
     private void handleEvents(List<SnippetEvent> events, JShellEvalResult result) {
@@ -191,11 +193,11 @@ public class JShellX implements Closeable {
             return new ArrayList<>();
         }
 
-        List<SourceCodeAnalysis.Suggestion> suggestions = codeAnalysis
+        List<Suggestion> suggestions = codeAnalysis
                 .completionSuggestions(input, input.length(), new int[]{-1});
         return suggestions.stream()
-                .filter(SourceCodeAnalysis.Suggestion::matchesType)
-                .map(SourceCodeAnalysis.Suggestion::continuation)
+                .filter(Suggestion::matchesType)
+                .map(Suggestion::continuation)
                 .distinct()
                 .collect(Collectors.toList());
     }
