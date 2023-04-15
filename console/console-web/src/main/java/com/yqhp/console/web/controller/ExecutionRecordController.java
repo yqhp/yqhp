@@ -1,8 +1,8 @@
 package com.yqhp.console.web.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yqhp.console.model.dto.ExecutionRecordDTO;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
+import com.yqhp.console.model.vo.ExecutionRecordDetails;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.web.service.ExecutionRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class ExecutionRecordController {
     }
 
     @GetMapping("/{id}/details")
-    public ExecutionRecordDTO getExecutionRecordDTOById(@PathVariable String id) {
-        return executionRecordService.getExecutionRecordDTOById(id);
+    public ExecutionRecordDetails getExecutionRecordDetailsById(@PathVariable String id) {
+        return executionRecordService.getExecutionRecordDetailsById(id);
     }
 
 }

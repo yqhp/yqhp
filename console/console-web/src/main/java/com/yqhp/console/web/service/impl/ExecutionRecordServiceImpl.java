@@ -5,15 +5,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.dto.ExecutionRecordDTO;
+import com.yqhp.console.model.dto.DeviceExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
-import com.yqhp.console.repository.entity.DeviceTask;
+import com.yqhp.console.model.vo.ExecutionRecordDetails;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionRecordStatus;
 import com.yqhp.console.repository.mapper.ExecutionRecordMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.ExecutionRecordService;
+import com.yqhp.console.web.service.ProjectService;
+import com.yqhp.console.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,11 @@ public class ExecutionRecordServiceImpl
     @Lazy
     @Autowired
     private DeviceTaskService deviceTaskService;
+    @Autowired
+    private ProjectService projectService;
+    @Autowired
+    private UserService userService;
+
 
     @Override
     public ExecutionRecord getExecutionRecordById(String id) {
@@ -71,16 +78,19 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
-    public ExecutionRecordDTO getExecutionRecordDTOById(String id) {
+    public ExecutionRecordDetails getExecutionRecordDetailsById(String id) {
         ExecutionRecord executionRecord = getExecutionRecordById(id);
-        return toExecutionRecordDTO(executionRecord);
+        return toExecutionRecordDetails(executionRecord);
     }
 
-    private ExecutionRecordDTO toExecutionRecordDTO(ExecutionRecord executionRecord) {
+    private ExecutionRecordDetails toExecutionRecordDetails(ExecutionRecord executionRecord) {
         if (executionRecord == null) return null;
-        ExecutionRecordDTO executionRecordDTO = new ExecutionRecordDTO().convertFrom(executionRecord);
-        List<DeviceTask> tasks = deviceTaskService.listByExecutionRecordId(executionRecord.getId());
-        executionRecordDTO.setTasks(tasks);
-        return executionRecordDTO;
+        ExecutionRecordDetails details = new ExecutionRecordDetails().convertFrom(executionRecord);
+        details.setProject(projectService.getProjectById(executionRecord.getProjectId()));
+        details.setCreator(userService.getNicknameById(executionRecord.getCreateBy()));
+        List<DeviceExecutionResult> deviceExecutionResults = deviceTaskService
+                .listDeviceExecutionResultByExecutionRecordId(executionRecord.getId());
+        details.setDeviceExecutionResults(deviceExecutionResults);
+        return details;
     }
 }

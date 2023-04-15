@@ -2,8 +2,8 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yqhp.console.model.dto.ExecutionRecordDTO;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
+import com.yqhp.console.model.vo.ExecutionRecordDetails;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 
 import java.time.LocalDateTime;
@@ -21,5 +21,5 @@ public interface ExecutionRecordService extends IService<ExecutionRecord> {
 
     IPage<ExecutionRecord> pageBy(ExecutionRecordPageQuery query);
 
-    ExecutionRecordDTO getExecutionRecordDTOById(String id);
+    ExecutionRecordDetails getExecutionRecordDetailsById(String id);
 }

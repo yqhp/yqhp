@@ -2,11 +2,14 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.console.model.dto.DeviceExecutionResult;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
+import com.yqhp.console.repository.entity.Device;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
 import com.yqhp.console.repository.mapper.DeviceTaskMapper;
+import com.yqhp.console.web.service.DeviceService;
 import com.yqhp.console.web.service.DeviceTaskService;
 import com.yqhp.console.web.service.ExecutionRecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +39,8 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private ExecutionRecordService executionRecordService;
+    @Autowired
+    private DeviceService deviceService;
 
     @Override
     public void cacheExecutionRecordForDevice(String deviceId, String executionRecordId) {
@@ -83,6 +91,12 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     }
 
     @Override
+    public List<DeviceExecutionResult> listDeviceExecutionResultByExecutionRecordId(String executionRecordId) {
+        List<DeviceTask> tasks = listByExecutionRecordId(executionRecordId);
+        return toDeviceExecutionResult(tasks);
+    }
+
+    @Override
     public List<DeviceTask> listInExecutionRecordIds(List<String> executionRecordIds) {
         if (CollectionUtils.isEmpty(executionRecordIds)) {
             return new ArrayList<>();
@@ -100,5 +114,30 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
 
     private String getExecutionRecordKey(String deviceId) {
         return "executionRecord:" + deviceId;
+    }
+
+    private List<DeviceExecutionResult> toDeviceExecutionResult(List<DeviceTask> tasks) {
+        if (CollectionUtils.isEmpty(tasks)) {
+            return new ArrayList<>();
+        }
+
+        Set<String> deviceIds = tasks.stream()
+                .map(DeviceTask::getDeviceId).collect(Collectors.toSet());
+        // deviceId -> Device
+        Map<String, Device> deviceMap = deviceService.listByIds(deviceIds).stream()
+                .collect(Collectors.toMap(Device::getId, Function.identity(), (k1, k2) -> k1));
+
+        // deviceId -> List<DeviceTask>
+        Map<String, List<DeviceTask>> tasksMap = tasks.stream()
+                .collect(Collectors.groupingBy(DeviceTask::getDeviceId));
+        List<DeviceExecutionResult> results = new ArrayList<>(deviceIds.size());
+        tasksMap.forEach((deviceId, deviceTasks) -> {
+            DeviceExecutionResult result = new DeviceExecutionResult();
+            result.setDevice(deviceMap.get(deviceId));
+            result.setTasks(deviceTasks);
+            results.add(result);
+        });
+
+        return results;
     }
 }
