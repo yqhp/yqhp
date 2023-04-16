@@ -23,30 +23,30 @@ public class ZkDeviceManager {
     }
 
     public void create(ZkDevice device) {
-        String path = getPath(device.getLocation(), device.getId());
+        String path = getDevicePath(device.getLocation(), device.getId());
         zkTemplate.create(CreateMode.EPHEMERAL, path, toJSONString(device));
     }
 
-    public void delete(ZkDevice device) {
-        delete(device.getLocation(), device.getId());
-    }
-
     public void delete(String location, String deviceId) {
-        String path = getPath(location, deviceId);
+        String path = getDevicePath(location, deviceId);
         zkTemplate.delete(path);
     }
 
     public void update(ZkDevice device) {
-        String path = getPath(device.getLocation(), device.getId());
+        String path = getDevicePath(device.getLocation(), device.getId());
         zkTemplate.setData(path, toJSONString(device));
     }
 
     public ZkDevice get(String location, String deviceId) {
-        String path = getPath(location, deviceId);
+        String path = getDevicePath(location, deviceId);
         return get(path);
     }
 
     public ZkDevice get(String path) {
+        if (!zkTemplate.exist(path)) {
+            return null;
+        }
+        // 如果path不存在，会抛异常
         byte[] data = zkTemplate.getData(path);
         return toZkDevice(data);
     }
@@ -62,7 +62,7 @@ public class ZkDeviceManager {
         return JacksonUtils.writeValueAsString(device);
     }
 
-    private String getPath(String location, String deviceId) {
+    private String getDevicePath(String location, String deviceId) {
         return getWatchPath() + "/" + location + "/" + deviceId;
     }
 }

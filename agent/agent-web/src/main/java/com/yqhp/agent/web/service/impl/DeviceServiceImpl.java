@@ -121,10 +121,13 @@ public class DeviceServiceImpl implements DeviceService {
             if (isDeviceLocked(deviceId)) {
                 throw new ServiceException(ResponseCodeEnum.DEVICE_LOCKED);
             }
-            String token = createDeviceToken(deviceId);
             ZkDevice zkDevice = zkDeviceManager.get(location, deviceId);
+            if (zkDevice == null) {
+                throw new ServiceException(ResponseCodeEnum.DEVICE_NOT_FOUND);
+            }
             zkDevice.setLocked(true);
             zkDevice.setLockUser(user);
+            String token = createDeviceToken(deviceId);
             zkDevice.setLockToken(token);
             zkDevice.setLockTime(LocalDateTime.now());
             zkDeviceManager.update(zkDevice);
@@ -139,9 +142,11 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
         deviceDriver.release();
         ZkDevice zkDevice = zkDeviceManager.get(location, deviceDriver.getDeviceId());
-        zkDevice.setLocked(false);
-        zkDevice.setUnlockTime(LocalDateTime.now());
-        zkDeviceManager.update(zkDevice);
+        if (zkDevice != null) {
+            zkDevice.setLocked(false);
+            zkDevice.setUnlockTime(LocalDateTime.now());
+            zkDeviceManager.update(zkDevice);
+        }
         LOCKED_DEVICE_DRIVERS.remove(token);
         log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
     }
