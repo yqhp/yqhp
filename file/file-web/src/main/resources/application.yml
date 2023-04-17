@@ -24,7 +24,7 @@ spring:
 
 oss:
   minio:
-    url: ${MINIO_URL:http://127.0.0.1:9000}
+    endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
     bucket: yqhp
-    accessKey: ${MINIO_ACCESS_KEY:admin}
+    accessKey: ${MINIO_ACCESS_KEY:yqhp}
     secretKey: ${MINIO_SECRET_KEY:yqhp@123..Aa88}

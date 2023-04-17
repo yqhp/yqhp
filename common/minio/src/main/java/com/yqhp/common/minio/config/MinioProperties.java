@@ -9,8 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "oss.minio")
 public class MinioProperties {
-    private String url;
-    private String bucket;
+    private String endpoint;
     private String accessKey;
     private String secretKey;
+    private String bucket;
 }

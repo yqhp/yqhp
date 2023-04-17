@@ -1,11 +1,7 @@
 package com.yqhp.common.minio.config;
 
 import com.yqhp.common.minio.MinioTemplate;
-import com.yqhp.common.minio.enums.PolicyType;
-import com.yqhp.common.minio.exception.MinioException;
 import io.minio.MinioClient;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,15 +24,10 @@ public class MinioAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     public MinioClient minioClient() {
-        try {
-            return new MinioClient(
-                    minioProperties.getUrl(),
-                    minioProperties.getAccessKey(),
-                    minioProperties.getSecretKey()
-            );
-        } catch (InvalidEndpointException | InvalidPortException e) {
-            throw new MinioException(e);
-        }
+        return MinioClient.builder()
+                .endpoint(minioProperties.getEndpoint())
+                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
+                .build();
     }
 
     @Bean
@@ -44,7 +35,7 @@ public class MinioAutoConfig {
     public MinioTemplate minioTemplate(MinioClient minioClient) {
         MinioTemplate template = new MinioTemplate(minioClient, minioProperties);
         if (StringUtils.hasText(minioProperties.getBucket())) {
-            template.createBucketIfAbsent(minioProperties.getBucket(), PolicyType.READ_WRITE);
+            template.createBucketIfAbsent(minioProperties.getBucket());
         }
         return template;
     }
