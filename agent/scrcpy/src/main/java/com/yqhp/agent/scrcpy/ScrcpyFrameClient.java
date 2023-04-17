@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 /**
  * @author jiangyitao
@@ -28,16 +29,13 @@ public class ScrcpyFrameClient {
 
     private Socket frameSocket;
     private InputStream frameInputStream;
-    private byte[] frameBuffer;
 
     ScrcpyFrameClient(IDevice iDevice) {
         this.iDevice = iDevice;
-        frameBuffer = new byte[1024 * 1024];
     }
 
     void connect(int localPort, Duration readTimeout, ScrcpyOptions scrcpyOptions) throws IOException {
         this.scrcpyOptions = scrcpyOptions;
-
         if (scrcpyOptions.isTunnelForward()) {
             try {
                 log.info("[{}]adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
@@ -48,11 +46,10 @@ public class ScrcpyFrameClient {
         } else {
             // todo iDevice.createReverse
         }
-        this.localPort = localPort;
 
+        this.localPort = localPort;
         frameSocket = new Socket("127.0.0.1", localPort);
         frameInputStream = frameSocket.getInputStream();
-
         long timeoutMs = System.currentTimeMillis() + readTimeout.toMillis();
 
         while (scrcpyOptions.isSendDummyByte() && frameInputStream.read() != 0) { // 读到0，代表连接成功
@@ -87,7 +84,6 @@ public class ScrcpyFrameClient {
             }
             frameInputStream = null;
         }
-
         if (frameSocket != null) {
             try {
                 log.info("[{}]close frame socket", iDevice.getSerialNumber());
@@ -97,7 +93,6 @@ public class ScrcpyFrameClient {
             }
             frameSocket = null;
         }
-
         if (localPort > 0) {
             if (scrcpyOptions.isTunnelForward()) {
                 try {
@@ -119,7 +114,6 @@ public class ScrcpyFrameClient {
             for (int i = 0; i < 64; i++) {
                 frameInputStream.read();
             }
-
             // width height 2字节
             int width = frameInputStream.read() << 8 | frameInputStream.read();
             int height = frameInputStream.read() << 8 | frameInputStream.read();
@@ -128,29 +122,34 @@ public class ScrcpyFrameClient {
         }
     }
 
-    public ByteBuffer readFrame() throws IOException {
-        int frameSize;
-        if (scrcpyOptions.isSendFrameMeta()) {
-            // presentationTimeUs 8字节，暂时用不到，忽略
-            for (int i = 0; i < 8; i++) {
-                frameInputStream.read();
-            }
+    /**
+     * H264 NALU: H264 NALU（Network Abstraction Layer Unit）是H264视频流的基本单元，由一个start code和紧随其后的视频数据组成
+     * start code: 0x000001或0x00000001
+     */
+    public synchronized void startReadingFrames(Consumer<ByteBuffer> consumer) throws IOException {
+        final byte[] buffer = new byte[1024 * 1024];
+        final int maxReadLen = 1024; // 每次最多读取
+        int bufferOffset = 0;
+        int naluOffset;
 
-            // packetSize 4字节
-            frameSize = frameInputStream.read() << 24 | frameInputStream.read() << 16
-                    | frameInputStream.read() << 8 | frameInputStream.read();
-
-            if (frameSize > frameBuffer.length) {
-                frameBuffer = new byte[frameSize]; // 扩容
+        for (; ; ) {
+            int readLen = frameInputStream.read(buffer, bufferOffset, maxReadLen);
+            if (readLen > 0) {
+                bufferOffset += readLen;
+                for (int i = 5; i < bufferOffset - 4; i++) {
+                    if (buffer[i] == 0x00 && buffer[i + 1] == 0x00
+                            && buffer[i + 2] == 0x00 && buffer[i + 3] == 0x01) {
+                        naluOffset = i;
+                        byte[] nalu = new byte[naluOffset];
+                        System.arraycopy(buffer, 0, nalu, 0, naluOffset);
+                        consumer.accept(ByteBuffer.wrap(nalu));
+                        bufferOffset -= naluOffset;
+                        System.arraycopy(buffer, naluOffset, buffer, 0, bufferOffset);
+                        i = 5;
+                    }
+                }
             }
-
-            for (int i = 0; i < frameSize; i++) {
-                frameBuffer[i] = (byte) frameInputStream.read();
-            }
-        } else {
-            frameSize = frameInputStream.read(frameBuffer);
         }
-        return ByteBuffer.wrap(frameBuffer, 0, frameSize);
     }
 
 }
