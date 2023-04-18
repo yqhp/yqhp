@@ -75,23 +75,29 @@ public class ScrcpyFrameClient {
     }
 
     void disconnect() {
+        if (frameSocket != null) {
+            try {
+                log.info("[{}]shutdown frame socket input", iDevice.getSerialNumber());
+                frameSocket.shutdownInput();
+            } catch (IOException e) {
+                log.warn("[{}]shutdown frame socket input io err", iDevice.getSerialNumber());
+            }
+            try {
+                log.info("[{}]close frame socket", iDevice.getSerialNumber());
+                frameSocket.close();
+            } catch (IOException e) {
+                log.warn("[{}]close frame socket io err", iDevice.getSerialNumber(), e);
+            }
+            frameSocket = null;
+        }
         if (frameInputStream != null) {
             try {
                 log.info("[{}]close frame input stream", iDevice.getSerialNumber());
                 frameInputStream.close();
             } catch (IOException e) {
-                log.warn("close frame input stream io err", e);
+                log.warn("[{}]close frame input stream io err", iDevice.getSerialNumber(), e);
             }
             frameInputStream = null;
-        }
-        if (frameSocket != null) {
-            try {
-                log.info("[{}]close frame socket", iDevice.getSerialNumber());
-                frameSocket.close();
-            } catch (IOException e) {
-                log.warn("close frame socket io err", e);
-            }
-            frameSocket = null;
         }
         if (localPort > 0) {
             if (scrcpyOptions.isTunnelForward()) {
