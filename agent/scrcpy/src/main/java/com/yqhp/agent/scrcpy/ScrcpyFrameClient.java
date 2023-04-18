@@ -82,13 +82,6 @@ public class ScrcpyFrameClient {
             } catch (IOException e) {
                 log.warn("[{}]shutdown frame socket input io err", iDevice.getSerialNumber());
             }
-            try {
-                log.info("[{}]close frame socket", iDevice.getSerialNumber());
-                frameSocket.close();
-            } catch (IOException e) {
-                log.warn("[{}]close frame socket io err", iDevice.getSerialNumber(), e);
-            }
-            frameSocket = null;
         }
         if (frameInputStream != null) {
             try {
@@ -98,6 +91,15 @@ public class ScrcpyFrameClient {
                 log.warn("[{}]close frame input stream io err", iDevice.getSerialNumber(), e);
             }
             frameInputStream = null;
+        }
+        if (frameSocket != null) {
+            try {
+                log.info("[{}]close frame socket", iDevice.getSerialNumber());
+                frameSocket.close();
+            } catch (IOException e) {
+                log.warn("[{}]close frame socket io err", iDevice.getSerialNumber(), e);
+            }
+            frameSocket = null;
         }
         if (localPort > 0) {
             if (scrcpyOptions.isTunnelForward()) {
@@ -138,7 +140,7 @@ public class ScrcpyFrameClient {
         int bufferOffset = 0;
         int naluOffset;
 
-        for (; ; ) {
+        while (frameInputStream != null) {
             int readLen = frameInputStream.read(buffer, bufferOffset, maxReadLen);
             if (readLen > 0) {
                 bufferOffset += readLen;
