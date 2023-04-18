@@ -43,7 +43,7 @@ public class ZkDeviceManager {
     }
 
     public ZkDevice get(String path) {
-        if (!zkTemplate.exist(path)) {
+        if (!zkTemplate.exists(path)) {
             return null;
         }
         // 如果path不存在，会抛异常

@@ -37,24 +37,22 @@ public class D implements JShellVar {
     /**
      * @since 0.0.1
      */
+    public AppiumDriver appium() {
+        return deviceDriver.getOrCreateAppiumDriver();
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public AppiumDriver refresh() {
+        return deviceDriver.refreshAppiumDriver();
+    }
+
+    /**
+     * @since 0.0.1
+     */
     public D capability(String key, Object value) {
         deviceDriver.setCapability(key, value);
-        return this;
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public D init() {
-        appium();
-        return this;
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public D refresh() {
-        deviceDriver.refreshAppiumDriver();
         return this;
     }
 
@@ -148,12 +146,5 @@ public class D implements JShellVar {
     @SneakyThrows
     public void install(String url) {
         deviceDriver.installApp(url);
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public AppiumDriver appium() {
-        return deviceDriver.getOrCreateAppiumDriver();
     }
 }

@@ -112,6 +112,16 @@ public class PlanDocServiceImpl
     }
 
     @Override
+    public void deleteByDocId(String docId) {
+        Assert.hasText(docId, "docId must has text");
+        LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
+        query.eq(PlanDoc::getDocId, docId);
+        if (!remove(query)) {
+            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAIL);
+        }
+    }
+
+    @Override
     public PlanDoc getPlanDocById(String id) {
         return Optional.ofNullable(getById(id))
                 .orElseThrow(() -> new ServiceException(ResponseCodeEnum.PLAN_DOC_NOT_FOUND));

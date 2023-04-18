@@ -3,10 +3,12 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.jshell.D;
+import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.util.ApplicationContextUtils;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
@@ -225,6 +227,14 @@ public abstract class DeviceDriver {
 
     public List<String> jshellDocumentation(String input) {
         return getOrCreateJShellContext().getJShellX().documentation(input);
+    }
+
+    private static final PluginService PLUGIN_SERVICE = ApplicationContextUtils.getBean(PluginService.class);
+
+    public List<File> jshellAddToClasspath(PluginDTO plugin) throws IOException {
+        List<File> files = PLUGIN_SERVICE.downloadIfAbsent(plugin);
+        jshellAddToClasspath(files);
+        return files;
     }
 
     public void jshellAddToClasspath(List<File> files) {

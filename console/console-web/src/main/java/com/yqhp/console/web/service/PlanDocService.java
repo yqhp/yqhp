@@ -21,6 +21,8 @@ public interface PlanDocService extends IService<PlanDoc> {
 
     void deletePlanDocById(String id);
 
+    void deleteByDocId(String docId);
+
     PlanDoc getPlanDocById(String id);
 
     List<String> listEnabledAndSortedDocIdByPlanId(String planId);

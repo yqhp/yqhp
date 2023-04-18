@@ -44,6 +44,20 @@ public class ScrcpyControlClient {
     }
 
     void disconnect() {
+        if (controlSocket != null) {
+            try {
+                log.info("[{}]shutdown control socket input", iDevice.getSerialNumber());
+                controlSocket.shutdownInput();
+            } catch (IOException e) {
+                log.warn("[{}]shutdown control socket input io err", iDevice.getSerialNumber(), e);
+            }
+            try {
+                log.info("[{}]shutdown control socket output", iDevice.getSerialNumber());
+                controlSocket.shutdownOutput();
+            } catch (IOException e) {
+                log.warn("[{}]shutdown control socket output io err", iDevice.getSerialNumber(), e);
+            }
+        }
         if (controlOutputStream != null) {
             try {
                 log.info("[{}]close control output stream", iDevice.getSerialNumber());

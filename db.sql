@@ -233,7 +233,8 @@ CREATE TABLE `plan_doc` (
     `create_by` varchar(32) NOT NULL COMMENT '创建人',
     `update_by` varchar(32) NOT NULL COMMENT '更新人',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_plan_id_doc_id` (`plan_id`, `doc_id`) USING BTREE
+    UNIQUE KEY `uk_plan_id_doc_id` (`plan_id`, `doc_id`) USING BTREE,
+    KEY `idx_doc_id` (`doc_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `execution_record` (

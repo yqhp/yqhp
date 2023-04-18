@@ -99,7 +99,7 @@ public class ZkTemplate {
         }
     }
 
-    public boolean exist(String path) {
+    public boolean exists(String path) {
         try {
             return curator.checkExists().forPath(path) != null;
         } catch (Exception e) {

@@ -5,7 +5,6 @@ import com.yqhp.agent.doc.DocExecutor;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.DeviceService;
-import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.kafka.message.DeviceTaskMessage;
 import com.yqhp.console.model.vo.ReceivedDeviceTasks;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,8 +32,6 @@ public class DeviceTaskJob {
 
     private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
 
-    @Autowired
-    private PluginService pluginService;
     @Autowired
     private DeviceService deviceService;
     @Autowired
@@ -62,8 +58,7 @@ public class DeviceTaskJob {
                 // 加载插件
                 List<PluginDTO> plugins = received.getExecutionRecord().getPlugins();
                 for (PluginDTO plugin : plugins) {
-                    List<File> files = pluginService.downloadIfAbsent(plugin);
-                    driver.jshellAddToClasspath(files);
+                    driver.jshellAddToClasspath(plugin);
                 }
                 // 执行init docs
                 List<Doc> docs = received.getExecutionRecord().getDocs();

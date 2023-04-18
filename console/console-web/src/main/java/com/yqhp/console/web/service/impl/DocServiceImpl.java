@@ -14,6 +14,7 @@ import com.yqhp.console.repository.mapper.DocMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DocService;
+import com.yqhp.console.web.service.PlanDocService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,8 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
     @Autowired
     private Snowflake snowflake;
+    @Autowired
+    private PlanDocService planDocService;
 
     @Override
     public Doc createDoc(CreateDocParam createDocParam) {
@@ -72,6 +75,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         return createDoc(to);
     }
 
+    @Transactional
     @Override
     public Doc updateDoc(String id, UpdateDocParam updateDocParam) {
         Doc doc = getDocById(id);
@@ -81,6 +85,12 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         boolean renamed = !doc.getName().equals(updateDocParam.getName());
         if (renamed && ResourceFlags.unrenamable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNRENAMABLE);
+        }
+
+        boolean actionToInit = DocKind.JSH_ACTION.equals(doc.getKind())
+                && DocKind.JSH_INIT.equals(updateDocParam.getKind());
+        if (actionToInit) {
+            planDocService.deleteByDocId(id);
         }
 
         updateDocParam.update(doc);
@@ -163,12 +173,14 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         }
     }
 
+    @Transactional
     @Override
     public void deleteDocById(String id) {
         Doc doc = getDocById(id);
         if (ResourceFlags.undeletable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNDELETABLE);
         }
+        planDocService.deleteByDocId(id);
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_DOC_FAIL);
         }
