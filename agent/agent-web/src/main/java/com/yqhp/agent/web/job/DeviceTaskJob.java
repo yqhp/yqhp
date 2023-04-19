@@ -11,6 +11,7 @@ import com.yqhp.console.model.vo.ReceivedDeviceTasks;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.rpc.DeviceTaskRpc;
 import lombok.Setter;
@@ -60,18 +61,20 @@ public class DeviceTaskJob {
                 for (PluginDTO plugin : plugins) {
                     driver.jshellAddToClasspath(plugin);
                 }
-                // 执行init docs
-                List<Doc> docs = received.getExecutionRecord().getDocs();
-                for (Doc doc : docs) {
-                    driver.jshellAnalysisAndEval(doc.getContent());
-                }
-                // 执行任务
+                // 执行doc
                 DocExecutor executor = new DocExecutor(driver);
                 DocExecutionListenerImpl listener = new DocExecutionListenerImpl(driver.getDeviceId());
                 executor.addListener(listener);
                 for (DeviceTask task : received.getTasks()) {
                     listener.setTaskId(task.getId());
-                    executor.execQuietly(task.getDoc());
+                    try {
+                        executor.exec(task.getDoc());
+                    } catch (Throwable cause) {
+                        if (DocKind.JSH_INIT.equals(task.getDocKind())) {
+                            // 初始化执行异常，不继续执行
+                            break;
+                        }
+                    }
                 }
             } catch (Throwable cause) {
                 log.error("unexpected error, deviceId={}", driver.getDeviceId(), cause);

@@ -116,9 +116,7 @@ public class PlanDocServiceImpl
         Assert.hasText(docId, "docId must has text");
         LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
         query.eq(PlanDoc::getDocId, docId);
-        if (!remove(query)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAIL);
-        }
+        remove(query);
     }
 
     @Override

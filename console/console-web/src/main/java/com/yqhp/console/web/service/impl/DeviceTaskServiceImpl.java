@@ -8,6 +8,7 @@ import com.yqhp.console.repository.entity.Device;
 import com.yqhp.console.repository.entity.DeviceTask;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.mapper.DeviceTaskMapper;
 import com.yqhp.console.web.service.DeviceService;
 import com.yqhp.console.web.service.DeviceTaskService;
@@ -107,9 +108,19 @@ public class DeviceTaskServiceImpl extends ServiceImpl<DeviceTaskMapper, DeviceT
     }
 
     @Override
-    public boolean isFinished(DeviceTask task) {
-        return DeviceTaskStatus.SUCCESSFUL.equals(task.getStatus())
-                || DeviceTaskStatus.FAILED.equals(task.getStatus());
+    public boolean isDeviceFinished(List<DeviceTask> tasks) {
+        if (CollectionUtils.isEmpty(tasks)) {
+            return true;
+        }
+        boolean initFailed = tasks.stream()
+                .filter(task -> DocKind.JSH_INIT.equals(task.getDocKind()))
+                .anyMatch(task -> DeviceTaskStatus.FAILED.equals(task.getStatus()));
+        if (initFailed) {
+            return true;
+        }
+        return tasks.stream()
+                .allMatch(task -> DeviceTaskStatus.SUCCESSFUL.equals(task.getStatus())
+                        || DeviceTaskStatus.FAILED.equals(task.getStatus()));
     }
 
     private String getExecutionRecordKey(String deviceId) {

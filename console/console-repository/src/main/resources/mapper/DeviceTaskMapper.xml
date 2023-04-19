@@ -10,6 +10,7 @@
         <result column="execution_record_id" property="executionRecordId" />
         <result column="device_id" property="deviceId" />
         <result column="doc_id" property="docId" />
+        <result column="doc_kind" property="docKind" />
         <result column="doc" property="doc" typeHandler="com.yqhp.console.repository.typehandler.DocTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />

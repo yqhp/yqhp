@@ -28,14 +28,7 @@ public class DocExecutor {
         listeners.add(listener);
     }
 
-    public void execQuietly(Doc doc) {
-        try {
-            exec(doc);
-        } catch (Throwable ignore) {
-        }
-    }
-
-    private void exec(Doc doc) {
+    public void exec(Doc doc) {
         if (doc == null) return;
         listeners.forEach(listener -> listener.onStarted(doc));
         try {

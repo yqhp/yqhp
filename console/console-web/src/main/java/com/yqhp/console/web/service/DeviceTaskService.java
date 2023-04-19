@@ -21,5 +21,5 @@ public interface DeviceTaskService extends IService<DeviceTask> {
 
     List<DeviceTask> listInExecutionRecordIds(List<String> executionRecordIds);
 
-    boolean isFinished(DeviceTask task);
+    boolean isDeviceFinished(List<DeviceTask> tasks);
 }

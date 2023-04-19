@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.typehandler.DocTypeHandler;
 import com.yqhp.console.repository.typehandler.JShellEvalResultsTypeHandler;
 import lombok.Data;
@@ -40,6 +41,8 @@ public class DeviceTask implements Serializable {
     private String deviceId;
 
     private String docId;
+
+    private DocKind docKind;
 
     @TableField(typeHandler = DocTypeHandler.class)
     private Doc doc;

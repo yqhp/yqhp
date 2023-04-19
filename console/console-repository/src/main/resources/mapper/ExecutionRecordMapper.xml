@@ -9,7 +9,6 @@
         <result column="plan_id" property="planId" />
         <result column="plan" property="plan" typeHandler="com.yqhp.console.repository.typehandler.PlanTypeHandler" />
         <result column="plugins" property="plugins" typeHandler="com.yqhp.console.repository.typehandler.PluginDTOsTypeHandler" />
-        <result column="docs" property="docs" typeHandler="com.yqhp.console.repository.typehandler.DocsTypeHandler" />
         <result column="status" property="status" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />

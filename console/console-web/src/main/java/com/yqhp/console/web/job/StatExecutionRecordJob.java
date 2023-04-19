@@ -43,23 +43,28 @@ public class StatExecutionRecordJob {
             LocalDateTime since = LocalDateTime.now().minusDays(3);
             List<String> recordIds = executionRecordService.listUncompletedRecordId(since);
             List<DeviceTask> deviceTasks = deviceTaskService.listInExecutionRecordIds(recordIds);
-
-            // executionRecordId -> List<DeviceTask>
-            Map<String, List<DeviceTask>> tasksMap = deviceTasks.stream()
-                    .collect(Collectors.groupingBy(DeviceTask::getExecutionRecordId));
-            tasksMap.forEach((recordId, tasks) -> {
-                boolean allTasksFinished = tasks.stream().allMatch(deviceTaskService::isFinished);
-                if (allTasksFinished) {
-                    ExecutionRecord record = new ExecutionRecord();
-                    record.setId(recordId);
-                    record.setStatus(ExecutionRecordStatus.COMPLETED);
-                    // 所有设备开始时间最早的
-                    record.setStartTime(tasks.stream().mapToLong(DeviceTask::getStartTime).min().orElse(0));
-                    // 所有设备结束时间最晚的
-                    record.setEndTime(tasks.stream().mapToLong(DeviceTask::getEndTime).max().orElse(0));
-                    executionRecordService.updateById(record);
-                }
-            });
+            deviceTasks.stream()
+                    .collect(Collectors.groupingBy(DeviceTask::getExecutionRecordId))
+                    .forEach((recordId, tasks) -> {
+                        boolean allDeviceFinished = true;
+                        Map<String, List<DeviceTask>> tasksMap = tasks.stream()
+                                .collect(Collectors.groupingBy(DeviceTask::getDeviceId));
+                        for (String deviceId : tasksMap.keySet()) {
+                            if (!deviceTaskService.isDeviceFinished(tasksMap.get(deviceId))) {
+                                allDeviceFinished = false;
+                            }
+                        }
+                        if (allDeviceFinished) {
+                            ExecutionRecord record = new ExecutionRecord();
+                            record.setId(recordId);
+                            record.setStatus(ExecutionRecordStatus.COMPLETED);
+                            // 所有设备开始时间最早的
+                            record.setStartTime(tasks.stream().mapToLong(DeviceTask::getStartTime).min().orElse(0));
+                            // 所有设备结束时间最晚的
+                            record.setEndTime(tasks.stream().mapToLong(DeviceTask::getEndTime).max().orElse(0));
+                            executionRecordService.updateById(record);
+                        }
+                    });
         } finally {
             lock.unlock();
         }

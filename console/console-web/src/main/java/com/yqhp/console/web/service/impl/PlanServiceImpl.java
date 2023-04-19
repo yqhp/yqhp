@@ -129,10 +129,10 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Override
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
-        // 分配设备任务
-        Map<String, List<Doc>> deviceDocsMap = assignDeviceTasks(plan);
-        String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
+        // 分配docs, deviceId->docs
+        Map<String, List<Doc>> deviceDocsMap = assignDocs(plan);
 
+        String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
         // 保存计划执行记录
         ExecutionRecord executionRecord = new ExecutionRecord();
         executionRecord.setId(snowflake.nextIdStr());
@@ -140,7 +140,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         executionRecord.setPlanId(plan.getId());
         executionRecord.setPlan(plan); // 保留提交执行时的计划
         executionRecord.setPlugins(pluginService.listPluginDTOByProjectId(plan.getProjectId())); // 保留提交执行时的项目插件
-        executionRecord.setDocs(docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT)); // 保留提交执行时的JSH_INIT
         executionRecord.setStatus(ExecutionRecordStatus.UNCOMPLETED);
         executionRecord.setCreateBy(createBy);
         executionRecord.setUpdateBy(createBy);
@@ -157,6 +156,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                     task.setExecutionRecordId(executionRecord.getId());
                     task.setDeviceId(deviceId);
                     task.setDocId(doc.getId());
+                    task.setDocKind(doc.getKind());
                     task.setDoc(doc); // 保留提交执行时的doc
                     task.setStatus(DeviceTaskStatus.TODO);
                     task.setCreateBy(createBy);
@@ -172,38 +172,51 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     }
 
     /**
-     * @return deviceId -> v
+     * @return deviceId -> List<Doc>
      */
-    private Map<String, List<Doc>> assignDeviceTasks(Plan plan) {
-        HashMap<String, List<Doc>> result = new HashMap<>();
+    private Map<String, List<Doc>> assignDocs(Plan plan) {
         List<String> deviceIds = planDeviceService.listEnabledAndSortedPlanDeviceIdByPlanId(plan.getId());
         if (CollectionUtils.isEmpty(deviceIds)) {
             throw new ServiceException(ResponseCodeEnum.NO_DEVICES);
         }
         List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        // 查出来的有可能乱序，重新排一下
-        List<Doc> docs = docService.listInIds(docIds).stream()
+        // listIn返回的结果乱序，重新排一下
+        List<Doc> planDocs = docService.listInIds(docIds).stream()
                 .sorted(Comparator.comparingInt(doc -> docIds.indexOf(doc.getId())))
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(docs)) {
+        if (CollectionUtils.isEmpty(planDocs)) {
             throw new ServiceException(ResponseCodeEnum.NO_DOCS);
         }
 
+        HashMap<String, List<Doc>> result = new HashMap<>();
         if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {
             // 兼容模式，执行同一份
             for (String deviceId : deviceIds) {
-                result.put(deviceId, docs);
+                result.put(deviceId, planDocs);
             }
         } else if (RunMode.EFFICIENT.equals(plan.getRunMode())) {
             // 高效模式，平均分
             int i = 0;
             int deviceCount = deviceIds.size();
-            for (Doc doc : docs) {
+            for (Doc doc : planDocs) {
                 if (i == deviceCount) i = 0;
                 String deviceId = deviceIds.get(i);
                 result.computeIfAbsent(deviceId, k -> new ArrayList<>()).add(doc);
                 i++;
             }
+        }
+
+        List<Doc> initDocs = docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
+        if (initDocs.isEmpty()) {
+            return result;
+        }
+        // 高效模式下，有的设备可能分不到doc，以result.keySet()为准
+        for (String deviceId : result.keySet()) {
+            List<Doc> devicePlanDocs = result.get(deviceId);
+            List<Doc> deviceAllDocs = new ArrayList<>(initDocs.size() + devicePlanDocs.size());
+            deviceAllDocs.addAll(initDocs);
+            deviceAllDocs.addAll(devicePlanDocs);
+            result.put(deviceId, deviceAllDocs);
         }
         return result;
     }
