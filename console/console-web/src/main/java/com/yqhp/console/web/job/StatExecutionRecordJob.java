@@ -46,24 +46,22 @@ public class StatExecutionRecordJob {
             deviceTasks.stream()
                     .collect(Collectors.groupingBy(DeviceTask::getExecutionRecordId))
                     .forEach((recordId, tasks) -> {
-                        boolean allDeviceFinished = true;
                         Map<String, List<DeviceTask>> tasksMap = tasks.stream()
                                 .collect(Collectors.groupingBy(DeviceTask::getDeviceId));
                         for (String deviceId : tasksMap.keySet()) {
                             if (!deviceTaskService.isDeviceFinished(tasksMap.get(deviceId))) {
-                                allDeviceFinished = false;
+                                return;
                             }
                         }
-                        if (allDeviceFinished) {
-                            ExecutionRecord record = new ExecutionRecord();
-                            record.setId(recordId);
-                            record.setStatus(ExecutionRecordStatus.COMPLETED);
-                            // 所有设备开始时间最早的
-                            record.setStartTime(tasks.stream().mapToLong(DeviceTask::getStartTime).min().orElse(0));
-                            // 所有设备结束时间最晚的
-                            record.setEndTime(tasks.stream().mapToLong(DeviceTask::getEndTime).max().orElse(0));
-                            executionRecordService.updateById(record);
-                        }
+                        // 所有设备完成
+                        ExecutionRecord record = new ExecutionRecord();
+                        record.setId(recordId);
+                        record.setStatus(ExecutionRecordStatus.COMPLETED);
+                        // 所有设备开始时间最早的
+                        record.setStartTime(tasks.stream().mapToLong(DeviceTask::getStartTime).min().orElse(0));
+                        // 所有设备结束时间最晚的
+                        record.setEndTime(tasks.stream().mapToLong(DeviceTask::getEndTime).max().orElse(0));
+                        executionRecordService.updateById(record);
                     });
         } finally {
             lock.unlock();
