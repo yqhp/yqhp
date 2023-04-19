@@ -50,13 +50,12 @@ public class PluginServiceImpl implements PluginService {
                 if (!file.exists()) {
                     // 先下载到临时文件再重命名，防止下载过程被中断，下次文件存在
                     File tmpFile = new File(pluginDir, fileInfo.getName() + ".tmp");
-                    log.info("[plugin][{}]{} not exists, download {} -> {}", plugin.getName(), file, fileInfo.getUrl(), tmpFile);
+                    log.info("[plugin][{}][{}]download from {}", plugin.getName(), fileInfo.getName(), fileInfo.getUrl());
                     FileUtils.download(fileInfo.getUrl(), tmpFile);
-                    log.info("[plugin][{}]{} download completed", plugin.getName(), tmpFile);
                     if (!tmpFile.renameTo(file)) {
                         throw new IOException(tmpFile + " renameTo " + file + " fail");
                     }
-                    log.info("[plugin][{}]rename {} -> {}", plugin.getName(), tmpFile, file);
+                    log.info("[plugin][{}][{}]download complete -> {}", plugin.getName(), fileInfo.getName(), file);
                 }
                 files.add(file);
             }
