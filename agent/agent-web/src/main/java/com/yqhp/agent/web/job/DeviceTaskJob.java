@@ -93,6 +93,7 @@ public class DeviceTaskJob {
     private void onLoadPluginStarted(PluginExecutionRecord record) {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(PluginExecutionRecordStatus.STARTED);
         message.setStartTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
@@ -101,6 +102,7 @@ public class DeviceTaskJob {
     private void onLoadPluginSuccessful(PluginExecutionRecord record) {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(PluginExecutionRecordStatus.SUCCESSFUL);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
@@ -109,6 +111,7 @@ public class DeviceTaskJob {
     private void onLoadPluginFailed(PluginExecutionRecord record, Throwable cause) {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(PluginExecutionRecordStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
@@ -135,6 +138,7 @@ public class DeviceTaskJob {
     private void onEvalDocStarted(DocExecutionRecord record) {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(DocExecutionRecordStatus.STARTED);
         message.setStartTime(System.currentTimeMillis());
         producer.sendDocExecutionRecordMessage(message);
@@ -143,6 +147,7 @@ public class DeviceTaskJob {
     private void onEvalDocSuccessful(DocExecutionRecord record, List<JShellEvalResult> results) {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(DocExecutionRecordStatus.SUCCESSFUL);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);
@@ -152,6 +157,7 @@ public class DeviceTaskJob {
     private void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, Throwable cause) {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
+        message.setDeviceId(record.getDeviceId());
         message.setStatus(DocExecutionRecordStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);

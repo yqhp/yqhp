@@ -80,10 +80,16 @@ public class StatExecutionRecordJob {
         ExecutionRecord record = new ExecutionRecord();
         record.setId(executionRecord.getId());
         record.setStatus(ExecutionRecordStatus.COMPLETED);
-        // 所有设备开始时间最早的。从插件执行记录里获取，因为插件是优先执行的
-        record.setStartTime(pluginExecutionRecords.stream().mapToLong(PluginExecutionRecord::getStartTime).filter(value -> value > 0).min().orElse(0));
-        // 所有设备结束时间最晚的。从Doc执行记录里获取
-        record.setEndTime(docExecutionRecords.stream().mapToLong(DocExecutionRecord::getEndTime).filter(value -> value > 0).max().orElse(0));
+        // 所有设备开始时间最早的
+        long pluginExecutionRecordsMinStartTime = pluginExecutionRecords.stream()
+                .mapToLong(PluginExecutionRecord::getStartTime).filter(value -> value > 0).min().orElse(0);
+        record.setStartTime(pluginExecutionRecordsMinStartTime);
+        // 所有设备结束时间最晚的
+        long pluginExecutionRecordsMaxEndTime = pluginExecutionRecords.stream()
+                .mapToLong(PluginExecutionRecord::getEndTime).max().orElse(0);
+        long docExecutionRecordsMaxEndTime = docExecutionRecords.stream()
+                .mapToLong(DocExecutionRecord::getEndTime).max().orElse(0);
+        record.setEndTime(Math.max(pluginExecutionRecordsMaxEndTime, docExecutionRecordsMaxEndTime));
         executionRecordService.updateById(record);
     }
 }

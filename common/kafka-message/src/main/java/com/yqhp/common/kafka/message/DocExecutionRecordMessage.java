@@ -16,6 +16,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocExecutionRecordMessage implements InputConverter<DocExecutionRecord> {
     private String id;
+    private String deviceId;
     private DocExecutionRecordStatus status;
     private Long startTime;
     private Long endTime;

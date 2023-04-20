@@ -20,12 +20,14 @@ public class MessageProducer {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendDocExecutionRecordMessage(DocExecutionRecordMessage message) {
-        Assert.isTrue(message != null && StringUtils.hasText(message.getId()), "Illegal message");
-        kafkaTemplate.send(Topics.DOC_EXECUTION_RECORD, JacksonUtils.writeValueAsString(message));
+        Assert.isTrue(message != null && StringUtils.hasText(message.getId())
+                && StringUtils.hasText(message.getDeviceId()), "Illegal message");
+        kafkaTemplate.send(Topics.DOC_EXECUTION_RECORD, message.getDeviceId(), JacksonUtils.writeValueAsString(message));
     }
 
     public void sendPluginExecutionRecordMessage(PluginExecutionRecordMessage message) {
-        Assert.isTrue(message != null && StringUtils.hasText(message.getId()), "Illegal message");
-        kafkaTemplate.send(Topics.PLUGIN_EXECUTION_RECORD, JacksonUtils.writeValueAsString(message));
+        Assert.isTrue(message != null && StringUtils.hasText(message.getId())
+                && StringUtils.hasText(message.getDeviceId()), "Illegal message");
+        kafkaTemplate.send(Topics.PLUGIN_EXECUTION_RECORD, message.getDeviceId(), JacksonUtils.writeValueAsString(message));
     }
 }
