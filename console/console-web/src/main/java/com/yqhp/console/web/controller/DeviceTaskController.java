@@ -1,6 +1,6 @@
 package com.yqhp.console.web.controller;
 
-import com.yqhp.console.model.vo.ReceivedDeviceTasks;
+import com.yqhp.console.model.vo.DeviceTask;
 import com.yqhp.console.web.service.DeviceTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +22,7 @@ public class DeviceTaskController {
     private DeviceTaskService deviceTaskService;
 
     @GetMapping("/receive")
-    public ReceivedDeviceTasks receive(@NotBlank(message = "设备id不能为空") String deviceId) {
+    public DeviceTask receive(@NotBlank(message = "设备id不能为空") String deviceId) {
         return deviceTaskService.receive(deviceId);
     }
 }

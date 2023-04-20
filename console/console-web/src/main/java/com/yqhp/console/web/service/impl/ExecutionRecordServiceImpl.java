@@ -5,19 +5,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.dto.DeviceExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
 import com.yqhp.console.model.vo.ExecutionRecordDetails;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionRecordStatus;
 import com.yqhp.console.repository.mapper.ExecutionRecordMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
-import com.yqhp.console.web.service.DeviceTaskService;
-import com.yqhp.console.web.service.ExecutionRecordService;
-import com.yqhp.console.web.service.ProjectService;
-import com.yqhp.console.web.service.UserService;
+import com.yqhp.console.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -25,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
@@ -35,14 +29,14 @@ public class ExecutionRecordServiceImpl
         extends ServiceImpl<ExecutionRecordMapper, ExecutionRecord>
         implements ExecutionRecordService {
 
-    @Lazy
     @Autowired
-    private DeviceTaskService deviceTaskService;
+    private PluginExecutionRecordService pluginExecutionRecordService;
+    @Autowired
+    private DocExecutionRecordService docExecutionRecordService;
     @Autowired
     private ProjectService projectService;
     @Autowired
     private UserService userService;
-
 
     @Override
     public ExecutionRecord getExecutionRecordById(String id) {
@@ -51,18 +45,12 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
-    public List<ExecutionRecord> listUncompletedRecord(LocalDateTime since) {
+    public List<ExecutionRecord> listUncompleted(LocalDateTime since) {
         Assert.notNull(since, "since cannot be null");  // 考虑到查询性能问题，加上创建时间索引查询
         LambdaQueryWrapper<ExecutionRecord> query = new LambdaQueryWrapper<>();
         query.ge(ExecutionRecord::getCreateTime, since);
         query.eq(ExecutionRecord::getStatus, ExecutionRecordStatus.UNCOMPLETED);
         return list(query);
-    }
-
-    @Override
-    public List<String> listUncompletedRecordId(LocalDateTime since) {
-        return listUncompletedRecord(since).stream()
-                .map(ExecutionRecord::getId).collect(Collectors.toList());
     }
 
     @Override
@@ -78,7 +66,7 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
-    public ExecutionRecordDetails getExecutionRecordDetailsById(String id) {
+    public ExecutionRecordDetails getDetailsById(String id) {
         ExecutionRecord executionRecord = getExecutionRecordById(id);
         return toExecutionRecordDetails(executionRecord);
     }
@@ -88,9 +76,8 @@ public class ExecutionRecordServiceImpl
         ExecutionRecordDetails details = new ExecutionRecordDetails().convertFrom(executionRecord);
         details.setProject(projectService.getProjectById(executionRecord.getProjectId()));
         details.setCreator(userService.getNicknameById(executionRecord.getCreateBy()));
-        List<DeviceExecutionResult> deviceExecutionResults = deviceTaskService
-                .listDeviceExecutionResultByExecutionRecordId(executionRecord.getId());
-        details.setDeviceExecutionResults(deviceExecutionResults);
+        details.setPluginExecutionRecords(pluginExecutionRecordService.listByExecutionRecordId(executionRecord.getId()));
+        details.setDocExecutionRecords(docExecutionRecordService.listByExecutionRecordId(executionRecord.getId()));
         return details;
     }
 }

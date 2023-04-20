@@ -242,7 +242,6 @@ CREATE TABLE `execution_record` (
   `project_id` varchar(32) NOT NULL,
   `plan_id` varchar(32) NOT NULL,
   `plan` json,
-  `plugins` json,
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `start_time` bigint(20) NOT NULL DEFAULT '0',
   `end_time` bigint(20) NOT NULL DEFAULT '0',
@@ -255,7 +254,26 @@ CREATE TABLE `execution_record` (
   KEY `idx_create_time` (`create_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `device_task` (
+CREATE TABLE `plugin_execution_record` (
+  `id` varchar(32) NOT NULL,
+  `project_id` varchar(32) NOT NULL,
+  `plan_id` varchar(32) NOT NULL,
+  `execution_record_id` varchar(32) NOT NULL,
+  `device_id` varchar(128) NOT NULL,
+  `plugin_id` varchar(128) NOT NULL,
+  `plugin` json,
+  `status` tinyint(4) NOT NULL DEFAULT '0',
+  `start_time` bigint(20) NOT NULL DEFAULT '0',
+  `end_time` bigint(20) NOT NULL DEFAULT '0',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_by` varchar(32) NOT NULL COMMENT '创建人',
+  `update_by` varchar(32) NOT NULL COMMENT '更新人',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_execution_record_id` (`execution_record_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `doc_execution_record` (
   `id` varchar(32) NOT NULL,
   `project_id` varchar(32) NOT NULL,
   `plan_id` varchar(32) NOT NULL,

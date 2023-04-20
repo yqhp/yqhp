@@ -9,7 +9,7 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum DeviceTaskStatus implements BaseEnum<Integer> {
+public enum PluginExecutionRecordStatus implements BaseEnum<Integer> {
 
     TODO(0),
     RECEIVED(1),
@@ -22,7 +22,7 @@ public enum DeviceTaskStatus implements BaseEnum<Integer> {
     @JsonValue
     private final Integer value;
 
-    DeviceTaskStatus(Integer value) {
+    PluginExecutionRecordStatus(Integer value) {
         this.value = value;
     }
 }

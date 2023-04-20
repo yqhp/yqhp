@@ -1,20 +1,18 @@
 package com.yqhp.agent.web.job;
 
-import com.yqhp.agent.doc.DocExecutionListener;
-import com.yqhp.agent.doc.DocExecutor;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.common.kafka.message.DeviceTaskMessage;
-import com.yqhp.console.model.vo.ReceivedDeviceTasks;
-import com.yqhp.console.repository.entity.DeviceTask;
-import com.yqhp.console.repository.entity.Doc;
-import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.common.kafka.message.DocExecutionRecordMessage;
+import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
+import com.yqhp.console.model.vo.DeviceTask;
+import com.yqhp.console.repository.entity.DocExecutionRecord;
+import com.yqhp.console.repository.entity.PluginExecutionRecord;
+import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
-import com.yqhp.console.repository.jsonfield.PluginDTO;
+import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
 import com.yqhp.console.rpc.DeviceTaskRpc;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,90 +39,123 @@ public class DeviceTaskJob {
     private MessageProducer producer;
 
     @Scheduled(fixedDelay = 10_000)
-    public void execDeviceTasks() {
+    public void execTask() {
         List<DeviceDriver> unlockedDeviceDrivers = deviceService.getUnlockedDeviceDrivers();
         for (DeviceDriver driver : unlockedDeviceDrivers) {
-            receiveAndExecTasksAsync(driver);
+            receiveAndExecTaskAsync(driver);
         }
     }
 
-    public void receiveAndExecTasksAsync(DeviceDriver driver) {
+    public void receiveAndExecTaskAsync(DeviceDriver driver) {
         THREAD_POOL.submit(() -> {
-            ReceivedDeviceTasks received = deviceTaskRpc.receive(driver.getDeviceId());
-            if (received == null) return;
+            DeviceTask deviceTask = deviceTaskRpc.receive(driver.getDeviceId());
+            if (deviceTask == null) return;
 
-            String planName = received.getExecutionRecord().getPlan().getName();
+            String planName = deviceTask.getExecutionRecord().getPlan().getName();
             String token = deviceService.lockDevice(driver.getDeviceId(), planName);
             try {
                 // 加载插件
-                List<PluginDTO> plugins = received.getExecutionRecord().getPlugins();
-                for (PluginDTO plugin : plugins) {
-                    driver.jshellAddToClasspath(plugin);
+                for (PluginExecutionRecord record : deviceTask.getPluginExecutionRecords()) {
+                    boolean ok = loadPluginQuietly(driver, record);
+                    if (!ok) {
+                        break;
+                    }
                 }
                 // 执行doc
-                DocExecutor executor = new DocExecutor(driver);
-                DocExecutionListenerImpl listener = new DocExecutionListenerImpl(driver.getDeviceId());
-                executor.addListener(listener);
-                for (DeviceTask task : received.getTasks()) {
-                    listener.setTaskId(task.getId());
-                    try {
-                        executor.exec(task.getDoc());
-                    } catch (Throwable cause) {
-                        if (DocKind.JSH_INIT.equals(task.getDocKind())) {
-                            // 初始化执行异常，不继续执行
-                            break;
-                        }
+                for (DocExecutionRecord record : deviceTask.getDocExecutionRecords()) {
+                    boolean ok = evalDocQuietly(driver, record);
+                    if (!ok && DocKind.JSH_INIT.equals(record.getDocKind())) {
+                        // 初始化执行异常，不继续执行
+                        break;
                     }
                 }
             } catch (Throwable cause) {
-                log.error("unexpected error, deviceId={}", driver.getDeviceId(), cause);
+                log.error("unexpected error, deviceId={}, executionRecordId={}",
+                        driver.getDeviceId(), deviceTask.getExecutionRecord().getId(), cause);
             } finally {
                 deviceService.unlockDevice(token);
             }
         });
     }
 
-    class DocExecutionListenerImpl implements DocExecutionListener {
-
-        private final String deviceId;
-        @Setter
-        private String taskId;
-
-        DocExecutionListenerImpl(String deviceId) {
-            this.deviceId = deviceId;
+    private boolean loadPluginQuietly(DeviceDriver driver, PluginExecutionRecord record) {
+        try {
+            onLoadPluginStarted(record);
+            driver.jshellAddToClasspath(record.getPlugin());
+            onLoadPluginSuccessful(record);
+            return true;
+        } catch (Throwable cause) {
+            onLoadPluginFailed(record, cause);
+            return false;
         }
+    }
 
-        @Override
-        public void onStarted(Doc doc) {
-            DeviceTaskMessage message = new DeviceTaskMessage();
-            message.setId(taskId);
-            message.setDeviceId(deviceId);
-            message.setStatus(DeviceTaskStatus.STARTED);
-            message.setStartTime(System.currentTimeMillis());
-            producer.sendDeviceTaskMessage(message);
-        }
+    private void onLoadPluginStarted(PluginExecutionRecord record) {
+        PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(PluginExecutionRecordStatus.STARTED);
+        message.setStartTime(System.currentTimeMillis());
+        producer.sendPluginExecutionRecordMessage(message);
+    }
 
-        @Override
-        public void onSuccessful(Doc doc, List<JShellEvalResult> results) {
-            DeviceTaskMessage message = new DeviceTaskMessage();
-            message.setId(taskId);
-            message.setDeviceId(deviceId);
-            message.setStatus(DeviceTaskStatus.SUCCESSFUL);
-            message.setEndTime(System.currentTimeMillis());
-            message.setResults(results);
-            producer.sendDeviceTaskMessage(message);
-        }
+    private void onLoadPluginSuccessful(PluginExecutionRecord record) {
+        PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(PluginExecutionRecordStatus.SUCCESSFUL);
+        message.setEndTime(System.currentTimeMillis());
+        producer.sendPluginExecutionRecordMessage(message);
+    }
 
-        @Override
-        public void onFailed(Doc doc, List<JShellEvalResult> results, Throwable cause) {
-            DeviceTaskMessage message = new DeviceTaskMessage();
-            message.setId(taskId);
-            message.setDeviceId(deviceId);
-            message.setStatus(DeviceTaskStatus.FAILED);
-            message.setEndTime(System.currentTimeMillis());
-            message.setResults(results);
-            producer.sendDeviceTaskMessage(message);
+    private void onLoadPluginFailed(PluginExecutionRecord record, Throwable cause) {
+        PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(PluginExecutionRecordStatus.FAILED);
+        message.setEndTime(System.currentTimeMillis());
+        producer.sendPluginExecutionRecordMessage(message);
+    }
+
+    private boolean evalDocQuietly(DeviceDriver driver, DocExecutionRecord record) {
+        try {
+            onEvalDocStarted(record);
+            List<JShellEvalResult> results = driver.jshellAnalysisAndEval(record.getDoc().getContent());
+            boolean failed = results.stream().anyMatch(JShellEvalResult::isFailed);
+            if (failed) {
+                onEvalDocFailed(record, results, null);
+                return false;
+            } else {
+                onEvalDocSuccessful(record, results);
+                return true;
+            }
+        } catch (Throwable cause) {
+            onEvalDocFailed(record, null, cause);
+            return false;
         }
+    }
+
+    private void onEvalDocStarted(DocExecutionRecord record) {
+        DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(DocExecutionRecordStatus.STARTED);
+        message.setStartTime(System.currentTimeMillis());
+        producer.sendDocExecutionRecordMessage(message);
+    }
+
+    private void onEvalDocSuccessful(DocExecutionRecord record, List<JShellEvalResult> results) {
+        DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(DocExecutionRecordStatus.SUCCESSFUL);
+        message.setEndTime(System.currentTimeMillis());
+        message.setResults(results);
+        producer.sendDocExecutionRecordMessage(message);
+    }
+
+    private void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, Throwable cause) {
+        DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(DocExecutionRecordStatus.FAILED);
+        message.setEndTime(System.currentTimeMillis());
+        message.setResults(results);
+        producer.sendDocExecutionRecordMessage(message);
     }
 
 }

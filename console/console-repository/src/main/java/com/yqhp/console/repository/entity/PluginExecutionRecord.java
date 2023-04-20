@@ -3,8 +3,9 @@ package com.yqhp.console.repository.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.yqhp.console.repository.enums.ExecutionRecordStatus;
-import com.yqhp.console.repository.typehandler.PlanTypeHandler;
+import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
+import com.yqhp.console.repository.jsonfield.PluginDTO;
+import com.yqhp.console.repository.typehandler.PluginDTOTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,7 +22,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName(autoResultMap = true)
-public class ExecutionRecord implements Serializable {
+public class PluginExecutionRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,10 +33,16 @@ public class ExecutionRecord implements Serializable {
 
     private String planId;
 
-    @TableField(typeHandler = PlanTypeHandler.class)
-    private Plan plan;
+    private String executionRecordId;
 
-    private ExecutionRecordStatus status;
+    private String deviceId;
+
+    private String pluginId;
+
+    @TableField(typeHandler = PluginDTOTypeHandler.class)
+    private PluginDTO plugin;
+
+    private PluginExecutionRecordStatus status;
 
     private Long startTime;
 

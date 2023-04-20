@@ -1,10 +1,12 @@
 package com.yqhp.console.web.job;
 
-import com.yqhp.console.repository.entity.DeviceTask;
+import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.ExecutionRecord;
+import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionRecordStatus;
-import com.yqhp.console.web.service.DeviceTaskService;
+import com.yqhp.console.web.service.DocExecutionRecordService;
 import com.yqhp.console.web.service.ExecutionRecordService;
+import com.yqhp.console.web.service.PluginExecutionRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -31,7 +33,9 @@ public class StatExecutionRecordJob {
     @Autowired
     private ExecutionRecordService executionRecordService;
     @Autowired
-    private DeviceTaskService deviceTaskService;
+    private PluginExecutionRecordService pluginExecutionRecordService;
+    @Autowired
+    private DocExecutionRecordService docExecutionRecordService;
 
     @Scheduled(cron = "0 0/1 * * * ?")
     public void statExecutionRecord() {
@@ -41,30 +45,45 @@ public class StatExecutionRecordJob {
         }
         try {
             LocalDateTime since = LocalDateTime.now().minusDays(3);
-            List<String> recordIds = executionRecordService.listUncompletedRecordId(since);
-            List<DeviceTask> deviceTasks = deviceTaskService.listInExecutionRecordIds(recordIds);
-            deviceTasks.stream()
-                    .collect(Collectors.groupingBy(DeviceTask::getExecutionRecordId))
-                    .forEach((recordId, tasks) -> {
-                        Map<String, List<DeviceTask>> tasksMap = tasks.stream()
-                                .collect(Collectors.groupingBy(DeviceTask::getDeviceId));
-                        for (String deviceId : tasksMap.keySet()) {
-                            if (!deviceTaskService.isDeviceFinished(tasksMap.get(deviceId))) {
-                                return;
-                            }
-                        }
-                        // 所有设备完成
-                        ExecutionRecord record = new ExecutionRecord();
-                        record.setId(recordId);
-                        record.setStatus(ExecutionRecordStatus.COMPLETED);
-                        // 所有设备开始时间最早的
-                        record.setStartTime(tasks.stream().mapToLong(DeviceTask::getStartTime).filter(value -> value > 0).min().orElse(0));
-                        // 所有设备结束时间最晚的
-                        record.setEndTime(tasks.stream().mapToLong(DeviceTask::getEndTime).filter(value -> value > 0).max().orElse(0));
-                        executionRecordService.updateById(record);
-                    });
+            List<ExecutionRecord> executionRecords = executionRecordService.listUncompleted(since);
+            for (ExecutionRecord executionRecord : executionRecords) {
+                try {
+                    statExecutionRecord(executionRecord);
+                } catch (Exception e) {
+                    log.error("stat executionRecord={} err", executionRecord.getId(), e);
+                }
+            }
         } finally {
             lock.unlock();
         }
+    }
+
+    private void statExecutionRecord(ExecutionRecord executionRecord) {
+        List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordService.listByExecutionRecordId(executionRecord.getId());
+        Map<String, List<PluginExecutionRecord>> pluginExecutionRecordsMap = pluginExecutionRecords.stream()
+                .collect(Collectors.groupingBy(PluginExecutionRecord::getDeviceId));
+        for (String deviceId : pluginExecutionRecordsMap.keySet()) {
+            if (!pluginExecutionRecordService.isFinished(pluginExecutionRecordsMap.get(deviceId))) {
+                return;
+            }
+        }
+
+        List<DocExecutionRecord> docExecutionRecords = docExecutionRecordService.listByExecutionRecordId(executionRecord.getId());
+        Map<String, List<DocExecutionRecord>> docExecutionRecordsMap = docExecutionRecords.stream()
+                .collect(Collectors.groupingBy(DocExecutionRecord::getDeviceId));
+        for (String deviceId : docExecutionRecordsMap.keySet()) {
+            if (!docExecutionRecordService.isFinished(docExecutionRecordsMap.get(deviceId))) {
+                return;
+            }
+        }
+
+        ExecutionRecord record = new ExecutionRecord();
+        record.setId(executionRecord.getId());
+        record.setStatus(ExecutionRecordStatus.COMPLETED);
+        // 所有设备开始时间最早的。从插件执行记录里获取，因为插件是优先执行的
+        record.setStartTime(pluginExecutionRecords.stream().mapToLong(PluginExecutionRecord::getStartTime).filter(value -> value > 0).min().orElse(0));
+        // 所有设备结束时间最晚的。从Doc执行记录里获取
+        record.setEndTime(docExecutionRecords.stream().mapToLong(DocExecutionRecord::getEndTime).filter(value -> value > 0).max().orElse(0));
+        executionRecordService.updateById(record);
     }
 }

@@ -15,11 +15,9 @@ import java.util.List;
 public interface ExecutionRecordService extends IService<ExecutionRecord> {
     ExecutionRecord getExecutionRecordById(String id);
 
-    List<ExecutionRecord> listUncompletedRecord(LocalDateTime since);
-
-    List<String> listUncompletedRecordId(LocalDateTime since);
+    List<ExecutionRecord> listUncompleted(LocalDateTime since);
 
     IPage<ExecutionRecord> pageBy(ExecutionRecordPageQuery query);
 
-    ExecutionRecordDetails getExecutionRecordDetailsById(String id);
+    ExecutionRecordDetails getDetailsById(String id);
 }

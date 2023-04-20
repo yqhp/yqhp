@@ -27,7 +27,7 @@ public class ExecutionRecordController {
 
     @GetMapping("/{id}/details")
     public ExecutionRecordDetails getExecutionRecordDetailsById(@PathVariable String id) {
-        return executionRecordService.getExecutionRecordDetailsById(id);
+        return executionRecordService.getDetailsById(id);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.yqhp.console.repository.mapper;
 
-import com.yqhp.console.repository.entity.DeviceTask;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yqhp.console.repository.entity.DocExecutionRecord;
 
 /**
  * <p>
@@ -10,6 +10,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  *
  * @author mybatis-plus generator
  */
-public interface DeviceTaskMapper extends BaseMapper<DeviceTask> {
+public interface DocExecutionRecordMapper extends BaseMapper<DocExecutionRecord> {
 
 }

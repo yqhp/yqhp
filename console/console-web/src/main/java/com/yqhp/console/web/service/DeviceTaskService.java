@@ -1,25 +1,14 @@
 package com.yqhp.console.web.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.yqhp.console.model.dto.DeviceExecutionResult;
-import com.yqhp.console.model.vo.ReceivedDeviceTasks;
-import com.yqhp.console.repository.entity.DeviceTask;
+import com.yqhp.console.model.vo.DeviceTask;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author jiangyitao
  */
-public interface DeviceTaskService extends IService<DeviceTask> {
-    void cacheExecutionRecordForDevice(String deviceId, String executionRecordId);
+public interface DeviceTaskService {
+    void push(Set<String> deviceIds, String executionRecordId);
 
-    ReceivedDeviceTasks receive(String deviceId);
-
-    List<DeviceTask> listByExecutionRecordId(String executionRecordId);
-
-    List<DeviceExecutionResult> listDeviceExecutionResultByExecutionRecordId(String executionRecordId);
-
-    List<DeviceTask> listInExecutionRecordIds(List<String> executionRecordIds);
-
-    boolean isDeviceFinished(List<DeviceTask> tasks);
+    DeviceTask receive(String deviceId);
 }

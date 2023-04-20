@@ -1,7 +1,8 @@
 package com.yqhp.agent.web.kafka;
 
 import com.yqhp.common.commons.util.JacksonUtils;
-import com.yqhp.common.kafka.message.DeviceTaskMessage;
+import com.yqhp.common.kafka.message.DocExecutionRecordMessage;
+import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
 import com.yqhp.common.kafka.message.Topics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,17 +19,13 @@ public class MessageProducer {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    /**
-     * deviceId维度需要保证有序消费，所以这里用deviceId作为key
-     */
-    public void sendDeviceTaskMessage(DeviceTaskMessage message) {
-        Assert.isTrue(message != null
-                && StringUtils.hasText(message.getId())
-                && StringUtils.hasText(message.getDeviceId()), "Illegal message");
-        kafkaTemplate.send(
-                Topics.DEVICE_TASK,
-                message.getDeviceId(),
-                JacksonUtils.writeValueAsString(message)
-        );
+    public void sendDocExecutionRecordMessage(DocExecutionRecordMessage message) {
+        Assert.isTrue(message != null && StringUtils.hasText(message.getId()), "Illegal message");
+        kafkaTemplate.send(Topics.DOC_EXECUTION_RECORD, JacksonUtils.writeValueAsString(message));
+    }
+
+    public void sendPluginExecutionRecordMessage(PluginExecutionRecordMessage message) {
+        Assert.isTrue(message != null && StringUtils.hasText(message.getId()), "Illegal message");
+        kafkaTemplate.send(Topics.PLUGIN_EXECUTION_RECORD, JacksonUtils.writeValueAsString(message));
     }
 }

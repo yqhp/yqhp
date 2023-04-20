@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.console.repository.enums.DeviceTaskStatus;
+import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.typehandler.DocTypeHandler;
 import com.yqhp.console.repository.typehandler.JShellEvalResultsTypeHandler;
@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName(autoResultMap = true)
-public class DeviceTask implements Serializable {
+public class DocExecutionRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +47,7 @@ public class DeviceTask implements Serializable {
     @TableField(typeHandler = DocTypeHandler.class)
     private Doc doc;
 
-    private DeviceTaskStatus status;
+    private DocExecutionRecordStatus status;
 
     private Long startTime;
 
