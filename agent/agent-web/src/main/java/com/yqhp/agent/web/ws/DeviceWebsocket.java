@@ -65,6 +65,7 @@ public class DeviceWebsocket {
     @OnMessage
     public void onMessage(String message, Session session) {
         messageHandler.handle(message, ((input, cause) -> {
+            log.warn("[{}]onMessage err, message={}", session.getId(), message, cause);
             Output<?> output = new Output<>();
             output.setStatus(Output.Status.ERROR);
             output.setMessage(cause.getMessage());

@@ -75,13 +75,18 @@ public class ScrcpyFrameClient {
     }
 
     void disconnect() {
-        if (frameSocket != null) {
-            try {
-                log.info("[{}]shutdown frame socket input", iDevice.getSerialNumber());
-                frameSocket.shutdownInput();
-            } catch (IOException e) {
-                log.warn("[{}]shutdown frame socket input io err", iDevice.getSerialNumber());
+        if (localPort > 0) {
+            if (scrcpyOptions.isTunnelForward()) {
+                try {
+                    log.info("[{}]adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
+                    iDevice.removeForward(localPort);
+                } catch (Exception e) {
+                    log.warn("[{}]adb remove forward err", iDevice.getSerialNumber(), e);
+                }
+            } else {
+                // todo iDevice.removeReverse
             }
+            localPort = 0;
         }
         if (frameInputStream != null) {
             try {
@@ -100,19 +105,6 @@ public class ScrcpyFrameClient {
                 log.warn("[{}]close frame socket io err", iDevice.getSerialNumber(), e);
             }
             frameSocket = null;
-        }
-        if (localPort > 0) {
-            if (scrcpyOptions.isTunnelForward()) {
-                try {
-                    log.info("[{}]adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
-                    iDevice.removeForward(localPort);
-                } catch (Exception e) {
-                    log.warn("[{}]adb remove forward err", iDevice.getSerialNumber(), e);
-                }
-            } else {
-                // todo iDevice.removeReverse
-            }
-            localPort = 0;
         }
     }
 

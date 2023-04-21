@@ -95,9 +95,9 @@ public class Scrcpy {
     }
 
     public synchronized void stop() {
-        running = false;
         scrcpyControlClient.disconnect();
         scrcpyFrameClient.disconnect();
+        running = false;
     }
 
     private void pushScrcpyServerFileToDevice(String scrcpyServerFilePath) {
