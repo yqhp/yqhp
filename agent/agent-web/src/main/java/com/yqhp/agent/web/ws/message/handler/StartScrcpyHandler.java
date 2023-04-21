@@ -69,7 +69,8 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
                 }
                 log.info("[{}]stop sending frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop sending frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
+                log.info("[{}]stop sending frames, cause: {}", deviceDriver.getDeviceId(),
+                        cause instanceof InterruptedException ? "interrupted" : cause.getMessage());
             }
         });
         READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {

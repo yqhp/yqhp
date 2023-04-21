@@ -1,6 +1,5 @@
 package com.yqhp.console.repository.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,12 +26,6 @@ public class PluginFile implements Serializable {
     private String pluginId;
 
     private String name;
-
-    /**
-     * key是mysql关键字，加上`key`才不会报错
-     */
-    @TableField(value = "`key`")
-    private String key;
 
     private String url;
 
