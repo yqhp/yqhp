@@ -58,7 +58,7 @@ public class DeviceTaskJob {
                 for (PluginExecutionRecord record : deviceTask.getPluginExecutionRecords()) {
                     boolean ok = loadPluginQuietly(driver, record);
                     if (!ok) {
-                        break;
+                        return;
                     }
                 }
                 // 执行doc
@@ -66,7 +66,7 @@ public class DeviceTaskJob {
                     boolean ok = evalDocQuietly(driver, record);
                     if (!ok && DocKind.JSH_INIT.equals(record.getDocKind())) {
                         // 初始化执行异常，不继续执行
-                        break;
+                        return;
                     }
                 }
             } catch (Throwable cause) {
@@ -81,7 +81,7 @@ public class DeviceTaskJob {
     private boolean loadPluginQuietly(DeviceDriver driver, PluginExecutionRecord record) {
         try {
             onLoadPluginStarted(record);
-            driver.jshellAddToClasspath(record.getPlugin());
+            driver.jshellLoadPlugin(record.getPlugin());
             onLoadPluginSuccessful(record);
             return true;
         } catch (Throwable cause) {

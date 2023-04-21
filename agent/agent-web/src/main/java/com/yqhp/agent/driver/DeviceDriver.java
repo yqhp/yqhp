@@ -231,7 +231,7 @@ public abstract class DeviceDriver {
 
     private static final PluginService PLUGIN_SERVICE = ApplicationContextUtils.getBean(PluginService.class);
 
-    public List<File> jshellAddToClasspath(PluginDTO plugin) throws IOException {
+    public List<File> jshellLoadPlugin(PluginDTO plugin) throws IOException {
         List<File> files = PLUGIN_SERVICE.downloadIfAbsent(plugin);
         jshellAddToClasspath(files);
         return files;

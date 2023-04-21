@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Input<T> {
+    private Long timestamp;
     private String uid;
     private Command command;
     private T data;
