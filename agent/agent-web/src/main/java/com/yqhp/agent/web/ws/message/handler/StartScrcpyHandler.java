@@ -75,7 +75,6 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
         });
         READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
             try {
-                log.info("[{}]start reading frames", deviceDriver.getDeviceId());
                 scrcpyFrameClient.startReadingFrames(frame -> {
                     try {
                         blockingQueue.put(frame);
@@ -83,7 +82,6 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
                         log.warn("[{}]put frame interrupted", deviceDriver.getDeviceId(), e);
                     }
                 });
-                log.info("[{}]stop reading frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
                 log.info("[{}]stop reading frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
             } finally {

@@ -1,6 +1,7 @@
 package com.yqhp.agent.web.controller;
 
 import com.yqhp.agent.driver.DeviceInfo;
+import com.yqhp.agent.driver.Hierarchy;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.file.model.OSSFile;
@@ -37,6 +38,11 @@ public class DeviceController {
     public void installApp(@RequestHeader("deviceToken") String token,
                            @NotNull(message = "app不能为空") MultipartFile app) {
         deviceService.installAppByToken(token, app);
+    }
+
+    @GetMapping("/dumpHierarchy")
+    public Hierarchy dumpHierarchy(@RequestHeader("deviceToken") String token) {
+        return deviceService.dumpHierarchy(token);
     }
 
     @GetMapping("/screenshot")

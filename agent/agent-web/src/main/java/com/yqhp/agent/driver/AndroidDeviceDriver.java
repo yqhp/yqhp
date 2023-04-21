@@ -9,6 +9,7 @@ import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.scrcpy.Scrcpy;
 import com.yqhp.common.commons.model.Size;
+import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.AutomationName;
@@ -46,6 +47,11 @@ public class AndroidDeviceDriver extends DeviceDriver {
     @Override
     public void installApp(File app) {
         AndroidUtils.installApp(getIDevice(), app);
+    }
+
+    @Override
+    protected ViewType viewType() {
+        return isNativeContext() ? ViewType.ANDROID_NATIVE : ViewType.ANDROID_WEB;
     }
 
     @Override

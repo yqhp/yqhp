@@ -123,15 +123,16 @@ public class ScrcpyFrameClient {
     }
 
     /**
-     * H264 NALU: H264 NALU（Network Abstraction Layer Unit）是H264视频流的基本单元，由一个start code和紧随其后的视频数据组成
-     * start code: 0x000001或0x00000001
+     * H264 NALU: H264 NALU（Network Abstraction Layer Unit）是H264视频流的基本单元，由一个StartCode和紧随其后的视频数据组成
+     * StartCode: 0x000001(3byte)或0x00000001(4byte)
      */
     public synchronized void startReadingFrames(Consumer<ByteBuffer> consumer) throws IOException {
-        final byte[] buffer = new byte[1024 * 1024];
-        final int maxReadLen = 1024; // 每次最多读取
+        final byte[] buffer = new byte[2 * 1024 * 1024];
+        final int maxReadLen = 2 * 1024; // 每次最多读取
         int bufferOffset = 0;
         int naluOffset;
 
+        log.info("[{}]start reading frames", iDevice.getSerialNumber());
         while (frameInputStream != null) {
             int readLen = frameInputStream.read(buffer, bufferOffset, maxReadLen);
             if (readLen > 0) {
@@ -150,6 +151,7 @@ public class ScrcpyFrameClient {
                 }
             }
         }
+        log.info("[{}]stop reading frames", iDevice.getSerialNumber());
     }
 
 }

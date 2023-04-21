@@ -8,6 +8,7 @@ import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.web.util.ApplicationContextUtils;
+import com.yqhp.console.repository.enums.ViewType;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -19,6 +20,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -44,7 +46,6 @@ public abstract class DeviceDriver {
     @Getter
     private AppiumDriver appiumDriver;
     private AppiumDriverLocalService appiumService;
-
     private ByteArrayOutputStream appiumLogBuffer;
     private OutputStream appiumLogOutput;
 
@@ -64,6 +65,22 @@ public abstract class DeviceDriver {
     }
 
     public abstract void installApp(File app);
+
+    protected abstract ViewType viewType();
+
+    public boolean isNativeContext() {
+        String context = (String) getOrCreateAppiumDriver()
+                .execute(DriverCommand.GET_CURRENT_CONTEXT_HANDLE).getValue();
+        return "NATIVE_APP".equals(context);
+    }
+
+    public Hierarchy dumpHierarchy() {
+        Hierarchy hierarchy = new Hierarchy();
+        String pageSource = getOrCreateAppiumDriver().getPageSource();
+        hierarchy.setPageSource(pageSource);
+        hierarchy.setViewType(viewType());
+        return hierarchy;
+    }
 
     public abstract File screenshot() throws IOException;
 

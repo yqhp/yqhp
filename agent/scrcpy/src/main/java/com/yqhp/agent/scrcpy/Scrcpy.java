@@ -69,7 +69,7 @@ public class Scrcpy {
             } catch (Exception e) {
                 log.error("[{}]start scrcpy err", iDevice.getSerialNumber(), e);
             }
-            log.info("[{}]scrcpy has exited", iDevice.getSerialNumber());
+            log.info("[{}]scrcpy stopped", iDevice.getSerialNumber());
         };
 
         // 启动scrcpy

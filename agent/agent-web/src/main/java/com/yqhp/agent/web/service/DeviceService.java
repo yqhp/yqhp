@@ -3,6 +3,7 @@ package com.yqhp.agent.web.service;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.DeviceInfo;
+import com.yqhp.agent.driver.Hierarchy;
 import com.yqhp.file.model.OSSFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,8 @@ public interface DeviceService {
     DeviceDriver getDeviceDriverByToken(String token);
 
     void installAppByToken(String token, MultipartFile app);
+
+    Hierarchy dumpHierarchy(String token);
 
     OSSFile screenshotByToken(String token, boolean isTmpFile);
 

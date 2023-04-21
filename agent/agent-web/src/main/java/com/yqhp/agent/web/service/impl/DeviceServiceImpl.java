@@ -197,6 +197,12 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public Hierarchy dumpHierarchy(String token) {
+        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
+        return deviceDriver.dumpHierarchy();
+    }
+
+    @Override
     public OSSFile screenshotByToken(String token, boolean isTmpFile) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
         return screenshot(deviceDriver, isTmpFile);

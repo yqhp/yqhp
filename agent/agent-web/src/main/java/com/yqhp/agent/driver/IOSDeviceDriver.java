@@ -2,6 +2,7 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.ios.IOSDevice;
+import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.IOSMobileCapabilityType;
@@ -25,6 +26,11 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     @Override
     public void installApp(File app) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected ViewType viewType() {
+        return isNativeContext() ? ViewType.iOS_NATIVE : ViewType.iOS_WEB;
     }
 
     @Override
