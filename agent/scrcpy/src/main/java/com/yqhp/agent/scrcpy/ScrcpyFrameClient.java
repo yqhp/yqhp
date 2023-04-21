@@ -82,12 +82,6 @@ public class ScrcpyFrameClient {
             } catch (IOException e) {
                 log.warn("[{}]shutdown frame socket input io err", iDevice.getSerialNumber());
             }
-            try {
-                log.info("[{}]shutdown frame socket output", iDevice.getSerialNumber());
-                frameSocket.shutdownOutput();
-            } catch (IOException e) {
-                log.warn("[{}]shutdown frame socket output io err", iDevice.getSerialNumber());
-            }
         }
         if (frameInputStream != null) {
             try {

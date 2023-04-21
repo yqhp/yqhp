@@ -15,8 +15,8 @@ import javax.websocket.server.ServerEndpoint;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/token/{token}/jshellExec")
-public class JShellExecWebsocket extends DeviceWebsocket {
+@ServerEndpoint(value = "/device/token/{token}/jshellExecution")
+public class JShellExecutionWebsocket extends DeviceWebsocket {
     @OnOpen
     @Override
     public void onOpen(@PathParam("token") String token, Session session) {

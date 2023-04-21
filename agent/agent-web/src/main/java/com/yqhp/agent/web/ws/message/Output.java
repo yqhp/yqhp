@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Output<T> {
 
+    private long timestamp = System.currentTimeMillis();
     private String uid;
     private Command command;
     private String message;

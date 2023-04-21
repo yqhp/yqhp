@@ -37,9 +37,7 @@ public class Scrcpy {
             throw new ScrcpyException("scrcpy is running");
 
         pushScrcpyServerFileToDevice(scrcpyServerFilePath);
-
         running = true; // 为了防止isCancelled返回true导致scrcpy退出，先把running变为true
-
         final ScrcpyOptions scrcpyOptions = options == null ? new ScrcpyOptions() : options;
         Runnable startScrcpy = () -> {
             String startScrcpyCmd = new StringJoiner(" ")
@@ -71,9 +69,7 @@ public class Scrcpy {
             } catch (Exception e) {
                 log.error("[{}]start scrcpy err", iDevice.getSerialNumber(), e);
             }
-
             log.info("[{}]scrcpy has exited", iDevice.getSerialNumber());
-            stop();
         };
 
         // 启动scrcpy
@@ -88,11 +84,10 @@ public class Scrcpy {
             scrcpyFrameClient.connect(localPort, timeout, scrcpyOptions);
             scrcpyControlClient.connect(localPort);
             scrcpyFrameClient.readDeviceMeta();
-        } catch (ScrcpyException e) {
-            stop();
-            throw e;
         } catch (Exception e) {
-            stop();
+            if (e instanceof ScrcpyException) {
+                throw (ScrcpyException) e;
+            }
             throw new ScrcpyException(e);
         }
 
@@ -100,9 +95,9 @@ public class Scrcpy {
     }
 
     public synchronized void stop() {
+        running = false;
         scrcpyControlClient.disconnect();
         scrcpyFrameClient.disconnect();
-        running = false;
     }
 
     private void pushScrcpyServerFileToDevice(String scrcpyServerFilePath) {
