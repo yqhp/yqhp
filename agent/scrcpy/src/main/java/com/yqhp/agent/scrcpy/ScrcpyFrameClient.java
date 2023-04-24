@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.SocketChannel;
 import java.time.Duration;
-import java.util.function.Consumer;
 
 /**
  * @author jiangyitao
@@ -27,8 +27,8 @@ public class ScrcpyFrameClient {
     private ScrcpyOptions scrcpyOptions;
     private int localPort;
 
-    private Socket frameSocket;
-    private InputStream frameInputStream;
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(1024 * 1024 * 2);
+    private SocketChannel socketChannel;
 
     ScrcpyFrameClient(IDevice iDevice) {
         this.iDevice = iDevice;
@@ -46,35 +46,38 @@ public class ScrcpyFrameClient {
         } else {
             // todo iDevice.createReverse
         }
-
         this.localPort = localPort;
-        frameSocket = new Socket("127.0.0.1", localPort);
-        frameInputStream = frameSocket.getInputStream();
+
+        socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
+        ByteBuffer dummy = ByteBuffer.allocate(1);
         long timeoutMs = System.currentTimeMillis() + readTimeout.toMillis();
-
-        while (scrcpyOptions.isSendDummyByte() && frameInputStream.read() != 0) { // 读到0，代表连接成功
-            frameInputStream.close();
-            frameSocket.close();
-
+        while (scrcpyOptions.isSendDummyByte() && socketChannel.read(dummy) != 1) {
+            socketChannel.close();
             if (System.currentTimeMillis() > timeoutMs) {
-                throw new ScrcpyException("read frame timeout in " + readTimeout);
+                throw new ScrcpyException("read dummy byte timeout in " + readTimeout);
             }
-
             try {
-                Thread.sleep(500);
+                Thread.sleep(400);
             } catch (InterruptedException e) {
                 log.warn("Interrupted", e);
             }
-
             // reconnect
-            frameSocket = new Socket("127.0.0.1", localPort);
-            frameInputStream = frameSocket.getInputStream();
+            socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
         }
 
         log.info("[{}]connect frame socket success", iDevice.getSerialNumber());
     }
 
     void disconnect() {
+        if (socketChannel != null) {
+            try {
+                log.info("[{}]close frame socket channel", iDevice.getSerialNumber());
+                socketChannel.close();
+                socketChannel = null;
+            } catch (IOException e) {
+                log.warn("[{}]close frame socket channel io err", iDevice.getSerialNumber(), e);
+            }
+        }
         if (localPort > 0) {
             if (scrcpyOptions.isTunnelForward()) {
                 try {
@@ -88,70 +91,28 @@ public class ScrcpyFrameClient {
             }
             localPort = 0;
         }
-        if (frameInputStream != null) {
-            try {
-                log.info("[{}]close frame input stream", iDevice.getSerialNumber());
-                frameInputStream.close();
-            } catch (IOException e) {
-                log.warn("[{}]close frame input stream io err", iDevice.getSerialNumber(), e);
-            }
-            frameInputStream = null;
-        }
-        if (frameSocket != null) {
-            try {
-                log.info("[{}]close frame socket", iDevice.getSerialNumber());
-                frameSocket.close();
-            } catch (IOException e) {
-                log.warn("[{}]close frame socket io err", iDevice.getSerialNumber(), e);
-            }
-            frameSocket = null;
-        }
     }
 
     void readDeviceMeta() throws IOException {
         if (scrcpyOptions.isSendDeviceMeta()) {
-            // deviceName 64字节，暂时用不到，忽略
-            for (int i = 0; i < 64; i++) {
-                frameInputStream.read();
-            }
-            // width height 2字节
-            int width = frameInputStream.read() << 8 | frameInputStream.read();
-            int height = frameInputStream.read() << 8 | frameInputStream.read();
+            ByteBuffer deviceNameBuffer = ByteBuffer.allocate(64);
+            socketChannel.read(deviceNameBuffer);
+            ByteBuffer widthBuffer = ByteBuffer.allocate(2);
+            socketChannel.read(widthBuffer);
+            ByteBuffer heightBuffer = ByteBuffer.allocate(2);
+            socketChannel.read(heightBuffer);
+            widthBuffer.flip();
+            int width = widthBuffer.order(ByteOrder.BIG_ENDIAN).getShort();
+            heightBuffer.flip();
+            int height = heightBuffer.order(ByteOrder.BIG_ENDIAN).getShort();
             log.info("[{}]scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
             screenSize = new Size(width, height);
         }
     }
 
-    /**
-     * H264 NALU: H264 NALU（Network Abstraction Layer Unit）是H264视频流的基本单元，由一个StartCode和紧随其后的视频数据组成
-     * StartCode: 0x000001(3byte)或0x00000001(4byte)
-     */
-    public synchronized void startReadingFrames(Consumer<ByteBuffer> consumer) throws IOException {
-        final byte[] buffer = new byte[2 * 1024 * 1024];
-        final int maxReadLen = 2 * 1024; // 每次最多读取
-        int bufferOffset = 0;
-        int naluOffset;
-
-        log.info("[{}]start reading frames", iDevice.getSerialNumber());
-        while (frameInputStream != null) {
-            int readLen = frameInputStream.read(buffer, bufferOffset, maxReadLen);
-            if (readLen > 0) {
-                bufferOffset += readLen;
-                for (int i = 5; i < bufferOffset - 4; i++) {
-                    if (buffer[i] == 0x00 && buffer[i + 1] == 0x00
-                            && buffer[i + 2] == 0x00 && buffer[i + 3] == 0x01) {
-                        naluOffset = i;
-                        byte[] nalu = new byte[naluOffset];
-                        System.arraycopy(buffer, 0, nalu, 0, naluOffset);
-                        consumer.accept(ByteBuffer.wrap(nalu));
-                        bufferOffset -= naluOffset;
-                        System.arraycopy(buffer, naluOffset, buffer, 0, bufferOffset);
-                        i = 5;
-                    }
-                }
-            }
-        }
-        log.info("[{}]stop reading frames", iDevice.getSerialNumber());
+    public ByteBuffer read() throws IOException {
+        readBuffer.clear();
+        socketChannel.read(readBuffer);
+        return ByteBuffer.wrap(readBuffer.array(), 0, readBuffer.position());
     }
-
 }

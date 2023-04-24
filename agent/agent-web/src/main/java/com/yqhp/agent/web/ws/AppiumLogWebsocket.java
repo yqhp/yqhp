@@ -25,10 +25,12 @@ public class AppiumLogWebsocket extends DeviceWebsocket {
         super.onOpen(token, session);
         RemoteEndpoint.Basic remote = session.getBasicRemote();
         deviceDriver.receiveAppiumLog(appiumLog -> {
-            try {
-                remote.sendText(appiumLog);
-            } catch (IOException e) {
-                log.warn("send {} error, cause:{}", appiumLog, e.getMessage());
+            if (session.isOpen()) {
+                try {
+                    remote.sendText(appiumLog);
+                } catch (IOException e) {
+                    log.warn("send error, log:{}, cause:{}", appiumLog, e.getMessage());
+                }
             }
         });
     }

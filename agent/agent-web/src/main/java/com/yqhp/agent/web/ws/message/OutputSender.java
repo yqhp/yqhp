@@ -42,6 +42,9 @@ public class OutputSender {
     }
 
     public static <T> void send(Session session, Output<T> output) {
+        if (!session.isOpen()) {
+            return;
+        }
         try {
             String text = JacksonUtils.writeValueAsString(output);
             session.getBasicRemote().sendText(text);

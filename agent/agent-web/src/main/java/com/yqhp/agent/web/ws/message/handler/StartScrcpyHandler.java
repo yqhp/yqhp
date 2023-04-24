@@ -63,32 +63,33 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
             try {
                 os.ok(uid, "start sending frames...");
                 log.info("[{}]start sending frames...", deviceDriver.getDeviceId());
-                while (!Thread.interrupted()) {
+                while (session.isOpen()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     remote.sendBinary(frame);
                 }
                 log.info("[{}]stop sending frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
                 log.info("[{}]stop sending frames, cause: {}", deviceDriver.getDeviceId(),
-                        cause instanceof InterruptedException ? "interrupted" : cause.getMessage());
+                        cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
+        sendFrameThread.start();
+
         READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
             try {
-                scrcpyFrameClient.startReadingFrames(frame -> {
-                    try {
-                        blockingQueue.put(frame);
-                    } catch (InterruptedException e) {
-                        log.warn("[{}]put frame interrupted", deviceDriver.getDeviceId(), e);
-                    }
-                });
+                log.info("[{}]start reading frames", deviceDriver.getDeviceId());
+                while (session.isOpen()) {
+                    ByteBuffer frame = scrcpyFrameClient.read();
+                    blockingQueue.put(frame);
+                }
+                log.info("[{}]stop reading frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop reading frames, cause: {}", deviceDriver.getDeviceId(), cause.getMessage());
+                log.info("[{}]stop reading frames, cause: {}", deviceDriver.getDeviceId(),
+                        cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
                 sendFrameThread.interrupt();
             }
         });
-        sendFrameThread.start();
     }
 
 }

@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -28,8 +28,7 @@ public class ScrcpyControlClient {
     private final ByteBuffer keyEventBuffer = ByteBuffer.allocate(14);
     private final ByteBuffer scrollEventBuffer = ByteBuffer.allocate(21);
 
-    private Socket controlSocket;
-    private OutputStream controlOutputStream;
+    private SocketChannel socketChannel;
 
     private final IDevice iDevice;
 
@@ -38,35 +37,24 @@ public class ScrcpyControlClient {
     }
 
     void connect(int localPort) throws IOException {
-        controlSocket = new Socket("127.0.0.1", localPort);
-        controlOutputStream = controlSocket.getOutputStream();
-        log.info("[{}]connect control socket success", iDevice.getSerialNumber());
+        socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
+        log.info("[{}]connect control socket channel success", iDevice.getSerialNumber());
     }
 
     void disconnect() {
-        if (controlOutputStream != null) {
+        if (socketChannel != null) {
             try {
-                log.info("[{}]close control output stream", iDevice.getSerialNumber());
-                controlOutputStream.close();
+                log.info("[{}]close control socket channel", iDevice.getSerialNumber());
+                socketChannel.close();
+                socketChannel = null;
             } catch (IOException e) {
-                log.warn("[{}]close control output stream io err", iDevice.getSerialNumber(), e);
+                log.warn("[{}]close control socket channel io err", iDevice.getSerialNumber(), e);
             }
-            controlOutputStream = null;
-        }
-        if (controlSocket != null) {
-            try {
-                log.info("[{}]close control socket", iDevice.getSerialNumber());
-                controlSocket.close();
-            } catch (IOException e) {
-                log.warn("[{}]close control socket io err", iDevice.getSerialNumber(), e);
-            }
-            controlSocket = null;
         }
     }
 
     public void sendTouchEvent(TouchEvent event) throws IOException {
-        touchEventBuffer.rewind();
-
+        touchEventBuffer.clear();
         touchEventBuffer.put(INJECT_TOUCH_EVENT);
         touchEventBuffer.put(event.getAction());
         touchEventBuffer.putLong(event.getPointerId());
@@ -76,20 +64,19 @@ public class ScrcpyControlClient {
         touchEventBuffer.putShort(event.getHeight());
         touchEventBuffer.putShort(event.getPressure());
         touchEventBuffer.putInt(event.getButtons());
-
-        controlOutputStream.write(touchEventBuffer.array());
+        touchEventBuffer.flip();
+        socketChannel.write(touchEventBuffer);
     }
 
     public void sendKeyEvent(KeyEvent event) throws IOException {
-        keyEventBuffer.rewind();
-
+        keyEventBuffer.clear();
         keyEventBuffer.put(INJECT_KEYCODE);
         keyEventBuffer.put(event.getAction());
         keyEventBuffer.putInt(event.getCode());
         keyEventBuffer.putInt(event.getRepeat());
         keyEventBuffer.putInt(event.getMetaState());
-
-        controlOutputStream.write(keyEventBuffer.array());
+        keyEventBuffer.flip();
+        socketChannel.write(keyEventBuffer);
     }
 
     public void sendTextEvent(String text) throws IOException {
@@ -101,12 +88,12 @@ public class ScrcpyControlClient {
         textEventBuffer.put(INJECT_TEXT);
         textEventBuffer.putInt(bytes.length);
         textEventBuffer.put(bytes);
-        controlOutputStream.write(textEventBuffer.array());
+        textEventBuffer.flip();
+        socketChannel.write(textEventBuffer);
     }
 
     public void sendScrollEvent(ScrollEvent event) throws IOException {
-        scrollEventBuffer.rewind();
-
+        scrollEventBuffer.clear();
         scrollEventBuffer.put(INJECT_SCROLL_EVENT);
         scrollEventBuffer.putInt(event.getX());
         scrollEventBuffer.putInt(event.getY());
@@ -115,8 +102,8 @@ public class ScrcpyControlClient {
         scrollEventBuffer.putShort(event.getScrollX());
         scrollEventBuffer.putShort(event.getScrollY());
         scrollEventBuffer.putInt(event.getButtons());
-
-        controlOutputStream.write(scrollEventBuffer.array());
+        scrollEventBuffer.flip();
+        socketChannel.write(scrollEventBuffer);
     }
 
 }
