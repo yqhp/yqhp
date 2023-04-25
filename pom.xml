@@ -21,7 +21,7 @@
     <properties>
         <revision>0.0.1</revision>
         <hutool.version>5.3.8</hutool.version>
-        <junixsocket.version>2.4.0</junixsocket.version>
+        <junixsocket.version>2.6.2</junixsocket.version>
         <jwt.version>0.11.5</jwt.version>
         <!-- 覆盖spring-boot-dependencies，解决appium.java-client依赖冲突 -->
         <selenium.version>4.4.0</selenium.version>
