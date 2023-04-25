@@ -21,14 +21,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author jiangyitao
  */
 @Slf4j
-public class UsbmuxdConnection implements Closeable {
+public class UsbmuxdChannel implements Closeable {
 
     private static final int WINDOWS_USBMUXD_LOCAL_PORT = 27015;
     private static final AtomicInteger TAG = new AtomicInteger(1);
 
     private final SocketChannel socketChannel;
 
-    public UsbmuxdConnection() {
+    public UsbmuxdChannel() {
         try {
             socketChannel = OS.isWindows()
                     ? SocketChannel.open(new InetSocketAddress("127.0.0.1", WINDOWS_USBMUXD_LOCAL_PORT))
@@ -82,7 +82,7 @@ public class UsbmuxdConnection implements Closeable {
         try {
             respHeaderBuffer.clear();
             socketChannel.read(respHeaderBuffer);
-            // header第1个字节标识响应长度，-header=payload
+            // header前4个字节标识响应长度，-header=payload
             int payloadLen = respHeaderBuffer.getInt(0) - respHeaderBuffer.capacity();
             ByteBuffer payload = ByteBuffer.allocate(payloadLen);
             socketChannel.read(payload);

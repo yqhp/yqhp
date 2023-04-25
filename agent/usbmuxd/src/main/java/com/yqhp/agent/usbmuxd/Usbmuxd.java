@@ -21,13 +21,13 @@ public class Usbmuxd {
     private volatile boolean devicesListening = false;
 
     public List<IDevice> listDevices() {
-        try (UsbmuxdConnection conn = new UsbmuxdConnection()) {
+        try (UsbmuxdChannel channel = new UsbmuxdChannel()) {
             NSDictionary req = new NSDictionary();
             req.put("MessageType", "ListDevices");
             req.put("ClientVersionString", CLIENT_VERSION);
             req.put("ProgName", PROG_NAME);
 
-            NSDictionary response = (NSDictionary) conn.writeAndRead(req);
+            NSDictionary response = (NSDictionary) channel.writeAndRead(req);
             NSArray deviceList = (NSArray) response.get("DeviceList");
             return Stream.of(deviceList.getArray())
                     .map(device -> {
@@ -43,19 +43,19 @@ public class Usbmuxd {
         }
         devicesListening = true;
         new Thread(() -> {
-            try (UsbmuxdConnection conn = new UsbmuxdConnection()) {
+            try (UsbmuxdChannel channel = new UsbmuxdChannel()) {
                 // 发送监听设备请求
                 NSDictionary req = new NSDictionary();
                 req.put("MessageType", "Listen");
                 req.put("ClientVersionString", CLIENT_VERSION);
                 req.put("ProgName", PROG_NAME);
-                conn.write(req);
+                channel.write(req);
 
                 // deviceId : IDevice
                 Map<Long, IDevice> connectedDevices = new HashMap<>();
 
                 while (devicesListening) {
-                    NSObject response = conn.read(); // 读取数据，没有数据将阻塞在此
+                    NSObject response = channel.read(); // 读取数据，没有数据将阻塞在此
                     if (response instanceof NSDictionary) {
                         NSDictionary res = (NSDictionary) response;
                         NSObject messageType = res.get("MessageType");
