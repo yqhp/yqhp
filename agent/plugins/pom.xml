@@ -3,22 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yqhp</artifactId>
+        <artifactId>agent</artifactId>
         <groupId>com.yqhp</groupId>
         <version>0.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>agent</artifactId>
+    <artifactId>plugins</artifactId>
     <packaging>pom</packaging>
-
     <modules>
-        <module>device-discovery</module>
-        <module>agent-web</module>
-        <module>usbmuxd</module>
-        <module>android-tools</module>
-        <module>scrcpy</module>
-        <module>plugins</module>
+        <module>appium</module>
     </modules>
-
 </project>

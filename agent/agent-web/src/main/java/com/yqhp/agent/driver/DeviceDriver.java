@@ -2,7 +2,7 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
-import com.yqhp.agent.jshell.D;
+import com.yqhp.agent.jshell.Driver;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
@@ -214,7 +214,7 @@ public abstract class DeviceDriver {
                 if (jshellContext == null) {
                     log.info("[{}]init jshell context...", device.getId());
                     jshellContext = new JShellContext();
-                    jshellContext.injectVar(new D(this));
+                    jshellContext.injectVar(new Driver(this));
                     log.info("[{}]init jshell context completed", device.getId());
                 }
             }
