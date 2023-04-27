@@ -281,6 +281,7 @@ public abstract class DeviceDriver {
         stopReceiveAppiumLog();
         quitAppiumDriver();
         stopAppiumService();
+        capabilities = null;
         closeJShellContext();
     }
 }
