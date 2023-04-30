@@ -1,5 +1,6 @@
 package com.yqhp.console.web.service.impl;
 
+import com.yqhp.auth.model.vo.UserVO;
 import com.yqhp.auth.rpc.UserRpc;
 import com.yqhp.console.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class UserServiceImpl implements UserService {
     private UserRpc userRpc;
 
     @Override
-    public String getNicknameById(String id) {
+    public UserVO getById(String id) {
         Assert.hasText(id, "id must has text");
-        return userRpc.getUserVOById(id).getNickname();
+        return userRpc.getUserVOById(id);
     }
 }

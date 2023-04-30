@@ -1,6 +1,7 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yqhp.console.model.dto.DevicePluginExecutionResult;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 
 import java.util.List;
@@ -13,5 +14,5 @@ public interface PluginExecutionRecordService extends IService<PluginExecutionRe
 
     List<PluginExecutionRecord> listByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
 
-    boolean isFinished(List<PluginExecutionRecord> records);
+    DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records);
 }

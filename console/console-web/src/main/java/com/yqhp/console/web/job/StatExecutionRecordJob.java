@@ -1,5 +1,7 @@
 package com.yqhp.console.web.job;
 
+import com.yqhp.console.model.dto.DeviceDocExecutionResult;
+import com.yqhp.console.model.dto.DevicePluginExecutionResult;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
@@ -63,7 +65,9 @@ public class StatExecutionRecordJob {
         Map<String, List<PluginExecutionRecord>> pluginExecutionRecordsMap = pluginExecutionRecords.stream()
                 .collect(Collectors.groupingBy(PluginExecutionRecord::getDeviceId));
         for (String deviceId : pluginExecutionRecordsMap.keySet()) {
-            if (!pluginExecutionRecordService.isFinished(pluginExecutionRecordsMap.get(deviceId))) {
+            DevicePluginExecutionResult result = pluginExecutionRecordService
+                    .statDevicePluginExecutionResult(pluginExecutionRecordsMap.get(deviceId));
+            if (!result.isFinished()) {
                 return;
             }
         }
@@ -72,7 +76,9 @@ public class StatExecutionRecordJob {
         Map<String, List<DocExecutionRecord>> docExecutionRecordsMap = docExecutionRecords.stream()
                 .collect(Collectors.groupingBy(DocExecutionRecord::getDeviceId));
         for (String deviceId : docExecutionRecordsMap.keySet()) {
-            if (!docExecutionRecordService.isFinished(docExecutionRecordsMap.get(deviceId))) {
+            DeviceDocExecutionResult result = docExecutionRecordService
+                    .statDeviceDocExecutionResult(docExecutionRecordsMap.get(deviceId));
+            if (!result.isFinished()) {
                 return;
             }
         }

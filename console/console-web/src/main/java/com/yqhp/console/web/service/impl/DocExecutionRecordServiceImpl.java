@@ -2,6 +2,8 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.console.model.dto.DeviceDocExecutionResult;
+import com.yqhp.console.model.enums.DeviceDocExecutionStatus;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
@@ -41,18 +43,36 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
     }
 
     @Override
-    public boolean isFinished(List<DocExecutionRecord> records) {
+    public DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records) {
+        DeviceDocExecutionResult result = new DeviceDocExecutionResult();
         if (CollectionUtils.isEmpty(records)) {
-            return true;
+            result.setFinished(true);
+            result.setStatus(DeviceDocExecutionStatus.SUCCESS);
+            return result;
         }
+
         boolean initFailed = records.stream()
                 .filter(record -> DocKind.JSH_INIT.equals(record.getDocKind()))
                 .anyMatch(record -> DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
         if (initFailed) {
-            return true;
+            result.setFinished(true);
+            result.setStatus(DeviceDocExecutionStatus.FAILED);
+            return result;
         }
-        return records.stream()
+
+        boolean isFinished = records.stream()
                 .allMatch(record -> DocExecutionRecordStatus.SUCCESSFUL.equals(record.getStatus())
                         || DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
+        if (isFinished) {
+            result.setFinished(true);
+            boolean anyFailed = records.stream()
+                    .anyMatch(record -> DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
+            result.setStatus(anyFailed ? DeviceDocExecutionStatus.FAILED : DeviceDocExecutionStatus.SUCCESS);
+            return result;
+        }
+
+        result.setFinished(false);
+        result.setStatus(DeviceDocExecutionStatus.UNFINISHED);
+        return result;
     }
 }

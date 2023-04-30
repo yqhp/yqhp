@@ -2,6 +2,8 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.console.model.dto.DevicePluginExecutionResult;
+import com.yqhp.console.model.enums.DevicePluginExecutionStatus;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
 import com.yqhp.console.repository.mapper.PluginExecutionRecordMapper;
@@ -39,16 +41,32 @@ public class PluginExecutionRecordServiceImpl
     }
 
     @Override
-    public boolean isFinished(List<PluginExecutionRecord> records) {
+    public DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records) {
+        DevicePluginExecutionResult result = new DevicePluginExecutionResult();
         if (CollectionUtils.isEmpty(records)) {
-            return true;
+            result.setFinished(true);
+            result.setStatus(DevicePluginExecutionStatus.SUCCESS);
+            return result;
         }
+
+        boolean allSuccessful = records.stream()
+                .allMatch(record -> PluginExecutionRecordStatus.SUCCESSFUL.equals(record.getStatus()));
+        if (allSuccessful) {
+            result.setFinished(true);
+            result.setStatus(DevicePluginExecutionStatus.SUCCESS);
+            return result;
+        }
+
         boolean anyFailed = records.stream()
                 .anyMatch(record -> PluginExecutionRecordStatus.FAILED.equals(record.getStatus()));
         if (anyFailed) {
-            return true;
+            result.setFinished(true);
+            result.setStatus(DevicePluginExecutionStatus.FAILED);
+            return result;
         }
-        return records.stream()
-                .allMatch(record -> PluginExecutionRecordStatus.SUCCESSFUL.equals(record.getStatus()));
+
+        result.setFinished(false);
+        result.setStatus(DevicePluginExecutionStatus.UNFINISHED);
+        return result;
     }
 }

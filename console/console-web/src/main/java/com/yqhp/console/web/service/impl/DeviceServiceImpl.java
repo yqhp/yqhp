@@ -22,9 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -86,6 +84,14 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
 
         return page(new Page<>(query.getPageNumb(), query.getPageSize()), q)
                 .convert(this::toDeviceVO);
+    }
+
+    @Override
+    public List<Device> listInIds(Collection<String> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return listByIds(ids);
     }
 
     @Override

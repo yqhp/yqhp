@@ -8,6 +8,7 @@ import com.yqhp.console.model.param.query.DevicePageQuery;
 import com.yqhp.console.model.vo.DeviceVO;
 import com.yqhp.console.repository.entity.Device;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,6 +19,8 @@ public interface DeviceService extends IService<Device> {
     List<DeviceVO> getAll();
 
     IPage<DeviceVO> pageBy(DevicePageQuery query);
+
+    List<Device> listInIds(Collection<String> ids);
 
     Device updateDevice(String id, UpdateDeviceParam updateDeviceParam);
 
