@@ -15,7 +15,7 @@ import java.util.List;
 public interface ProjectService extends IService<Project> {
     Project createProject(CreateProjectParam createProjectParam);
 
-    void deleteProjectById(String projectId);
+    void deleteById(String projectId);
 
     Project updateProject(String projectId, UpdateProjectParam updateProjectParam);
 

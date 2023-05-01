@@ -107,7 +107,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public void deleteProjectById(String projectId) {
+    public void deleteById(String projectId) {
         if (!removeById(projectId)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_FAIL);
         }

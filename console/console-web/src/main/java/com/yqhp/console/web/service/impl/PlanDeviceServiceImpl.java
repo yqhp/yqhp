@@ -8,9 +8,12 @@ import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
+import com.yqhp.console.model.vo.DeviceVO;
+import com.yqhp.console.model.vo.PlanDeviceVO;
 import com.yqhp.console.repository.entity.PlanDevice;
 import com.yqhp.console.repository.mapper.PlanDeviceMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
+import com.yqhp.console.web.service.DeviceService;
 import com.yqhp.console.web.service.PlanDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -21,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -35,6 +39,9 @@ public class PlanDeviceServiceImpl
 
     @Autowired
     private Snowflake snowflake;
+
+    @Autowired
+    private DeviceService deviceService;
 
     @Override
     public PlanDevice createPlanDevice(CreatePlanDeviceParam param) {
@@ -104,7 +111,7 @@ public class PlanDeviceServiceImpl
     }
 
     @Override
-    public void deletePlanDeviceById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DEVICE_FAIL);
         }
@@ -117,7 +124,7 @@ public class PlanDeviceServiceImpl
     }
 
     @Override
-    public List<String> listEnabledAndSortedPlanDeviceIdByPlanId(String planId) {
+    public List<String> listEnabledAndSortedDeviceIdByPlanId(String planId) {
         Assert.hasText(planId, "planId must has text");
         LambdaQueryWrapper<PlanDevice> query = new LambdaQueryWrapper<>();
         query.eq(PlanDevice::getPlanId, planId)
@@ -135,6 +142,12 @@ public class PlanDeviceServiceImpl
         query.eq(PlanDevice::getPlanId, planId);
         query.orderByAsc(PlanDevice::getWeight);
         return list(query);
+    }
+
+    @Override
+    public List<PlanDeviceVO> listSortedVOByPlanId(String planId) {
+        List<PlanDevice> planDevices = listSortedByPlanId(planId);
+        return toPlanDeviceVOs(planDevices);
     }
 
     @Override
@@ -190,5 +203,21 @@ public class PlanDeviceServiceImpl
         List<PlanDevice> planDevices = listSortedByPlanId(planId);
         PlanDevice maxWeightPlanDevice = CollectionUtils.lastElement(planDevices);
         return maxWeightPlanDevice == null ? -1 : maxWeightPlanDevice.getWeight();
+    }
+
+    private List<PlanDeviceVO> toPlanDeviceVOs(List<PlanDevice> planDevices) {
+        if (CollectionUtils.isEmpty(planDevices)) {
+            return new ArrayList<>();
+        }
+
+        List<String> deviceIds = planDevices.stream()
+                .map(PlanDevice::getDeviceId).collect(Collectors.toList());
+        Map<String, DeviceVO> deviceMap = deviceService.getVOMapByIds(deviceIds);
+
+        return planDevices.stream().map(planDevice -> {
+            PlanDeviceVO vo = new PlanDeviceVO().convertFrom(planDevice);
+            vo.setDevice(deviceMap.get(vo.getDeviceId()));
+            return vo;
+        }).collect(Collectors.toList());
     }
 }

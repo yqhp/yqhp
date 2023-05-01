@@ -11,7 +11,9 @@ import com.yqhp.console.model.param.CreatePlanParam;
 import com.yqhp.console.model.param.UpdatePlanParam;
 import com.yqhp.console.model.param.query.PlanPageQuery;
 import com.yqhp.console.repository.entity.*;
-import com.yqhp.console.repository.enums.*;
+import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.ExecutionStatus;
+import com.yqhp.console.repository.enums.RunMode;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.repository.mapper.PlanMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -104,7 +106,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     }
 
     @Override
-    public void deletePlanById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PLAN_FAIL);
         }
@@ -139,13 +141,13 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         executionRecord.setProjectId(plan.getProjectId());
         executionRecord.setPlanId(plan.getId());
         executionRecord.setPlan(plan); // 保留提交执行时的计划
-        executionRecord.setStatus(ExecutionRecordStatus.UNCOMPLETED);
+        executionRecord.setStatus(ExecutionStatus.TODO);
         executionRecord.setCreateBy(createBy);
         executionRecord.setUpdateBy(createBy);
         executionRecordService.save(executionRecord);
 
         // 保存设备plugin执行记录
-        List<PluginDTO> plugins = pluginService.listPluginDTOByProjectId(plan.getProjectId());
+        List<PluginDTO> plugins = pluginService.listDTOByProjectId(plan.getProjectId());
         if (!plugins.isEmpty()) {
             List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>();
             for (String deviceId : deviceIds) {
@@ -158,7 +160,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                     record.setDeviceId(deviceId);
                     record.setPluginId(plugin.getId());
                     record.setPlugin(plugin); // 保留提交执行时的plugin
-                    record.setStatus(PluginExecutionRecordStatus.TODO);
+                    record.setStatus(ExecutionStatus.TODO);
                     record.setCreateBy(createBy);
                     record.setUpdateBy(createBy);
                     return record;
@@ -180,7 +182,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                     record.setDocId(doc.getId());
                     record.setDocKind(doc.getKind());
                     record.setDoc(doc); // 保留提交执行时的doc
-                    record.setStatus(DocExecutionRecordStatus.TODO);
+                    record.setStatus(ExecutionStatus.TODO);
                     record.setCreateBy(createBy);
                     record.setUpdateBy(createBy);
                     return record;
@@ -195,7 +197,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
      * @return deviceId -> List<Doc>
      */
     private Map<String, List<Doc>> assignDocs(Plan plan) {
-        List<String> deviceIds = planDeviceService.listEnabledAndSortedPlanDeviceIdByPlanId(plan.getId());
+        List<String> deviceIds = planDeviceService.listEnabledAndSortedDeviceIdByPlanId(plan.getId());
         if (CollectionUtils.isEmpty(deviceIds)) {
             throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DEVICES_NOT_FOUND);
         }
@@ -226,7 +228,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             }
         }
 
-        List<Doc> initDocs = docService.listSortedDocByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
+        List<Doc> initDocs = docService.listSortedByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
         if (initDocs.isEmpty()) {
             return result;
         }

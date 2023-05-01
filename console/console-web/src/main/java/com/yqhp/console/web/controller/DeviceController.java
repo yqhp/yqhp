@@ -24,13 +24,13 @@ public class DeviceController {
     private DeviceService deviceService;
 
     @GetMapping("/all")
-    public List<DeviceVO> getAll() {
-        return deviceService.getAll();
+    public List<DeviceVO> listAllVO() {
+        return deviceService.listAllVO();
     }
 
     @GetMapping("/page")
-    public IPage<DeviceVO> pageBy(DevicePageQuery query) {
-        return deviceService.pageBy(query);
+    public IPage<DeviceVO> pageVOBy(DevicePageQuery query) {
+        return deviceService.pageVOBy(query);
     }
 
     @GetMapping("/{id}")
@@ -46,7 +46,7 @@ public class DeviceController {
 
     @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{id}")
-    public void deleteDeviceById(@PathVariable String id) {
-        deviceService.deleteDeviceById(id);
+    public void deleteById(@PathVariable String id) {
+        deviceService.deleteById(id);
     }
 }

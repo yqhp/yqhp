@@ -3,7 +3,7 @@ package com.yqhp.console.repository.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.yqhp.console.repository.enums.ExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.typehandler.PlanTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,7 +35,7 @@ public class ExecutionRecord implements Serializable {
     @TableField(typeHandler = PlanTypeHandler.class)
     private Plan plan;
 
-    private ExecutionRecordStatus status;
+    private ExecutionStatus status;
 
     private Long startTime;
 

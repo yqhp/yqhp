@@ -13,7 +13,7 @@ import java.util.List;
 public interface RoleService extends IService<Role> {
     List<Role> listByUserId(String userId);
 
-    List<RoleDTO> listRoleDTOByUserId(String userId);
+    List<RoleDTO> listDTOByUserId(String userId);
 
     Role getRoleById(String roleId);
 
@@ -21,5 +21,5 @@ public interface RoleService extends IService<Role> {
 
     void updateRole(String id, RoleParam param);
 
-    void deleteRoleById(String id);
+    void deleteById(String id);
 }

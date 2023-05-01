@@ -20,7 +20,7 @@ public interface RoleAuthorityService extends IService<RoleAuthority> {
 
     void updateRoleAuthority(String id, UpdateRoleAuthorityParam param);
 
-    void deleteRoleAuthorityById(String id);
+    void deleteById(String id);
 
     List<RoleAuthority> listByRoleId(String roleId);
 }

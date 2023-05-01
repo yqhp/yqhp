@@ -34,8 +34,8 @@ public class ViewController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteViewById(@PathVariable String id) {
-        viewService.deleteViewById(id);
+    public void deleteById(@PathVariable String id) {
+        viewService.deleteById(id);
     }
 
     @PutMapping("/{id}")

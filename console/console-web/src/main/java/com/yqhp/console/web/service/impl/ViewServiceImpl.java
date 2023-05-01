@@ -44,7 +44,7 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
     }
 
     @Override
-    public void deleteViewById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_VIEW_RESOURCE_FAIL);
         }

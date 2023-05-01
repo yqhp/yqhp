@@ -16,7 +16,7 @@ import java.util.List;
 public interface PkgService extends IService<Pkg> {
     Pkg createPkg(CreatePkgParam createPkgParam);
 
-    void deletePkgById(String id);
+    void deleteById(String id);
 
     Pkg updatePkg(String id, UpdatePkgParam updatePkgParam);
 

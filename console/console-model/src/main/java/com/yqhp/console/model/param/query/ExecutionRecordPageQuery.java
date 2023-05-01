@@ -1,7 +1,7 @@
 package com.yqhp.console.model.param.query;
 
 import com.yqhp.common.web.model.PageQuery;
-import com.yqhp.console.repository.enums.ExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -17,5 +17,5 @@ public class ExecutionRecordPageQuery extends PageQuery {
     private List<String> planIds;
     private Long startSince;
     private Long endUntil;
-    private ExecutionRecordStatus status;
+    private ExecutionStatus status;
 }

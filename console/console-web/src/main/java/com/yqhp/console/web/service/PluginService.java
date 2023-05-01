@@ -22,9 +22,9 @@ public interface PluginService extends IService<Plugin> {
 
     Plugin getPluginById(String id);
 
-    void deletePluginById(String id);
+    void deleteById(String id);
 
     List<Plugin> listByProjectId(String projectId);
 
-    List<PluginDTO> listPluginDTOByProjectId(String projectId);
+    List<PluginDTO> listDTOByProjectId(String projectId);
 }

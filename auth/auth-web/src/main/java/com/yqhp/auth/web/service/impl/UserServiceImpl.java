@@ -68,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public void deleteUserById(String userId) {
+    public void deleteById(String userId) {
         User user = getUserById(userId);
 
         if ("admin".equals(user.getUsername())) {
@@ -134,20 +134,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserVO getUserVOById(String userId) {
+    public UserVO getVOById(String userId) {
         return toUserVO(getUserById(userId));
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getByUsername(String username) {
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getUsername, username);
         return getOne(query);
     }
 
     @Override
-    public UserInfo getUserInfoByUsername(String username) {
-        User user = getUserByUsername(username);
+    public UserInfo getInfoByUsername(String username) {
+        User user = getByUsername(username);
         return toUserInfo(user);
     }
 
@@ -179,14 +179,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserInfo getUserInfo() {
+    public UserInfo getInfo() {
         UserInfo userInfo = CurrentUser.get();
         userInfo.setPassword(null);
         return userInfo;
     }
 
     @Override
-    public List<UserVO> listUserVOByIds(Set<String> userIds) {
+    public List<UserVO> listVOByIds(Set<String> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return new ArrayList<>();
         }
@@ -197,8 +197,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Map<String, UserVO> getUserVOMapByIds(Set<String> userIds) {
-        return listUserVOByIds(userIds).stream()
+    public Map<String, UserVO> getVOMapByIds(Set<String> userIds) {
+        return listVOByIds(userIds).stream()
                 .collect(Collectors.toMap(UserVO::getId, Function.identity(), (k1, k2) -> k1));
     }
 
@@ -210,7 +210,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserInfo toUserInfo(User user) {
         if (user == null) return null;
         UserInfo userInfo = new UserInfo().convertFrom(user);
-        List<RoleDTO> roles = roleService.listRoleDTOByUserId(userInfo.getId());
+        List<RoleDTO> roles = roleService.listDTOByUserId(userInfo.getId());
         userInfo.setRoles(roles);
         return userInfo;
     }

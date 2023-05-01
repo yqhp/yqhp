@@ -3,6 +3,7 @@ package com.yqhp.console.web.controller;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
+import com.yqhp.console.model.vo.PlanDeviceVO;
 import com.yqhp.console.repository.entity.PlanDevice;
 import com.yqhp.console.web.service.PlanDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,8 @@ public class PlanDeviceController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePlanDeviceById(@PathVariable String id) {
-        planDeviceService.deletePlanDeviceById(id);
+    public void deleteById(@PathVariable String id) {
+        planDeviceService.deleteById(id);
     }
 
     @PutMapping("/{id}")
@@ -50,7 +51,7 @@ public class PlanDeviceController {
     }
 
     @GetMapping
-    public List<PlanDevice> listSortedByPlanId(@NotBlank(message = "planId不能为空") String planId) {
-        return planDeviceService.listSortedByPlanId(planId);
+    public List<PlanDeviceVO> listSortedVOByPlanId(@NotBlank(message = "planId不能为空") String planId) {
+        return planDeviceService.listSortedVOByPlanId(planId);
     }
 }

@@ -16,7 +16,7 @@ public interface ProjectPluginService extends IService<ProjectPlugin> {
 
     void updateProjectPlugin(String id, UpdateProjectPluginParam param);
 
-    void deleteProjectPluginById(String id);
+    void deleteById(String id);
 
     void deleteProjectPlugin(DeleteProjectPluginParam param);
 

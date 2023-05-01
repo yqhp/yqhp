@@ -175,7 +175,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
     @Transactional
     @Override
-    public void deleteDocById(String id) {
+    public void deleteById(String id) {
         Doc doc = getDocById(id);
         if (ResourceFlags.undeletable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNDELETABLE);
@@ -204,7 +204,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listSortedDocByProjectIdAndKind(String projectId, DocKind kind) {
+    public List<Doc> listSortedByProjectIdAndKind(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(kind, "kind cannot be null");
 

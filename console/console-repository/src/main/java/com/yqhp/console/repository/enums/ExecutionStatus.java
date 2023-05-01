@@ -9,20 +9,19 @@ import lombok.Getter;
  * @author jiangyitao
  */
 @Getter
-public enum PluginExecutionRecordStatus implements BaseEnum<Integer> {
+public enum ExecutionStatus implements BaseEnum<Integer> {
 
     TODO(0),
-    RECEIVED(1),
-    STARTED(2),
-    SUCCESSFUL(3),
-    FAILED(4),
+    STARTED(1),
+    SUCCESSFUL(2),
+    FAILED(3),
     ;
 
     @EnumValue
     @JsonValue
     private final Integer value;
 
-    PluginExecutionRecordStatus(Integer value) {
+    ExecutionStatus(Integer value) {
         this.value = value;
     }
 }

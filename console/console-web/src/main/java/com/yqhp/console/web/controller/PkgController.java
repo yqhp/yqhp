@@ -35,8 +35,8 @@ public class PkgController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePkgById(@PathVariable String id) {
-        pkgService.deletePkgById(id);
+    public void deleteById(@PathVariable String id) {
+        pkgService.deleteById(id);
     }
 
     @PutMapping("/{id}")

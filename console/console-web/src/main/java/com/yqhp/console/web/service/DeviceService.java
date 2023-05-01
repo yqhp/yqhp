@@ -10,15 +10,22 @@ import com.yqhp.console.repository.entity.Device;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jiangyitao
  */
 public interface DeviceService extends IService<Device> {
 
-    List<DeviceVO> getAll();
+    List<DeviceVO> listAllVO();
 
-    IPage<DeviceVO> pageBy(DevicePageQuery query);
+    IPage<DeviceVO> pageVOBy(DevicePageQuery query);
+
+    List<DeviceVO> listVOInIds(Collection<String> ids);
+
+    Map<String, Device> getMapByIds(Collection<String> ids);
+
+    Map<String, DeviceVO> getVOMapByIds(Collection<String> ids);
 
     List<Device> listInIds(Collection<String> ids);
 
@@ -26,7 +33,7 @@ public interface DeviceService extends IService<Device> {
 
     Device getDeviceById(String id);
 
-    void deleteDeviceById(String id);
+    void deleteById(String id);
 
     void saveIfAbsent(ZkDevice zkDevice);
 

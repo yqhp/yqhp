@@ -20,7 +20,7 @@ import java.util.Set;
 public interface UserService extends IService<User> {
     User createUser(CreateUserParam createUserParam);
 
-    void deleteUserById(String userId);
+    void deleteById(String userId);
 
     User updateUser(String userId, UpdateUserParam updateUserParam);
 
@@ -30,19 +30,19 @@ public interface UserService extends IService<User> {
 
     User getUserById(String userId);
 
-    UserVO getUserVOById(String userId);
+    UserVO getVOById(String userId);
 
-    User getUserByUsername(String username);
+    User getByUsername(String username);
 
-    UserInfo getUserInfoByUsername(String username);
+    UserInfo getInfoByUsername(String username);
 
     void changePassword(String oldPassword, String newPassword);
 
     void changeStatus(String userId, UserStatus status);
 
-    UserInfo getUserInfo();
+    UserInfo getInfo();
 
-    List<UserVO> listUserVOByIds(Set<String> userIds);
+    List<UserVO> listVOByIds(Set<String> userIds);
 
-    Map<String, UserVO> getUserVOMapByIds(Set<String> userIds);
+    Map<String, UserVO> getVOMapByIds(Set<String> userIds);
 }

@@ -42,8 +42,8 @@ public class UserRoleController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserRoleById(@PathVariable String id) {
-        userRoleService.deleteUserRoleById(id);
+    public void deleteById(@PathVariable String id) {
+        userRoleService.deleteById(id);
     }
 
     @DeleteMapping

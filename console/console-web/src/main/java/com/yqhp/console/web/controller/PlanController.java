@@ -47,8 +47,8 @@ public class PlanController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePlanById(@PathVariable String id) {
-        planService.deletePlanById(id);
+    public void deleteById(@PathVariable String id) {
+        planService.deleteById(id);
     }
 
     @PutMapping("/{id}")

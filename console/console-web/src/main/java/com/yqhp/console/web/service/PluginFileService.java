@@ -15,7 +15,7 @@ public interface PluginFileService extends IService<PluginFile> {
 
     PluginFile getPluginFileById(String id);
 
-    void deletePluginFileById(String id);
+    void deleteById(String id);
 
     List<PluginFile> listByPluginId(String pluginId);
 

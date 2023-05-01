@@ -108,7 +108,7 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
     }
 
     @Override
-    public void deletePluginById(String id) {
+    public void deleteById(String id) {
         List<ProjectPlugin> projectPlugins = projectPluginService.listByPluginId(id);
         if (!projectPlugins.isEmpty()) {
             String projectIds = projectPlugins.stream()
@@ -129,7 +129,7 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
     }
 
     @Override
-    public List<PluginDTO> listPluginDTOByProjectId(String projectId) {
+    public List<PluginDTO> listDTOByProjectId(String projectId) {
         List<Plugin> plugins = listByProjectId(projectId);
         return toPluginDTOs(plugins);
     }

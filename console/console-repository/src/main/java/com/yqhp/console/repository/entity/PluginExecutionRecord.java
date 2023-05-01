@@ -3,7 +3,7 @@ package com.yqhp.console.repository.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import com.yqhp.console.repository.typehandler.PluginDTOTypeHandler;
 import lombok.Data;
@@ -42,7 +42,7 @@ public class PluginExecutionRecord implements Serializable {
     @TableField(typeHandler = PluginDTOTypeHandler.class)
     private PluginDTO plugin;
 
-    private PluginExecutionRecordStatus status;
+    private ExecutionStatus status;
 
     private Long startTime;
 

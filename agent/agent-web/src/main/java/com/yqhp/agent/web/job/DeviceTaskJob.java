@@ -9,9 +9,8 @@ import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
 import com.yqhp.console.model.vo.DeviceTask;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
-import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
-import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.rpc.DeviceTaskRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,7 @@ public class DeviceTaskJob {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(PluginExecutionRecordStatus.STARTED);
+        message.setStatus(ExecutionStatus.STARTED);
         message.setStartTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
     }
@@ -103,7 +102,7 @@ public class DeviceTaskJob {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(PluginExecutionRecordStatus.SUCCESSFUL);
+        message.setStatus(ExecutionStatus.SUCCESSFUL);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
     }
@@ -112,7 +111,7 @@ public class DeviceTaskJob {
         PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(PluginExecutionRecordStatus.FAILED);
+        message.setStatus(ExecutionStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
     }
@@ -139,7 +138,7 @@ public class DeviceTaskJob {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(DocExecutionRecordStatus.STARTED);
+        message.setStatus(ExecutionStatus.STARTED);
         message.setStartTime(System.currentTimeMillis());
         producer.sendDocExecutionRecordMessage(message);
     }
@@ -148,7 +147,7 @@ public class DeviceTaskJob {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(DocExecutionRecordStatus.SUCCESSFUL);
+        message.setStatus(ExecutionStatus.SUCCESSFUL);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);
         producer.sendDocExecutionRecordMessage(message);
@@ -158,7 +157,7 @@ public class DeviceTaskJob {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
         message.setDeviceId(record.getDeviceId());
-        message.setStatus(DocExecutionRecordStatus.FAILED);
+        message.setStatus(ExecutionStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);
         producer.sendDocExecutionRecordMessage(message);

@@ -30,7 +30,7 @@ public class ProjectController {
 
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/all")
-    public List<Project> getAllProjects() {
+    public List<Project> listAll() {
         return projectService.list();
     }
 
@@ -60,8 +60,8 @@ public class ProjectController {
 
     @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{projectId}")
-    public void deleteProjectById(@PathVariable String projectId) {
-        projectService.deleteProjectById(projectId);
+    public void deleteById(@PathVariable String projectId) {
+        projectService.deleteById(projectId);
     }
 
 }

@@ -3,9 +3,8 @@ package com.yqhp.console.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.console.model.dto.DevicePluginExecutionResult;
-import com.yqhp.console.model.enums.DevicePluginExecutionStatus;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
-import com.yqhp.console.repository.enums.PluginExecutionRecordStatus;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.PluginExecutionRecordMapper;
 import com.yqhp.console.web.service.PluginExecutionRecordService;
 import org.springframework.stereotype.Service;
@@ -43,30 +42,50 @@ public class PluginExecutionRecordServiceImpl
     @Override
     public DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records) {
         DevicePluginExecutionResult result = new DevicePluginExecutionResult();
+        result.setRecords(records);
         if (CollectionUtils.isEmpty(records)) {
             result.setFinished(true);
-            result.setStatus(DevicePluginExecutionStatus.SUCCESS);
+            result.setStatus(ExecutionStatus.SUCCESSFUL);
+            return result;
+        }
+
+        PluginExecutionRecord firstRecord = records.get(0);
+        result.setStartTime(firstRecord.getStartTime());
+
+        boolean anyFailed = records.stream()
+                .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
+        if (anyFailed) {
+            result.setFinished(true);
+            result.setEndTime(getEndTime(true, records));
+            result.setStatus(ExecutionStatus.FAILED);
             return result;
         }
 
         boolean allSuccessful = records.stream()
-                .allMatch(record -> PluginExecutionRecordStatus.SUCCESSFUL.equals(record.getStatus()));
+                .allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
         if (allSuccessful) {
             result.setFinished(true);
-            result.setStatus(DevicePluginExecutionStatus.SUCCESS);
-            return result;
-        }
-
-        boolean anyFailed = records.stream()
-                .anyMatch(record -> PluginExecutionRecordStatus.FAILED.equals(record.getStatus()));
-        if (anyFailed) {
-            result.setFinished(true);
-            result.setStatus(DevicePluginExecutionStatus.FAILED);
+            result.setEndTime(getEndTime(false, records));
+            result.setStatus(ExecutionStatus.SUCCESSFUL);
             return result;
         }
 
         result.setFinished(false);
-        result.setStatus(DevicePluginExecutionStatus.UNFINISHED);
+        if (ExecutionStatus.TODO.equals(firstRecord.getStatus())) {
+            result.setStatus(firstRecord.getStatus());
+        } else {
+            result.setStatus(ExecutionStatus.STARTED);
+        }
         return result;
+    }
+
+    private long getEndTime(boolean anyFailed, List<PluginExecutionRecord> records) {
+        if (anyFailed) {
+            return records.stream()
+                    .mapToLong(PluginExecutionRecord::getEndTime)
+                    .max().orElse(0);
+        }
+        PluginExecutionRecord lastRecord = records.get(records.size() - 1);
+        return lastRecord.getEndTime();
     }
 }

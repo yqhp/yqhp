@@ -16,7 +16,7 @@ public interface UserRoleService extends IService<UserRole> {
 
     void updateUserRole(String id, UpdateUserRoleParam param);
 
-    void deleteUserRoleById(String id);
+    void deleteById(String id);
 
     void deleteUserRole(DeleteUserRoleParam param);
 

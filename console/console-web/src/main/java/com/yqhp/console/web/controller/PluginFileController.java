@@ -35,8 +35,8 @@ public class PluginFileController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePluginFileById(@PathVariable String id) {
-        pluginFileService.deletePluginFileById(id);
+    public void deleteById(@PathVariable String id) {
+        pluginFileService.deleteById(id);
     }
 
 }

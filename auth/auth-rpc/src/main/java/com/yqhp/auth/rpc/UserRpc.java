@@ -25,11 +25,11 @@ public interface UserRpc {
     void updateUser(@RequestBody UpdateUserParam updateUserParam);
 
     @GetMapping("/{userId}")
-    UserVO getUserVOById(@PathVariable("userId") String userId);
+    UserVO getVOById(@PathVariable("userId") String userId);
 
     @PostMapping("/users")
-    List<UserVO> listUserVOByIds(@RequestBody Set<String> userIds);
+    List<UserVO> listVOByIds(@RequestBody Set<String> userIds);
 
     @PostMapping("/usersMap")
-    Map<String, UserVO> getUserVOMapByIds(@RequestBody Set<String> userIds);
+    Map<String, UserVO> getVOMapByIds(@RequestBody Set<String> userIds);
 }

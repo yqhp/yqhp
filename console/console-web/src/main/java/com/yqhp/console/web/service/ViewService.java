@@ -13,7 +13,7 @@ import java.util.List;
 public interface ViewService extends IService<View> {
     View createView(CreateViewParam createViewParam);
 
-    void deleteViewById(String id);
+    void deleteById(String id);
 
     View updateView(String id, UpdateViewParam updateViewParam);
 

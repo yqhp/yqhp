@@ -23,7 +23,7 @@ public class UpdateViewParam implements InputConverter<View> {
 
     private String source;
 
-    @Size(max = 512, message = "图片url长度不能超过{max}")
+    @Size(max = 1024, message = "图片url长度不能超过{max}")
     private String imgUrl;
     private Integer imgHeight;
     private Integer imgWidth;

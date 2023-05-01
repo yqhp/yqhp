@@ -19,7 +19,7 @@ public interface PlanService extends IService<Plan> {
 
     Plan updatePlan(String id, UpdatePlanParam param);
 
-    void deletePlanById(String id);
+    void deleteById(String id);
 
     Plan getPlanById(String id);
 

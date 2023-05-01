@@ -36,8 +36,8 @@ public class RoleAuthorityController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRoleAuthorityById(@PathVariable String id) {
-        roleAuthorityService.deleteRoleAuthorityById(id);
+    public void deleteById(@PathVariable String id) {
+        roleAuthorityService.deleteById(id);
     }
 
     @GetMapping

@@ -83,7 +83,7 @@ public class RoleAuthorityServiceImpl
     }
 
     @Override
-    public void deleteRoleAuthorityById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_ROLE_AUTHORITY_FAIL);
         }

@@ -42,8 +42,8 @@ public class ProjectPluginController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProjectPluginById(@PathVariable String id) {
-        projectPluginService.deleteProjectPluginById(id);
+    public void deleteById(@PathVariable String id) {
+        projectPluginService.deleteById(id);
     }
 
     @DeleteMapping

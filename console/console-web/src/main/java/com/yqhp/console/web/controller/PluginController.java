@@ -33,13 +33,13 @@ public class PluginController {
     }
 
     @GetMapping("/details")
-    public List<PluginDTO> listPluginDTOByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
-        return pluginService.listPluginDTOByProjectId(projectId);
+    public List<PluginDTO> listDTOByProjectId(@NotBlank(message = "项目不能为空") String projectId) {
+        return pluginService.listDTOByProjectId(projectId);
     }
 
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/all")
-    public List<Plugin> getAll() {
+    public List<Plugin> listAll() {
         return pluginService.list();
     }
 
@@ -57,8 +57,8 @@ public class PluginController {
 
     @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{id}")
-    public void deletePluginById(@PathVariable String id) {
-        pluginService.deletePluginById(id);
+    public void deleteById(@PathVariable String id) {
+        pluginService.deleteById(id);
     }
 
     @PreAuthorize("hasAuthority('admin')")

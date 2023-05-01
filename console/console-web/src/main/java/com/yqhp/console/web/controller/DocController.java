@@ -31,9 +31,9 @@ public class DocController {
         return docService.getDocById(id);
     }
 
-    @GetMapping("/sorted/jshInit")
+    @GetMapping("/sortedJshInit")
     public List<Doc> listSortedJshInitDocByProjectId(@NotBlank(message = "projectId不能为空") String projectId) {
-        return docService.listSortedDocByProjectIdAndKind(projectId, DocKind.JSH_INIT);
+        return docService.listSortedByProjectIdAndKind(projectId, DocKind.JSH_INIT);
     }
 
     @PostMapping
@@ -47,8 +47,8 @@ public class DocController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDocById(@PathVariable String id) {
-        docService.deleteDocById(id);
+    public void deleteById(@PathVariable String id) {
+        docService.deleteById(id);
     }
 
     @PutMapping("/{id}")

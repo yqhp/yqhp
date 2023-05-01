@@ -105,7 +105,7 @@ public class PlanDocServiceImpl
     }
 
     @Override
-    public void deletePlanDocById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAIL);
         }

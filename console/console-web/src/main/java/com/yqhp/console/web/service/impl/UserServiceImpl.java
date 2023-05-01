@@ -17,8 +17,8 @@ public class UserServiceImpl implements UserService {
     private UserRpc userRpc;
 
     @Override
-    public UserVO getById(String id) {
+    public UserVO getVOById(String id) {
         Assert.hasText(id, "id must has text");
-        return userRpc.getUserVOById(id);
+        return userRpc.getVOById(id);
     }
 }

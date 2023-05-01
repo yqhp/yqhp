@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -35,12 +36,12 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     public static final String APPLE_BRAND = "Apple";
 
     @Override
-    public List<DeviceVO> getAll() {
+    public List<DeviceVO> listAllVO() {
         return list().stream().map(this::toDeviceVO).collect(Collectors.toList());
     }
 
     @Override
-    public IPage<DeviceVO> pageBy(DevicePageQuery query) {
+    public IPage<DeviceVO> pageVOBy(DevicePageQuery query) {
         LambdaQueryWrapper<Device> q = new LambdaQueryWrapper<>();
         q.eq(query.getPlatform() != null, Device::getPlatform, query.getPlatform());
         q.eq(query.getType() != null, Device::getType, query.getType());
@@ -87,6 +88,24 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
+    public List<DeviceVO> listVOInIds(Collection<String> ids) {
+        return listInIds(ids).stream()
+                .map(this::toDeviceVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Device> getMapByIds(Collection<String> ids) {
+        return listInIds(ids).stream()
+                .collect(Collectors.toMap(Device::getId, Function.identity(), (k1, k2) -> k1));
+    }
+
+    @Override
+    public Map<String, DeviceVO> getVOMapByIds(Collection<String> ids) {
+        return listVOInIds(ids).stream()
+                .collect(Collectors.toMap(DeviceVO::getId, Function.identity(), (k1, k2) -> k1));
+    }
+
+    @Override
     public List<Device> listInIds(Collection<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return new ArrayList<>();
@@ -115,7 +134,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public void deleteDeviceById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_DEVICE_FAIL);
         }
@@ -134,9 +153,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         device.setPlatform(zkDevice.getPlatform());
         device.setType(zkDevice.getType());
         device.setModel(zkDevice.getModel());
-
-        // TODO 考虑走agent DeviceRpc拿详细信息，zkDevice.location拿到具体device所在的服务器地址，进行调用。
-        // 就像 gateway.AgentGatewayFilterFactory 处理一样
         if (DevicePlatform.iOS.equals(zkDevice.getPlatform())) {
             device.setBrand(APPLE_BRAND);
             device.setManufacturer(APPLE_MANUFACTURER);

@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.typehandler.DocTypeHandler;
 import com.yqhp.console.repository.typehandler.JShellEvalResultsTypeHandler;
 import lombok.Data;
@@ -47,7 +47,7 @@ public class DocExecutionRecord implements Serializable {
     @TableField(typeHandler = DocTypeHandler.class)
     private Doc doc;
 
-    private DocExecutionRecordStatus status;
+    private ExecutionStatus status;
 
     private Long startTime;
 

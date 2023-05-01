@@ -17,7 +17,7 @@ public class UpdateUserParam implements InputConverter<User> {
     @Size(max = 128, message = "昵称长度不能超过{max}")
     private String nickname;
 
-    @Size(max = 512, message = "头像url长度不能超过{max}")
+    @Size(max = 1024, message = "头像url长度不能超过{max}")
     private String avatar;
 
     @NotBlank(message = "邮箱不能为空")

@@ -24,13 +24,13 @@ public interface DocService extends IService<Doc> {
 
     void move(TreeNodeMoveEvent moveEvent);
 
-    void deleteDocById(String id);
+    void deleteById(String id);
 
     Doc getDocById(String id);
 
     List<Doc> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds);
 
-    List<Doc> listSortedDocByProjectIdAndKind(String projectId, DocKind type);
+    List<Doc> listSortedByProjectIdAndKind(String projectId, DocKind type);
 
     List<Doc> listInIds(Collection<String> ids);
 }

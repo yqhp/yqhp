@@ -42,8 +42,8 @@ public class UserProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserProjectById(@PathVariable String id) {
-        userProjectService.deleteUserProjectById(id);
+    public void deleteById(@PathVariable String id) {
+        userProjectService.deleteById(id);
     }
 
     @DeleteMapping

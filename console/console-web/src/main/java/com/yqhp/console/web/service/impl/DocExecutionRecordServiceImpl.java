@@ -3,10 +3,9 @@ package com.yqhp.console.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.console.model.dto.DeviceDocExecutionResult;
-import com.yqhp.console.model.enums.DeviceDocExecutionStatus;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
-import com.yqhp.console.repository.enums.DocExecutionRecordStatus;
 import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.DocExecutionRecordMapper;
 import com.yqhp.console.web.service.DocExecutionRecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,8 @@ import java.util.List;
 @Service
 public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecordMapper, DocExecutionRecord>
         implements DocExecutionRecordService {
+
+    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED);
 
     @Override
     public List<DocExecutionRecord> listByExecutionRecordId(String executionRecordId) {
@@ -45,34 +46,52 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
     @Override
     public DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records) {
         DeviceDocExecutionResult result = new DeviceDocExecutionResult();
+        result.setRecords(records);
         if (CollectionUtils.isEmpty(records)) {
             result.setFinished(true);
-            result.setStatus(DeviceDocExecutionStatus.SUCCESS);
+            result.setStatus(ExecutionStatus.SUCCESSFUL);
             return result;
         }
+
+        DocExecutionRecord firstRecord = records.get(0);
+        result.setStartTime(firstRecord.getStartTime());
 
         boolean initFailed = records.stream()
                 .filter(record -> DocKind.JSH_INIT.equals(record.getDocKind()))
-                .anyMatch(record -> DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
+                .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
         if (initFailed) {
             result.setFinished(true);
-            result.setStatus(DeviceDocExecutionStatus.FAILED);
+            result.setEndTime(getEndTime(true, records));
+            result.setStatus(ExecutionStatus.FAILED);
             return result;
         }
 
-        boolean isFinished = records.stream()
-                .allMatch(record -> DocExecutionRecordStatus.SUCCESSFUL.equals(record.getStatus())
-                        || DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
-        if (isFinished) {
+        boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
+        if (allFinished) {
             result.setFinished(true);
+            result.setEndTime(getEndTime(false, records));
             boolean anyFailed = records.stream()
-                    .anyMatch(record -> DocExecutionRecordStatus.FAILED.equals(record.getStatus()));
-            result.setStatus(anyFailed ? DeviceDocExecutionStatus.FAILED : DeviceDocExecutionStatus.SUCCESS);
+                    .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
+            result.setStatus(anyFailed ? ExecutionStatus.FAILED : ExecutionStatus.SUCCESSFUL);
             return result;
         }
 
         result.setFinished(false);
-        result.setStatus(DeviceDocExecutionStatus.UNFINISHED);
+        if (ExecutionStatus.TODO.equals(firstRecord.getStatus())) {
+            result.setStatus(firstRecord.getStatus());
+        } else {
+            result.setStatus(ExecutionStatus.STARTED);
+        }
         return result;
+    }
+
+    private long getEndTime(boolean initFailed, List<DocExecutionRecord> records) {
+        if (initFailed) {
+            return records.stream()
+                    .mapToLong(DocExecutionRecord::getEndTime)
+                    .max().orElse(0);
+        }
+        DocExecutionRecord lastRecord = records.get(records.size() - 1);
+        return lastRecord.getEndTime();
     }
 }

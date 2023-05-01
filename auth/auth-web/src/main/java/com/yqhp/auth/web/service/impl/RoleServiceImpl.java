@@ -45,7 +45,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     @Override
-    public List<RoleDTO> listRoleDTOByUserId(String userId) {
+    public List<RoleDTO> listDTOByUserId(String userId) {
         List<Role> roles = listByUserId(userId);
         return toRoleDTOs(roles);
     }
@@ -90,7 +90,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     @Override
-    public void deleteRoleById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_ROLE_FAIL);
         }

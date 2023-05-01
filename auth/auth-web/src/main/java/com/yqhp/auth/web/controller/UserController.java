@@ -58,8 +58,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable String userId) {
-        userService.deleteUserById(userId);
+    public void deleteById(@PathVariable String userId) {
+        userService.deleteById(userId);
     }
 
     @PreAuthorize("hasAuthority('admin')")
@@ -77,7 +77,7 @@ public class UserController {
 
     @GetMapping("/info")
     public UserInfo info() {
-        return userService.getUserInfo();
+        return userService.getInfo();
     }
 
     @PostMapping("/changePassword")
@@ -89,17 +89,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserVO getUserVOById(@PathVariable String userId) {
-        return userService.getUserVOById(userId);
+    public UserVO getVOById(@PathVariable String userId) {
+        return userService.getVOById(userId);
     }
 
     @PostMapping("/users")
-    public List<UserVO> listUserVOByIds(@RequestBody Set<String> userIds) {
-        return userService.listUserVOByIds(userIds);
+    public List<UserVO> listVOByIds(@RequestBody Set<String> userIds) {
+        return userService.listVOByIds(userIds);
     }
 
     @PostMapping("/usersMap")
-    public Map<String, UserVO> getUserVOMapByIds(@RequestBody Set<String> userIds) {
-        return userService.getUserVOMapByIds(userIds);
+    public Map<String, UserVO> getVOMapByIds(@RequestBody Set<String> userIds) {
+        return userService.getVOMapByIds(userIds);
     }
 }

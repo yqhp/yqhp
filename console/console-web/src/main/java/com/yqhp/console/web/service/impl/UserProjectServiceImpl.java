@@ -67,7 +67,7 @@ public class UserProjectServiceImpl
     }
 
     @Override
-    public void deleteUserProjectById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAIL);
         }

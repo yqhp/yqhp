@@ -19,7 +19,7 @@ public interface PlanDocService extends IService<PlanDoc> {
 
     PlanDoc updatePlanDoc(String id, UpdatePlanDocParam param);
 
-    void deletePlanDocById(String id);
+    void deleteById(String id);
 
     void deleteByDocId(String docId);
 

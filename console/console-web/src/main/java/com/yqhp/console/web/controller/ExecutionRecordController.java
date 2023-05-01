@@ -2,7 +2,7 @@ package com.yqhp.console.web.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
-import com.yqhp.console.model.vo.ExecutionRecordDetails;
+import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.web.service.ExecutionRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,9 @@ public class ExecutionRecordController {
         return executionRecordService.pageBy(query);
     }
 
-    @GetMapping("/{id}/details")
-    public ExecutionRecordDetails getExecutionRecordDetailsById(@PathVariable String id) {
-        return executionRecordService.getDetailsById(id);
+    @GetMapping("/{id}/report")
+    public ExecutionReport getReportById(@PathVariable String id) {
+        return executionRecordService.getReportById(id);
     }
 
 }

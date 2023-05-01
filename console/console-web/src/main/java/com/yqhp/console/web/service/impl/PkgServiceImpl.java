@@ -68,7 +68,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public void deletePkgById(String id) {
+    public void deleteById(String id) {
         Pkg pkg = getPkgById(id);
         if (ResourceFlags.undeletable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNDELETABLE);

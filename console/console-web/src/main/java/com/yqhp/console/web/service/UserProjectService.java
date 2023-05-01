@@ -16,7 +16,7 @@ public interface UserProjectService extends IService<UserProject> {
 
     void updateUserProject(String id, UpdateUserProjectParam param);
 
-    void deleteUserProjectById(String id);
+    void deleteById(String id);
 
     UserProject getUserProjectById(String id);
 

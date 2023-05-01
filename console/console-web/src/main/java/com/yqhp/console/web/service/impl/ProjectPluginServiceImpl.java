@@ -68,7 +68,7 @@ public class ProjectPluginServiceImpl
     }
 
     @Override
-    public void deleteProjectPluginById(String id) {
+    public void deleteById(String id) {
         if (!removeById(id)) {
             throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAIL);
         }

@@ -17,6 +17,9 @@ spring:
         server-addr: ${NACOS_ADDR:127.0.0.1:8848}
   kafka:
     bootstrap-servers: ${KAFKA_SERVERS:127.0.0.1:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
       group-id: console
       enable-auto-commit: true
