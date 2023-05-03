@@ -218,14 +218,17 @@ public class ExecutionRecordServiceImpl
             failureCount += docResult.getFailureCount();
             totalCount += docResult.getTotalCount();
         }
-        BigDecimal percent = BigDecimal.valueOf(passCount)
-                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
-        String passRate = new DecimalFormat("#.##").format(percent) + "%";
+
         result.setPassCount(passCount);
         result.setFailureCount(failureCount);
         result.setTotalCount(totalCount);
-        result.setPassRate(passRate);
+        if (totalCount != 0) {
+            BigDecimal percent = BigDecimal.valueOf(passCount)
+                    .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+            String passRate = new DecimalFormat("#.##").format(percent) + "%";
+            result.setPassRate(passRate);
+        }
         return result;
     }
 

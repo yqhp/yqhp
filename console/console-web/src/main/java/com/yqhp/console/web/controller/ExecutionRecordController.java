@@ -7,6 +7,7 @@ import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.repository.entity.ExecutionRecord;
 import com.yqhp.console.web.service.ExecutionRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * @author jiangyitao
  */
+@Validated
 @RestController
 @RequestMapping("/executionRecord")
 public class ExecutionRecordController {
