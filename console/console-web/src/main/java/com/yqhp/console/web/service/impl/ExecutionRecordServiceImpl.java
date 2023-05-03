@@ -143,9 +143,11 @@ public class ExecutionRecordServiceImpl
                     .allMatch(res -> ExecutionStatus.SUCCESSFUL.equals(res.getStatus()));
             result.setStatus(allSuccessful ? ExecutionStatus.SUCCESSFUL : ExecutionStatus.FAILED);
         } else {
-            boolean started = deviceExecutionResults.stream()
-                    .anyMatch(res -> !ExecutionStatus.TODO.equals(res.getStatus()));
-            if (started) {
+            boolean allTodo = deviceExecutionResults.stream()
+                    .allMatch(res -> ExecutionStatus.TODO.equals(res.getStatus()));
+            if (allTodo) {
+                result.setStatus(ExecutionStatus.TODO);
+            } else {
                 result.setStatus(ExecutionStatus.STARTED);
             }
         }
