@@ -11,7 +11,7 @@ import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.ExecutionStatus;
-import com.yqhp.console.rpc.DeviceTaskRpc;
+import com.yqhp.console.rpc.ExecutionRecordRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +33,7 @@ public class DeviceTaskJob {
     @Autowired
     private DeviceService deviceService;
     @Autowired
-    private DeviceTaskRpc deviceTaskRpc;
+    private ExecutionRecordRpc executionRecordRpc;
     @Autowired
     private MessageProducer producer;
 
@@ -47,7 +47,7 @@ public class DeviceTaskJob {
 
     public void receiveAndExecTaskAsync(DeviceDriver driver) {
         THREAD_POOL.submit(() -> {
-            DeviceTask deviceTask = deviceTaskRpc.receive(driver.getDeviceId());
+            DeviceTask deviceTask = executionRecordRpc.receive(driver.getDeviceId());
             if (deviceTask == null) return;
 
             String planName = deviceTask.getExecutionRecord().getPlan().getName();

@@ -10,6 +10,7 @@ import com.yqhp.console.model.dto.DeviceExecutionResult;
 import com.yqhp.console.model.dto.DevicePluginExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
+import com.yqhp.console.model.vo.DeviceTask;
 import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.repository.entity.Device;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
@@ -19,8 +20,11 @@ import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.ExecutionRecordMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -37,6 +41,7 @@ import java.util.stream.Collectors;
 /**
  * @author jiangyitao
  */
+@Slf4j
 @Service
 public class ExecutionRecordServiceImpl
         extends ServiceImpl<ExecutionRecordMapper, ExecutionRecord>
@@ -44,6 +49,8 @@ public class ExecutionRecordServiceImpl
 
     public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED);
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private PluginExecutionRecordService pluginExecutionRecordService;
     @Autowired
@@ -54,6 +61,45 @@ public class ExecutionRecordServiceImpl
     private UserService userService;
     @Autowired
     private DeviceService deviceService;
+
+    @Override
+    public void push(String deviceId, String executionRecordId) {
+        redisTemplate.opsForList().leftPush(getDeviceRedisKey(deviceId), executionRecordId);
+    }
+
+    @Override
+    public boolean removePushed(String deviceId, String executionRecordId) {
+        // 第2个参数count
+        // count > 0: Remove elements equal to element moving from head to tail.
+        // count < 0: Remove elements equal to element moving from tail to head.
+        // count = 0: Remove all elements equal to element.
+        Long result = redisTemplate.opsForList().remove(getDeviceRedisKey(deviceId), -1, executionRecordId);
+        return result != null && result > 0;
+    }
+
+    @Override
+    public DeviceTask receive(String deviceId) {
+        String executionRecordId = redisTemplate.opsForList().rightPop(getDeviceRedisKey(deviceId));
+        if (executionRecordId == null) {
+            return null;
+        }
+
+        log.info("deviceId={} receive executionRecordId={}", deviceId, executionRecordId);
+        ExecutionRecord executionRecord = getById(executionRecordId);
+        if (executionRecord == null) {
+            return null;
+        }
+
+        DeviceTask task = new DeviceTask();
+        task.setExecutionRecord(executionRecord);
+        List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordService
+                .listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId);
+        task.setPluginExecutionRecords(pluginExecutionRecords);
+        List<DocExecutionRecord> docExecutionRecords = docExecutionRecordService
+                .listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId);
+        task.setDocExecutionRecords(docExecutionRecords);
+        return task;
+    }
 
     @Override
     public ExecutionRecord getExecutionRecordById(String id) {
@@ -80,6 +126,17 @@ public class ExecutionRecordServiceImpl
         q.eq(query.getStatus() != null, ExecutionRecord::getStatus, query.getStatus());
         q.orderByDesc(ExecutionRecord::getId);
         return page(new Page<>(query.getPageNumb(), query.getPageSize()), q);
+    }
+
+    @Transactional
+    @Override
+    public void deleteDeviceExecutionRecord(String id, String deviceId) {
+        boolean removed = removePushed(deviceId, id);
+        if (!removed) {
+            throw new ServiceException(ResponseCodeEnum.DEVICE_TASK_HAS_BEEN_RECEIVED);
+        }
+        pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
+        docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
     }
 
     @Override
@@ -214,6 +271,10 @@ public class ExecutionRecordServiceImpl
             result.setStatus(pluginResult.getStatus());
         }
         return result;
+    }
+
+    private String getDeviceRedisKey(String deviceId) {
+        return "executionRecord:" + deviceId;
     }
 
 }

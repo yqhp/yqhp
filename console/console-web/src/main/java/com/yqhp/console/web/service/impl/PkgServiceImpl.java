@@ -17,7 +17,6 @@ import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.entity.Pkg;
 import com.yqhp.console.repository.enums.PkgType;
 import com.yqhp.console.repository.mapper.PkgMapper;
-import com.yqhp.console.web.common.Const;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DocService;
@@ -38,6 +37,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgService {
+
+    public static final String ROOT_PID = "0";
 
     @Autowired
     private DocService docService;
@@ -192,7 +193,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
         if (query.isListItem()) {
             List<String> pkgIds = pkgs.stream().map(Pkg::getId).collect(Collectors.toList());
-            pkgIds.add(Const.ROOT_PID);
+            pkgIds.add(ROOT_PID);
             if (PkgType.DOC.equals(query.getType())) {
                 List<Doc> docs = docService.listByProjectIdAndInPkgIds(query.getProjectId(), pkgIds);
                 List<TreeNode<String>> docNodes = docs.stream().map(doc -> {
@@ -227,7 +228,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
             }
 
             String parentId = pkg.getParentId();
-            while (!Const.ROOT_PID.equals(parentId)) {
+            while (!ROOT_PID.equals(parentId)) {
                 if (id.equals(parentId)) {
                     descendant.add(pkg.getId());
                     break;

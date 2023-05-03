@@ -14,5 +14,7 @@ public interface DocExecutionRecordService extends IService<DocExecutionRecord> 
 
     List<DocExecutionRecord> listByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
 
+    void deleteByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
+
     DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records);
 }

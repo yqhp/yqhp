@@ -51,8 +51,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Autowired
     private PlanDocService planDocService;
     @Autowired
-    private DeviceTaskService deviceTaskService;
-    @Autowired
     private PluginService pluginService;
 
     @Override
@@ -190,7 +188,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         );
         docExecutionRecordService.saveBatch(docExecutionRecords);
 
-        deviceTaskService.push(deviceIds, executionRecord.getId());
+        for (String deviceId : deviceIds) {
+            executionRecordService.push(deviceId, executionRecord.getId());
+        }
     }
 
     /**

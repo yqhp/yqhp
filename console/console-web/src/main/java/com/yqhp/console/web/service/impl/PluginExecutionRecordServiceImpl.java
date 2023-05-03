@@ -40,6 +40,16 @@ public class PluginExecutionRecordServiceImpl
     }
 
     @Override
+    public void deleteByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId) {
+        Assert.hasText(executionRecordId, "executionRecordId must has text");
+        Assert.hasText(deviceId, "deviceId must has text");
+        LambdaQueryWrapper<PluginExecutionRecord> query = new LambdaQueryWrapper<>();
+        query.eq(PluginExecutionRecord::getExecutionRecordId, executionRecordId);
+        query.eq(PluginExecutionRecord::getDeviceId, deviceId);
+        remove(query);
+    }
+
+    @Override
     public DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records) {
         DevicePluginExecutionResult result = new DevicePluginExecutionResult();
         result.setRecords(records);

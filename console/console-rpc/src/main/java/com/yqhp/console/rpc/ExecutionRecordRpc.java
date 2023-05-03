@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * @author jiangyitao
  */
-@FeignClient(name = "console-service", path = "/console/deviceTask", contextId = "deviceTask")
-public interface DeviceTaskRpc {
+@FeignClient(name = "console-service", path = "/console/executionRecord", contextId = "executionRecord")
+public interface ExecutionRecordRpc {
 
     @GetMapping("/receive")
     DeviceTask receive(@RequestParam("deviceId") String deviceId);

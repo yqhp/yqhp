@@ -48,6 +48,16 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
     }
 
     @Override
+    public void deleteByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId) {
+        Assert.hasText(executionRecordId, "executionRecordId must has text");
+        Assert.hasText(deviceId, "deviceId must has text");
+        LambdaQueryWrapper<DocExecutionRecord> query = new LambdaQueryWrapper<>();
+        query.eq(DocExecutionRecord::getExecutionRecordId, executionRecordId);
+        query.eq(DocExecutionRecord::getDeviceId, deviceId);
+        remove(query);
+    }
+
+    @Override
     public DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records) {
         DeviceDocExecutionResult result = new DeviceDocExecutionResult();
         result.setRecords(records);

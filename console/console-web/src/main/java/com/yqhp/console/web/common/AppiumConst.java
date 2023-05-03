@@ -5,10 +5,8 @@ import java.util.Set;
 /**
  * @author jiangyitao
  */
-public class Const {
-    public static final String ROOT_PID = "0";
-
-    public static final Set<String> APPIUM_IMPORTS = Set.of(
+public class AppiumConst {
+    public static final Set<String> DEFAULT_IMPORTS = Set.of(
             "import org.openqa.selenium.support.PageFactory;",
             "import org.openqa.selenium.remote.RemoteWebDriver;",
             "import org.openqa.selenium.remote.DriverCommand;",

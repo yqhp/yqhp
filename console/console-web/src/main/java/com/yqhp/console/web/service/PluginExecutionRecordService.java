@@ -14,5 +14,7 @@ public interface PluginExecutionRecordService extends IService<PluginExecutionRe
 
     List<PluginExecutionRecord> listByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
 
+    void deleteByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
+
     DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records);
 }
