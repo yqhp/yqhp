@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
@@ -52,6 +56,25 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
             result.setStatus(ExecutionStatus.SUCCESSFUL);
             return result;
         }
+
+        List<DocExecutionRecord> actionRecords = records.stream()
+                .filter(record -> DocKind.JSH_ACTION.equals(record.getDocKind()))
+                .collect(Collectors.toList());
+        long passCount = actionRecords.stream()
+                .filter(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()))
+                .count();
+        long failureCount = actionRecords.stream()
+                .filter(record -> ExecutionStatus.FAILED.equals(record.getStatus()))
+                .count();
+        int totalCount = actionRecords.size();
+        BigDecimal percent = BigDecimal.valueOf(passCount)
+                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+        String passRate = new DecimalFormat("#.##").format(percent) + "%";
+        result.setPassCount(passCount);
+        result.setFailureCount(failureCount);
+        result.setTotalCount(totalCount);
+        result.setPassRate(passRate);
 
         DocExecutionRecord firstRecord = records.get(0);
         result.setStartTime(firstRecord.getStartTime());

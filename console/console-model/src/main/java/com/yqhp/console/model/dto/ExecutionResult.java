@@ -18,4 +18,10 @@ public class ExecutionResult {
     private boolean isFinished;
     private ExecutionStatus status;
     private List<DeviceExecutionResult> deviceExecutionResults;
+
+    // for action
+    private Long passCount = 0L;
+    private Long failureCount = 0L;
+    private int totalCount = 0;
+    private String passRate;
 }
