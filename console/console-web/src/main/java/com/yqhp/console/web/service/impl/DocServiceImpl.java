@@ -10,6 +10,7 @@ import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.DocStatus;
 import com.yqhp.console.repository.mapper.DocMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -38,6 +39,8 @@ import java.util.stream.Collectors;
 @Service
 public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         implements DocService {
+
+    private static final List<DocStatus> AVAILABLE_STATUS = List.of(DocStatus.DEPRECATED, DocStatus.RELEASED);
 
     @Autowired
     private Snowflake snowflake;
@@ -204,7 +207,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     @Override
-    public List<Doc> listSortedByProjectIdAndKind(String projectId, DocKind kind) {
+    public List<Doc> listSortedAndAvailableByProjectIdAndKind(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(kind, "kind cannot be null");
 
@@ -212,7 +215,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         query.eq(Doc::getProjectId, projectId);
         query.eq(Doc::getKind, kind);
         query.orderByAsc(Doc::getWeight);
-        return list(query);
+        return list(query).stream().filter(this::isAvailable).collect(Collectors.toList());
     }
 
     @Override
@@ -221,6 +224,16 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
             return new ArrayList<>();
         }
         return listByIds(ids);
+    }
+
+    @Override
+    public List<Doc> listAvailableInIds(Collection<String> ids) {
+        List<Doc> docs = listInIds(ids);
+        return docs.stream().filter(this::isAvailable).collect(Collectors.toList());
+    }
+
+    private boolean isAvailable(Doc doc) {
+        return AVAILABLE_STATUS.contains(doc.getStatus());
     }
 
     private List<Doc> listByProjectIdAndPkgIdAndWeightGeOrLe(String projectId, String pkgId, Integer weight, boolean ge) {

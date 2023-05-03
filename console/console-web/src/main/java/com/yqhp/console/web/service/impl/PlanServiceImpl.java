@@ -202,12 +202,12 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DEVICES_NOT_FOUND);
         }
         List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        // listIn返回的结果乱序，重新排一下
-        List<Doc> planDocs = docService.listInIds(docIds).stream()
+        // listAvailableInIds返回的结果乱序，重新排一下
+        List<Doc> planDocs = docService.listAvailableInIds(docIds).stream()
                 .sorted(Comparator.comparingInt(doc -> docIds.indexOf(doc.getId())))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(planDocs)) {
-            throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DOCS_NOT_FOUND);
+            throw new ServiceException(ResponseCodeEnum.AVAILABLE_PLAN_DOCS_NOT_FOUND);
         }
 
         HashMap<String, List<Doc>> result = new HashMap<>();
@@ -228,7 +228,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             }
         }
 
-        List<Doc> initDocs = docService.listSortedByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
+        List<Doc> initDocs = docService.listSortedAndAvailableByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
         if (initDocs.isEmpty()) {
             return result;
         }

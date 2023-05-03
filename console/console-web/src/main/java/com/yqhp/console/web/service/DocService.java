@@ -30,7 +30,9 @@ public interface DocService extends IService<Doc> {
 
     List<Doc> listByProjectIdAndInPkgIds(String projectId, Collection<String> pkgIds);
 
-    List<Doc> listSortedByProjectIdAndKind(String projectId, DocKind type);
+    List<Doc> listSortedAndAvailableByProjectIdAndKind(String projectId, DocKind kind);
 
     List<Doc> listInIds(Collection<String> ids);
+
+    List<Doc> listAvailableInIds(Collection<String> ids);
 }

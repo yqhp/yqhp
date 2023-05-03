@@ -31,9 +31,9 @@ public class DocController {
         return docService.getDocById(id);
     }
 
-    @GetMapping("/sortedJshInit")
-    public List<Doc> listSortedJshInitDocByProjectId(@NotBlank(message = "projectId不能为空") String projectId) {
-        return docService.listSortedByProjectIdAndKind(projectId, DocKind.JSH_INIT);
+    @GetMapping("/init")
+    public List<Doc> listSortedAndAvailableByProjectIdAndKind(@NotBlank(message = "projectId不能为空") String projectId) {
+        return docService.listSortedAndAvailableByProjectIdAndKind(projectId, DocKind.JSH_INIT);
     }
 
     @PostMapping
