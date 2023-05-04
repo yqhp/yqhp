@@ -30,4 +30,8 @@ public class CurrentUser {
         }
         return authorities.stream().anyMatch(authority -> target.equals(authority.getAuthority()));
     }
+
+    public static boolean isAdmin() {
+        return hasAuthority("admin");
+    }
 }

@@ -23,9 +23,9 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    @GetMapping("/mine")
-    public List<Project> myProjects() {
-        return projectService.myProjects();
+    @GetMapping("/joined")
+    public List<Project> listJoined() {
+        return projectService.listJoined();
     }
 
     @PreAuthorize("hasAuthority('admin')")

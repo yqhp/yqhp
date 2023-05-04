@@ -23,5 +23,5 @@ public interface ProjectService extends IService<Project> {
 
     Project getProjectById(String projectId);
 
-    List<Project> myProjects();
+    List<Project> listJoined();
 }

@@ -32,7 +32,7 @@ public class FileServiceImpl implements FileService {
     public OSSFile uploadFile(MultipartFile file, boolean isTmpFile) {
         String filename = file.getOriginalFilename();
         String fileKey = fileKey(filename, isTmpFile);
-        log.info("[upload multipart file] {} -> {}", filename, fileKey);
+        log.info("[upload file] {} -> {}", filename, fileKey);
         minioTemplate.uploadMultipartFile(file, fileKey);
 
         OSSFile ossFile = new OSSFile();
@@ -55,7 +55,7 @@ public class FileServiceImpl implements FileService {
         String durableFileKey = LocalDate.now().format(YYYYMMDD_FORMATTER)
                 + key.substring(TMP_DIR.length());
         if (!minioTemplate.exists(durableFileKey)) {
-            log.info("copyFile {} -> {}", key, durableFileKey);
+            log.info("[copy file] {} -> {}", key, durableFileKey);
             minioTemplate.copyFile(key, durableFileKey);
         }
 
@@ -65,7 +65,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(String key) {
         if (StringUtils.hasText(key)) {
-            log.info("delete {}", key);
+            log.info("[delete file] {}", key);
             minioTemplate.deleteFile(key);
         }
     }

@@ -1,6 +1,7 @@
 package com.yqhp.console.web.service.impl;
 
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
@@ -8,17 +9,21 @@ import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreateDocParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdateDocParam;
+import com.yqhp.console.model.param.query.PkgTreeQuery;
 import com.yqhp.console.repository.entity.Doc;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.DocStatus;
+import com.yqhp.console.repository.enums.PkgType;
 import com.yqhp.console.repository.mapper.DocMapper;
 import com.yqhp.console.web.common.ResourceFlags;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.DocService;
+import com.yqhp.console.web.service.PkgService;
 import com.yqhp.console.web.service.PlanDocService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +31,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +48,9 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     private Snowflake snowflake;
     @Autowired
     private PlanDocService planDocService;
+    @Lazy
+    @Autowired
+    private PkgService pkgService;
 
     @Override
     public Doc createDoc(CreateDocParam createDocParam) {
@@ -206,16 +211,41 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         return list(query);
     }
 
+    /**
+     * doc的weight只能保证同一个目录有序
+     * 这个方法返回pkgTree从上往下排序的doc
+     */
     @Override
-    public List<Doc> listSortedAndAvailableByProjectIdAndKind(String projectId, DocKind kind) {
+    public List<Doc> listPkgTreeSortedAndAvailableByProjectIdAndKind(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(kind, "kind cannot be null");
+
+        PkgTreeQuery treeQuery = new PkgTreeQuery();
+        treeQuery.setProjectId(projectId);
+        treeQuery.setType(PkgType.DOC);
+        treeQuery.setParentId(PkgServiceImpl.ROOT_PID);
+        treeQuery.setListItem(true);
+        List<Tree<String>> pkgTree = pkgService.treeBy(treeQuery);
+        List<String> sortedIds = new ArrayList<>();
+        walk(pkgTree, sortedIds);
 
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
         query.eq(Doc::getProjectId, projectId);
         query.eq(Doc::getKind, kind);
-        query.orderByAsc(Doc::getWeight);
-        return list(query).stream().filter(this::isAvailable).collect(Collectors.toList());
+        return list(query).stream()
+                .filter(this::isAvailable)
+                .sorted(Comparator.comparingInt(doc -> sortedIds.indexOf(doc.getId())))
+                .collect(Collectors.toList());
+    }
+
+    private void walk(List<Tree<String>> trees, List<String> result) {
+        if (CollectionUtils.isEmpty(trees)) {
+            return;
+        }
+        for (Tree<String> tree : trees) {
+            result.add(tree.getId());
+            walk(tree.getChildren(), result);
+        }
     }
 
     @Override

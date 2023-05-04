@@ -228,7 +228,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             }
         }
 
-        List<Doc> initDocs = docService.listSortedAndAvailableByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
+        List<Doc> initDocs = docService.listPkgTreeSortedAndAvailableByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
         if (initDocs.isEmpty()) {
             return result;
         }

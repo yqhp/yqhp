@@ -151,15 +151,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public List<Project> myProjects() {
+    public List<Project> listJoined() {
         // admin返回所有项目
-        boolean isAdmin = CurrentUser.hasAuthority("admin");
-        if (isAdmin) return list();
+        boolean isAdmin = CurrentUser.isAdmin();
+        if (isAdmin) {
+            return list();
+        }
 
-        List<String> projectIds = userProjectService.
-                listProjectIdByUserId(CurrentUser.id());
-        return projectIds.isEmpty()
-                ? new ArrayList<>()
-                : listByIds(projectIds);
+        List<String> projectIds = userProjectService.listProjectIdByUserId(CurrentUser.id());
+        return projectIds.isEmpty() ? new ArrayList<>() : listByIds(projectIds);
     }
 }
