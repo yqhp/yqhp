@@ -17,7 +17,7 @@ public enum ResponseCodeEnum implements ResponseCode {
     USER_NOT_FOUND(1004, "用户不存在"),
     DUPLICATE_USER(1005, "用户名已存在"),
     OLD_PASSWORD_ERROR(1006, "旧密码错误"),
-    DEL_ADMIN_IS_NOT_ALLOWED(1007, "admin不允许删除"),
+    ADMIN_CANNOT_BE_DELETED(1007, "admin无法删除"),
     CHANGE_STATUS_FAIL(1008, "修改用户状态失败，请稍后重试"),
 
     SAVE_ROLE_FAIL(1100, "保存角色失败，请稍后重试"),

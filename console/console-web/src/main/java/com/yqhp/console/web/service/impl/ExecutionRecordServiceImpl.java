@@ -112,8 +112,9 @@ public class ExecutionRecordServiceImpl
         Assert.notNull(since, "since cannot be null");  // 考虑到查询性能问题，加上创建时间索引查询
         LambdaQueryWrapper<ExecutionRecord> query = new LambdaQueryWrapper<>();
         query.ge(ExecutionRecord::getCreateTime, since);
-        query.notIn(ExecutionRecord::getStatus, FINISHED_STATUS);
-        return list(query);
+        return list(query).stream()
+                .filter(record -> !isFinished(record))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -274,6 +275,10 @@ public class ExecutionRecordServiceImpl
             result.setStatus(pluginResult.getStatus());
         }
         return result;
+    }
+
+    private boolean isFinished(ExecutionRecord record) {
+        return FINISHED_STATUS.contains(record.getStatus());
     }
 
     private String getDeviceRedisKey(String deviceId) {

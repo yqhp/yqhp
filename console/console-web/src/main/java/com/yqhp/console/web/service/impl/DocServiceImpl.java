@@ -229,22 +229,20 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         List<String> sortedIds = new ArrayList<>();
         walk(pkgTree, sortedIds);
 
-        LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
-        query.eq(Doc::getProjectId, projectId);
-        query.eq(Doc::getKind, kind);
-        return list(query).stream()
+        return listByProjectId(projectId).stream()
+                .filter(doc -> kind.equals(doc.getKind()))
                 .filter(this::isAvailable)
                 .sorted(Comparator.comparingInt(doc -> sortedIds.indexOf(doc.getId())))
                 .collect(Collectors.toList());
     }
 
-    private void walk(List<Tree<String>> trees, List<String> result) {
+    private void walk(List<Tree<String>> trees, List<String> sortedIds) {
         if (CollectionUtils.isEmpty(trees)) {
             return;
         }
         for (Tree<String> tree : trees) {
-            result.add(tree.getId());
-            walk(tree.getChildren(), result);
+            sortedIds.add(tree.getId());
+            walk(tree.getChildren(), sortedIds);
         }
     }
 
@@ -267,21 +265,25 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     }
 
     private List<Doc> listByProjectIdAndPkgIdAndWeightGeOrLe(String projectId, String pkgId, Integer weight, boolean ge) {
-        LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
-        query.eq(Doc::getProjectId, projectId)
-                .eq(Doc::getPkgId, pkgId);
-        if (ge) {
-            query.ge(Doc::getWeight, weight);
-        } else {
-            query.le(Doc::getWeight, weight);
-        }
-        return list(query);
+        List<Doc> docs = listByProjectIdAndPkgId(projectId, pkgId);
+        return ge
+                ? docs.stream().filter(doc -> doc.getWeight() >= weight).collect(Collectors.toList())
+                : docs.stream().filter(doc -> doc.getWeight() <= weight).collect(Collectors.toList());
     }
 
     private List<Doc> listByProjectId(String projectId) {
         Assert.hasText(projectId, "projectId must has text");
         LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
         query.eq(Doc::getProjectId, projectId);
+        return list(query);
+    }
+
+    private List<Doc> listByProjectIdAndPkgId(String projectId, String pkgId) {
+        Assert.hasText(projectId, "projectId must has text");
+        Assert.hasText(pkgId, "pkgId must has text");
+        LambdaQueryWrapper<Doc> query = new LambdaQueryWrapper<>();
+        query.eq(Doc::getProjectId, projectId);
+        query.eq(Doc::getPkgId, pkgId);
         return list(query);
     }
 

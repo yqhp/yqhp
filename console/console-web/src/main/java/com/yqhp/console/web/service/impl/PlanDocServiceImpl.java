@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -127,23 +128,15 @@ public class PlanDocServiceImpl
 
     @Override
     public List<String> listEnabledAndSortedDocIdByPlanId(String planId) {
-        Assert.hasText(planId, "planId must has text");
-        LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
-        query.eq(PlanDoc::getPlanId, planId)
-                .eq(PlanDoc::getEnabled, 1)
-                .orderByAsc(PlanDoc::getWeight);
-        return list(query).stream()
-                .map(PlanDoc::getDocId)
-                .collect(Collectors.toList());
+        return listEnabledAndSortedByPlanId(planId).stream()
+                .map(PlanDoc::getDocId).collect(Collectors.toList());
     }
 
     @Override
     public List<PlanDoc> listSortedByPlanId(String planId) {
-        Assert.hasText(planId, "planId must has text");
-        LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
-        query.eq(PlanDoc::getPlanId, planId);
-        query.orderByAsc(PlanDoc::getWeight);
-        return list(query);
+        return listByPlanId(planId).stream()
+                .sorted(Comparator.comparing(PlanDoc::getWeight))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -185,20 +178,30 @@ public class PlanDocServiceImpl
         }
     }
 
-    private List<PlanDoc> listByPlanIdAndWeightGeOrLe(String planId, Integer weight, boolean ge) {
+    private List<PlanDoc> listEnabledAndSortedByPlanId(String planId) {
+        return listByPlanId(planId).stream()
+                .filter(planDoc -> planDoc.getEnabled() == 1)
+                .sorted(Comparator.comparing(PlanDoc::getWeight))
+                .collect(Collectors.toList());
+    }
+
+    private List<PlanDoc> listByPlanId(String planId) {
+        Assert.hasText(planId, "planId must has text");
         LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
         query.eq(PlanDoc::getPlanId, planId);
-        if (ge) {
-            query.ge(PlanDoc::getWeight, weight);
-        } else {
-            query.le(PlanDoc::getWeight, weight);
-        }
         return list(query);
     }
 
+    private List<PlanDoc> listByPlanIdAndWeightGeOrLe(String planId, Integer weight, boolean ge) {
+        List<PlanDoc> planDocs = listByPlanId(planId);
+        return ge
+                ? planDocs.stream().filter(planDoc -> planDoc.getWeight() >= weight).collect(Collectors.toList())
+                : planDocs.stream().filter(planDoc -> planDoc.getWeight() <= weight).collect(Collectors.toList());
+    }
+
     private int getMaxWeightByPlanId(String planId) {
-        List<PlanDoc> planDocs = listSortedByPlanId(planId);
-        PlanDoc maxWeightPlanDoc = CollectionUtils.lastElement(planDocs);
-        return maxWeightPlanDoc == null ? -1 : maxWeightPlanDoc.getWeight();
+        return listByPlanId(planId).stream()
+                .mapToInt(PlanDoc::getWeight)
+                .max().orElse(-1);
     }
 }

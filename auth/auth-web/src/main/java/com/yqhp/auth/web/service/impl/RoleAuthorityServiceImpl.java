@@ -11,6 +11,7 @@ import com.yqhp.auth.repository.mapper.RoleAuthorityMapper;
 import com.yqhp.auth.web.enums.ResponseCodeEnum;
 import com.yqhp.auth.web.service.RoleAuthorityService;
 import com.yqhp.common.web.exception.ServiceException;
+import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -91,6 +92,7 @@ public class RoleAuthorityServiceImpl
 
     @Override
     public List<RoleAuthority> listByRoleId(String roleId) {
+        Assert.hasText(roleId, "roleId must has text");
         LambdaQueryWrapper<RoleAuthority> query = new LambdaQueryWrapper<>();
         query.eq(RoleAuthority::getRoleId, roleId);
         return list(query);

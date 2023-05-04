@@ -13,6 +13,7 @@ import com.yqhp.console.web.enums.ResponseCodeEnum;
 import com.yqhp.console.web.service.ViewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -71,6 +72,7 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
 
     @Override
     public List<View> listByDocId(String docId) {
+        Assert.hasText(docId, "docId must has text");
         LambdaQueryWrapper<View> query = new LambdaQueryWrapper<>();
         query.eq(View::getDocId, docId);
         return list(query);

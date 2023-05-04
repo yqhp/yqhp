@@ -19,6 +19,7 @@ import com.yqhp.auth.web.enums.ResponseCodeEnum;
 import com.yqhp.auth.web.service.RoleService;
 import com.yqhp.auth.web.service.UserService;
 import com.yqhp.common.web.exception.ServiceException;
+import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,11 +71,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void deleteById(String userId) {
         User user = getUserById(userId);
-
         if ("admin".equals(user.getUsername())) {
-            throw new ServiceException(ResponseCodeEnum.DEL_ADMIN_IS_NOT_ALLOWED);
+            throw new ServiceException(ResponseCodeEnum.ADMIN_CANNOT_BE_DELETED);
         }
-
         if (!removeById(userId)) {
             throw new ServiceException(ResponseCodeEnum.DEL_USER_FAIL);
         }
@@ -83,11 +82,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User updateUser(String userId, UpdateUserParam updateUserParam) {
         User user = getUserById(userId);
-
         updateUserParam.update(user);
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
-
         if (!updateById(user)) {
             throw new ServiceException(ResponseCodeEnum.UPDATE_USER_FAIL);
         }
@@ -121,7 +118,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(encodePassword(password));
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
-
         if (!updateById(user)) {
             throw new ServiceException(ResponseCodeEnum.RESET_PASSWORD_FAIL);
         }
@@ -140,6 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User getByUsername(String username) {
+        Assert.hasText(username, "username must has text");
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getUsername, username);
         return getOne(query);
@@ -158,11 +155,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new ServiceException(ResponseCodeEnum.OLD_PASSWORD_ERROR);
         }
-
         if (oldPassword.equals(newPassword)) {
             return;
         }
-
         // 设置新密码
         resetPassword(user, newPassword);
     }

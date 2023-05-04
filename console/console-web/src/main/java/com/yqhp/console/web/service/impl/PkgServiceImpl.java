@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -244,22 +245,29 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     private List<Pkg> listByProjectIdAndTypeAndParentIdAndWeightGeOrLe(String projectId, PkgType type, String parentId, Integer weight, boolean ge) {
+        List<Pkg> pkgs = listByProjectIdAndTypeAndParentId(projectId, type, parentId);
+        return ge
+                ? pkgs.stream().filter(pkg -> pkg.getWeight() >= weight).collect(Collectors.toList())
+                : pkgs.stream().filter(pkg -> pkg.getWeight() <= weight).collect(Collectors.toList());
+    }
+
+    private List<Pkg> listByProjectIdAndTypeAndParentId(String projectId, PkgType type, String parentId) {
+        Assert.hasText(projectId, "projectId must has text");
+        Assert.notNull(type, "type cannot be null");
+        Assert.hasText(parentId, "parentId must has text");
         LambdaQueryWrapper<Pkg> query = new LambdaQueryWrapper<>();
-        query.eq(Pkg::getProjectId, projectId)
-                .eq(Pkg::getType, type)
-                .eq(Pkg::getParentId, parentId);
-        if (ge) {
-            query.ge(Pkg::getWeight, weight);
-        } else {
-            query.le(Pkg::getWeight, weight);
-        }
+        query.eq(Pkg::getProjectId, projectId);
+        query.eq(Pkg::getType, type);
+        query.eq(Pkg::getParentId, parentId);
         return list(query);
     }
 
     private List<Pkg> listByProjectIdAndType(String projectId, PkgType type) {
+        Assert.hasText(projectId, "projectId must has text");
+        Assert.notNull(type, "type cannot be null");
         LambdaQueryWrapper<Pkg> query = new LambdaQueryWrapper<>();
-        query.eq(Pkg::getProjectId, projectId)
-                .eq(Pkg::getType, type);
+        query.eq(Pkg::getProjectId, projectId);
+        query.eq(Pkg::getType, type);
         return list(query);
     }
 

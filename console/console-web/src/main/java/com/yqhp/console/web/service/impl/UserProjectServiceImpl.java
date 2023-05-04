@@ -15,6 +15,7 @@ import com.yqhp.console.web.service.UserProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -98,6 +99,7 @@ public class UserProjectServiceImpl
 
     @Override
     public List<UserProject> listByUserId(String userId) {
+        Assert.hasText(userId, "userId must has text");
         LambdaQueryWrapper<UserProject> query = new LambdaQueryWrapper<>();
         query.eq(UserProject::getUserId, userId);
         return list(query);

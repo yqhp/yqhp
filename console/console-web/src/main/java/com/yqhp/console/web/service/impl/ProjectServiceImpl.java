@@ -88,7 +88,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 d1.setName("默认导入");
                 d1.setContent(String.join("\n", JShellConst.DEFAULT_IMPORTS));
                 d1.setStatus(DocStatus.RELEASED);
-                d1.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
+                d1.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNDELETABLE);
                 docService.createDoc(d1);
 
                 CreateDocParam d2 = new CreateDocParam();
@@ -98,7 +98,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 d2.setName("Appium默认导入");
                 d2.setContent(String.join("\n", AppiumConst.DEFAULT_IMPORTS));
                 d2.setStatus(DocStatus.RELEASED);
-                d2.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNMOVABLE | ResourceFlags.UNDELETABLE);
+                d2.setFlags(ResourceFlags.UNRENAMABLE | ResourceFlags.UNDELETABLE);
                 docService.createDoc(d2);
             }
         }
@@ -153,8 +153,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public List<Project> listJoined() {
         // admin返回所有项目
-        boolean isAdmin = CurrentUser.isAdmin();
-        if (isAdmin) {
+        if (CurrentUser.isAdmin()) {
             return list();
         }
 
