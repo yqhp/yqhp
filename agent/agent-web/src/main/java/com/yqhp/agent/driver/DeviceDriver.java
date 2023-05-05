@@ -98,6 +98,7 @@ public abstract class DeviceDriver {
         AppiumServiceBuilder builder = new AppiumServiceBuilder()
                 .usingPort(port)
 //                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
+                .withArgument(GeneralServerFlag.SESSION_OVERRIDE, "")
                 .withArgument(GeneralServerFlag.LOG_TIMESTAMP, "")
                 .withArgument(GeneralServerFlag.LOCAL_TIMEZONE, "");
         String appiumJsPath = ApplicationContextUtils.getProperty("agent.appium.js-path");
