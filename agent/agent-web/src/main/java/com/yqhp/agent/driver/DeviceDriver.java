@@ -2,7 +2,7 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
-import com.yqhp.agent.jshell.Driver;
+import com.yqhp.agent.jshell.YQHP;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
@@ -59,8 +59,10 @@ public abstract class DeviceDriver {
         return device.getId();
     }
 
-    public void installApp(String url) throws IOException {
-        File app = FileUtils.downloadIfAbsent(url);
+    public void installApp(String uri) throws IOException {
+        File app = uri.startsWith("http")
+                ? FileUtils.downloadIfAbsent(uri)
+                : new File(uri);
         installApp(app);
     }
 
@@ -215,7 +217,7 @@ public abstract class DeviceDriver {
                 if (jshellContext == null) {
                     log.info("[{}]init jshell context...", device.getId());
                     jshellContext = new JShellContext();
-                    jshellContext.injectVar(new Driver(this));
+                    jshellContext.injectVar(new YQHP(this));
                     log.info("[{}]init jshell context completed", device.getId());
                 }
             }
