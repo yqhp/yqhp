@@ -10,6 +10,7 @@ import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.scrcpy.Scrcpy;
 import com.yqhp.common.commons.model.Size;
 import com.yqhp.console.repository.enums.ViewType;
+import io.appium.java_client.Setting;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.AutomationName;
@@ -96,7 +97,13 @@ public class AndroidDeviceDriver extends DeviceDriver {
             // appium默认会执行logcat，关闭logcat捕获提升性能
             capabilities.setCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE, true);
         }
-        return new AndroidDriver(appiumServiceURL, capabilities);
+
+        AndroidDriver androidDriver = new AndroidDriver(appiumServiceURL, capabilities);
+        // appium-uiautomator2-server在很多地方加了Device.waitForIdle()，默认10秒
+        // 导致设备在动态变化的时候很慢，如：点击，获取布局信息等
+        // 设置waitForIdle超时时间为0，可以加速执行速度
+        androidDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
+        return androidDriver;
     }
 
     public IDevice getIDevice() {
