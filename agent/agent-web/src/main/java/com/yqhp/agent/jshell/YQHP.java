@@ -1,5 +1,7 @@
 package com.yqhp.agent.jshell;
 
+import com.yqhp.agent.androidtools.AndroidUtils;
+import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellVar;
@@ -74,9 +76,18 @@ public class YQHP implements JShellVar {
 
     /**
      * @param uri url or filePath
+     * @since 0.0.1
      */
     @SneakyThrows
     public void installApp(String uri) {
         deviceDriver.installApp(uri);
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public String androidShell(String shellCommand) {
+        AndroidDevice device = (AndroidDevice) deviceDriver.getDevice();
+        return AndroidUtils.executeShellCommand(device.getIDevice(), shellCommand);
     }
 }

@@ -58,11 +58,9 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
 
-        String automationName = (String) capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME);
-        if (automationName == null) {
+        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
             // 默认XCuiTest
-            automationName = AutomationName.IOS_XCUI_TEST;
-            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, automationName);
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
             // 本地端口 -> 设备wda服务端口
             capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, LocalPortProvider.getAppiumIOSWdaAvailablePort());
         }

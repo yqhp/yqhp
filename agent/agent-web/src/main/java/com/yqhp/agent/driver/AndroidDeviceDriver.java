@@ -83,11 +83,13 @@ public class AndroidDeviceDriver extends DeviceDriver {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
 
-        String automationName = (String) capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME);
-        if (automationName == null) {
+        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
             // 默认uiautomator2
-            automationName = AutomationName.ANDROID_UIAUTOMATOR2;
-            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, automationName);
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
+        }
+
+        if (capabilities.getCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS) == null) {
+            capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         }
 
         // 本地端口 -> 设备uiautomator2/espresso服务端口

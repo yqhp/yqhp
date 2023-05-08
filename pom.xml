@@ -253,7 +253,7 @@
             <dependency>
                 <groupId>com.android.tools.ddms</groupId>
                 <artifactId>ddmlib</artifactId>
-                <version>30.3.1</version>
+                <version>31.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.plist</groupId>
@@ -370,9 +370,9 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <repository>
-            <id>maven-google</id>
-            <name>Google Repository</name>
-            <url>https://maven.google.com</url>
+            <id>maven-aliyun-google</id>
+            <name>Aliyun Google Repository</name>
+            <url>https://maven.aliyun.com/nexus/content/repositories/google</url>
         </repository>
     </repositories>
 
