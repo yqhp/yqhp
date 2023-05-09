@@ -11,7 +11,9 @@ public class AppiumConst {
             "import org.openqa.selenium.remote.RemoteWebDriver;",
             "import org.openqa.selenium.remote.DriverCommand;",
             "import org.openqa.selenium.*;",
+            "import org.openqa.selenium.interactions.*;",
+            "import io.appium.java_client.*;",
             "import io.appium.java_client.pagefactory.*;",
-            "import io.appium.java_client.*;"
+            "import io.appium.java_client.android.nativekey.AndroidKey;"
     );
 }
