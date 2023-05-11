@@ -17,6 +17,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jiangyitao
@@ -128,11 +129,22 @@ public class AppiumDriverWrapper {
     /**
      * @since 0.0.1
      */
-    public WebElement findQuietly(By by) {
+    public Optional<WebElement> findQuietly(By by) {
         try {
-            return driver.findElement(by);
-        } catch (NoSuchElementException e) {
-            return null;
+            return Optional.of(find(by));
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public Optional<WebElement> findQuietly(By by, Duration timeout) {
+        try {
+            return Optional.of(find(by, timeout));
+        } catch (TimeoutException e) {
+            return Optional.empty();
         }
     }
 

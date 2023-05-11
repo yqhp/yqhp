@@ -13,6 +13,8 @@ services:
     image: 'bitnami/zookeeper:3.6'
     ports:
       - '2181:2181'
+    volumes:
+      - ./zookeeper:/bitnami/zookeeper
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
 
@@ -20,6 +22,8 @@ services:
     image: 'bitnami/kafka:2.8.1'
     ports:
       - '9092:9092'
+    volumes:
+      - ./kafka:/bitnami/kafka
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
@@ -33,6 +37,8 @@ services:
     image: "bitnami/redis:6.2.10"
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis:/bitnami/redis/data
     restart: always
     environment:
       - REDIS_PASSWORD=yqhp@123..Aa88
@@ -55,7 +61,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - ./minio/data:/data
+      - ./minio:/data
     environment:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=yqhp@123..Aa88

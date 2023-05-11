@@ -10,9 +10,9 @@ import lombok.Getter;
 @Getter
 public enum DeviceStatus implements BaseEnum<Integer> {
 
-    OFFLINE(0),
     IDLE(1),
-    BUSY(2);
+    BUSY(2),
+    OFFLINE(3);
 
     @JsonValue
     private final Integer value;
