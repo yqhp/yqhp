@@ -46,7 +46,7 @@ public enum ResponseCodeEnum implements ResponseCode {
     UPDATE_PKG_FAIL(2402, "更新目录失败，请稍后重试"),
     PKG_NOT_FOUND(2403, "目录不存在"),
     DUPLICATE_PKG(2404, "目录已存在"),
-    PKG_DOCS_NOT_EMPTY(2405, "目录下文档不为空"),
+    PKG_DOCS_NOT_EMPTY(2405, "目录下Doc不为空"),
     PKG_UNDELETABLE(2410, "无法删除的目录"),
     PKG_UNMOVABLE(2411, "无法移动的目录"),
     PKG_UNRENAMABLE(2412, "无法重命名的目录"),

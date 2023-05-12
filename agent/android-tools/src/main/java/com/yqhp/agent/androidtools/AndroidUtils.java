@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class AndroidUtils {
 
     public static void installApp(IDevice iDevice, File apkFile) {
-        installApp(iDevice, apkFile, true, "-g");
+        installApp(iDevice, apkFile, true);
     }
 
     public static void installApp(IDevice iDevice, File apkFile, boolean reinstall, String... extraArgs) {

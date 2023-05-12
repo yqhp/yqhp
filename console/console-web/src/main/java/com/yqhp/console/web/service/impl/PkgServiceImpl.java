@@ -83,7 +83,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         pkgIds.add(id);
 
         if (PkgType.DOC.equals(pkg.getType())) {
-            // 检查目录下是否有文档
+            // 检查目录下是否有Doc
             List<Doc> docs = docService.listByProjectIdAndInPkgIds(pkg.getProjectId(), pkgIds);
             if (!docs.isEmpty()) {
                 throw new ServiceException(ResponseCodeEnum.PKG_DOCS_NOT_EMPTY);

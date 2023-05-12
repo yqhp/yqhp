@@ -24,7 +24,7 @@ public class ViewController {
     private ViewService viewService;
 
     @GetMapping
-    public List<View> listByDocId(@NotBlank(message = "文档不能为空") String docId) {
+    public List<View> listByDocId(@NotBlank(message = "docId不能为空") String docId) {
         return viewService.listByDocId(docId);
     }
 
