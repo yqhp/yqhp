@@ -5,7 +5,7 @@ import com.yqhp.console.repository.entity.View;
 
 /**
  * <p>
- * 视图资源 Mapper 接口
+ * 视图 Mapper 接口
  * </p>
  *
  * @author mybatis-plus generator

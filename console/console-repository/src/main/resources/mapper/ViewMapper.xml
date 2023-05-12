@@ -10,9 +10,8 @@
         <result column="type" property="type" />
         <result column="source" property="source" />
         <result column="img_url" property="imgUrl" />
-        <result column="img_height" property="imgHeight" />
-        <result column="img_width" property="imgWidth" />
-        <result column="screen_orientation" property="screenOrientation" />
+        <result column="height" property="height" />
+        <result column="width" property="width" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />

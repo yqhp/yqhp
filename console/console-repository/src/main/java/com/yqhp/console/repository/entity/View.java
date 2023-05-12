@@ -1,7 +1,6 @@
 package com.yqhp.console.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.yqhp.console.repository.enums.ScreenOrientation;
 import com.yqhp.console.repository.enums.ViewType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,9 +26,6 @@ public class View implements Serializable {
 
     private String docId;
 
-    /**
-     * 设备id
-     */
     private String deviceId;
 
     private ViewType type;
@@ -38,17 +34,9 @@ public class View implements Serializable {
 
     private String imgUrl;
 
-    /**
-     * 图片高
-     */
-    private Integer imgHeight;
+    private Integer height;
 
-    /**
-     * 图片宽
-     */
-    private Integer imgWidth;
-
-    private ScreenOrientation screenOrientation;
+    private Integer width;
 
     /**
      * 创建时间

@@ -36,10 +36,10 @@ public enum ResponseCodeEnum implements ResponseCode {
     DOC_UNRENAMABLE(1707, "无法重命名的Doc"),
     DOC_UNUPDATABLE(1709, "无法更新的Doc"),
 
-    SAVE_VIEW_RESOURCE_FAIL(2100, "保存视图资源失败，请稍后重试"),
-    DEL_VIEW_RESOURCE_FAIL(2101, "删除视图资源失败，请稍后重试"),
-    UPDATE_VIEW_RESOURCE_FAIL(2102, "更新视图资源失败，请稍后重试"),
-    VIEW_RESOURCE_NOT_FOUND(2103, "视图资源不存在"),
+    SAVE_VIEW_FAIL(2100, "保存View失败，请稍后重试"),
+    DEL_VIEW_FAIL(2101, "删除View失败，请稍后重试"),
+    UPDATE_VIEW_FAIL(2102, "更新View失败，请稍后重试"),
+    VIEW_NOT_FOUND(2103, "View不存在"),
 
     SAVE_PKG_FAIL(2400, "保存目录失败，请稍后重试"),
     DEL_PKG_FAIL(2401, "删除目录失败，请稍后重试"),
