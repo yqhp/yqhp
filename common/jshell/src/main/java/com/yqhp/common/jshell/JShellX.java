@@ -1,6 +1,7 @@
 package com.yqhp.common.jshell;
 
 import jdk.jshell.*;
+import jdk.jshell.execution.LocalExecutionControlProvider;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,7 +31,7 @@ public class JShellX implements Closeable {
         this.jShell = JShell.builder()
 //                .out(os)
 //                .err(os)
-                .executionEngine(new LocalXExecutionControlProvider(), new HashMap<>())
+                .executionEngine(new LocalExecutionControlProvider(), new HashMap<>())
                 .build();
         codeAnalysis = jShell.sourceCodeAnalysis();
     }
@@ -188,13 +189,16 @@ public class JShellX implements Closeable {
         toDisplay.add(sb.toString());
     }
 
-    public List<String> suggestions(String input) {
-        if (StringUtils.isBlank(input)) {
+    public List<String> suggestions(SuggestionsRequest request) {
+        if (request == null || StringUtils.isBlank(request.getInput())) {
             return new ArrayList<>();
         }
 
+        int cursor = request.getCursor() == null
+                ? request.getInput().length()
+                : request.getCursor();
         List<Suggestion> suggestions = codeAnalysis
-                .completionSuggestions(input, input.length(), new int[]{-1});
+                .completionSuggestions(request.getInput(), cursor, new int[]{-1});
         return suggestions.stream()
                 .filter(Suggestion::matchesType)
                 .map(Suggestion::continuation)
@@ -202,16 +206,20 @@ public class JShellX implements Closeable {
                 .collect(Collectors.toList());
     }
 
-    public List<String> documentation(String input) {
-        if (StringUtils.isBlank(input)) {
+    public List<DocumentationResponse> documentation(DocumentationRequest request) {
+        if (request == null || StringUtils.isBlank(request.getInput())) {
             return new ArrayList<>();
         }
 
-        return codeAnalysis.documentation(input, input.length(), true).stream()
+        int cursor = request.getCursor() == null
+                ? request.getInput().length()
+                : request.getCursor();
+        return codeAnalysis.documentation(request.getInput(), cursor, request.isComputeJavadoc()).stream()
                 .map(doc -> {
-                    String signature = doc.signature();
-                    String javadoc = doc.javadoc();
-                    return StringUtils.isBlank(javadoc) ? signature : signature + '\n' + javadoc;
+                    DocumentationResponse response = new DocumentationResponse();
+                    response.setSignature(doc.signature());
+                    response.setDoc(doc.javadoc());
+                    return response;
                 }).collect(Collectors.toList());
     }
 }
