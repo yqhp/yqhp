@@ -1,6 +1,7 @@
 package com.yqhp.common.jshell;
 
 import jdk.jshell.JShell;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author jiangyitao
  */
+@Slf4j
 public class JShellBridge {
     // com.yqhp.common.jshell.JShellBridge
     private static final String JSHELL_BRIDGE_CLASS_FULL_NAME = JShellBridge.class.getName();
@@ -39,16 +41,22 @@ public class JShellBridge {
         if (vars == null) {
             throw new IllegalArgumentException("bridgeId=" + bridgeId + " not exists");
         }
-        vars.put(varName, var);
 
-        String varTypeName = var.getClass().getTypeName();
-        String toEval = String.format("%s %s = (%s) %s.getVar(%s, \"%s\");",
-                varTypeName, varName, varTypeName, JSHELL_BRIDGE_CLASS_FULL_NAME, bridgeId, varName);
+        String varTypeName = var.getClass().getTypeName(); // eg. com.yqhp.agent.jshell.YQHP
+        vars.put(varTypeName, var);
+        String toEval = "import " + varTypeName + ";";
+        log.info("[inject]{}", toEval);
+        jshell.eval(toEval);
+
+        String varTypeSimpleName = var.getClass().getSimpleName(); // eg. YQHP
+        toEval = String.format("%s %s = (%s) %s.getVar(%s, \"%s\");",
+                varTypeSimpleName, varName, varTypeSimpleName, JSHELL_BRIDGE_CLASS_FULL_NAME, bridgeId, varTypeName);
+        log.info("[inject]{}", toEval);
         jshell.eval(toEval);
     }
 
-    public static Object getVar(Integer bridgeId, String varName) {
+    public static Object getVar(Integer bridgeId, String varTypeName) {
         Map<String, Object> vars = VARS_CONTAINER.get(bridgeId);
-        return vars == null ? null : vars.get(varName);
+        return vars == null ? null : vars.get(varTypeName);
     }
 }

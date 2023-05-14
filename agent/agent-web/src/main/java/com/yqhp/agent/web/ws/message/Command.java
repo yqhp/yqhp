@@ -12,5 +12,4 @@ public enum Command {
     JSHELL_LOAD_PLUGIN,
     JSHELL_EVAL,
     JSHELL_SUGGESTIONS,
-    JSHELL_DOCUMENTATION,
 }

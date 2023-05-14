@@ -5,7 +5,10 @@ import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.jshell.YQHP;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
-import com.yqhp.common.jshell.*;
+import com.yqhp.common.jshell.CompletionItem;
+import com.yqhp.common.jshell.JShellContext;
+import com.yqhp.common.jshell.JShellEvalResult;
+import com.yqhp.common.jshell.TriggerSuggestRequest;
 import com.yqhp.common.web.util.ApplicationContextUtils;
 import com.yqhp.console.repository.enums.ViewType;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
@@ -240,12 +243,8 @@ public abstract class DeviceDriver {
         return getOrCreateJShellContext().getJShellX().analysisAndEval(input, consumer);
     }
 
-    public List<String> jshellSuggestions(SuggestionsRequest req) {
-        return getOrCreateJShellContext().getJShellX().suggestions(req);
-    }
-
-    public List<DocumentationResponse> jshellDocumentation(DocumentationRequest req) {
-        return getOrCreateJShellContext().getJShellX().documentation(req);
+    public List<CompletionItem> jshellSuggestions(TriggerSuggestRequest request) {
+        return getOrCreateJShellContext().getJShellX().getSuggestions(request);
     }
 
     private static final PluginService PLUGIN_SERVICE = ApplicationContextUtils.getBean(PluginService.class);

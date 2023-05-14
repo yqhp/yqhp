@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static jdk.jshell.SourceCodeAnalysis.*;
@@ -189,37 +188,35 @@ public class JShellX implements Closeable {
         toDisplay.add(sb.toString());
     }
 
-    public List<String> suggestions(SuggestionsRequest request) {
-        if (request == null || StringUtils.isBlank(request.getInput())) {
+    public List<CompletionItem> getSuggestions(TriggerSuggestRequest request) {
+        String input = request.getInput();
+        if (StringUtils.isBlank(input)) {
             return new ArrayList<>();
         }
+        int cursor = request.getCursor() == null ? input.length() : request.getCursor();
 
-        int cursor = request.getCursor() == null
-                ? request.getInput().length()
-                : request.getCursor();
-        List<Suggestion> suggestions = codeAnalysis
-                .completionSuggestions(request.getInput(), cursor, new int[]{-1});
-        return suggestions.stream()
+        List<String> suggestions = codeAnalysis
+                .completionSuggestions(input, cursor, new int[]{-1}).stream()
                 .filter(Suggestion::matchesType)
                 .map(Suggestion::continuation)
                 .distinct()
-                .collect(Collectors.toList());
-    }
-
-    public List<DocumentationResponse> documentation(DocumentationRequest request) {
-        if (request == null || StringUtils.isBlank(request.getInput())) {
-            return new ArrayList<>();
+                .collect(toList());
+        if (suggestions.size() == 0) {
+            List<Documentation> docs = codeAnalysis.documentation(input, cursor, false);
+            return docs.stream().map(doc -> {
+                CompletionItem item = new CompletionItem();
+                item.setLabel(doc.signature());
+                item.setInsertText("");
+                return item;
+            }).collect(toList());
+        } else if (suggestions.size() < 200) {
+            return suggestions.stream().map(suggestion -> {
+                CompletionItem item = new CompletionItem();
+                item.setLabel(suggestion);
+                item.setInsertText(suggestion);
+                return item;
+            }).collect(toList());
         }
-
-        int cursor = request.getCursor() == null
-                ? request.getInput().length()
-                : request.getCursor();
-        return codeAnalysis.documentation(request.getInput(), cursor, request.isComputeJavadoc()).stream()
-                .map(doc -> {
-                    DocumentationResponse response = new DocumentationResponse();
-                    response.setSignature(doc.signature());
-                    response.setDoc(doc.javadoc());
-                    return response;
-                }).collect(Collectors.toList());
+        return new ArrayList<>();
     }
 }

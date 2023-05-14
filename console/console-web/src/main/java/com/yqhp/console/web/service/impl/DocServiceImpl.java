@@ -80,6 +80,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         CreateDocParam to = new CreateDocParam();
         BeanUtils.copyProperties(from, to);
         to.setName(from.getName() + "_" + System.currentTimeMillis());
+        to.setFlags(null);
         return createDoc(to);
     }
 

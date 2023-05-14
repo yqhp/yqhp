@@ -3,8 +3,7 @@ package com.yqhp.plugin.appium;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.ios.IOSDriver;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.Validate;
@@ -30,6 +29,34 @@ public class AppiumDriverWrapper {
     public AppiumDriverWrapper(AppiumDriver driver) {
         Validate.notNull(driver, "driver cannot be null");
         this.driver = driver;
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public boolean isAndroid() {
+        return driver instanceof AndroidDriver;
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public boolean isIOS() {
+        return driver instanceof IOSDriver;
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public AndroidDriver androidDriver() {
+        return (AndroidDriver) driver;
+    }
+
+    /**
+     * @since 0.0.1
+     */
+    public IOSDriver iOSDriver() {
+        return (IOSDriver) driver;
     }
 
     /**
@@ -171,14 +198,6 @@ public class AppiumDriverWrapper {
         int x = rect.x + rect.width / 2;
         int y = rect.y + rect.height / 2;
         return new Point(x, y);
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public AppiumDriverWrapper pressKey(AndroidKey key) {
-        ((AndroidDriver) driver).pressKey(new KeyEvent(key));
-        return this;
     }
 
     /**
