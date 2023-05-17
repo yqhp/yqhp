@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * 为了减轻调用方负担，这里对外提供的api，都不抛受检异常，使用@SneakyThrows自动抛出非受检异常
+ *
  * @author jiangyitao
  */
 public class AppiumDriverWrapper {

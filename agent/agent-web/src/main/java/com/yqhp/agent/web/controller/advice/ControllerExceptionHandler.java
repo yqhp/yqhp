@@ -48,7 +48,7 @@ public class ControllerExceptionHandler {
 
         log.error("unexpected exception", e);
 
-        return new Response<>(ResponseCodeEnum.INTERNAL_SERVER_ERROR);
+        return new Response<>(ResponseCodeEnum.INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
     }
 
     @ResponseBody
