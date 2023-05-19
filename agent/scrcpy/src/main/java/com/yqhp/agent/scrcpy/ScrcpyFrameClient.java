@@ -27,7 +27,7 @@ public class ScrcpyFrameClient {
     private ScrcpyOptions scrcpyOptions;
     private int localPort;
 
-    private final ByteBuffer readBuffer = ByteBuffer.allocate(1024 * 1024 * 2);
+    private ByteBuffer readBuffer;
     private SocketChannel socketChannel;
 
     ScrcpyFrameClient(IDevice iDevice) {
@@ -69,6 +69,7 @@ public class ScrcpyFrameClient {
     }
 
     void disconnect() {
+        readBuffer = null;
         if (socketChannel != null) {
             try {
                 log.info("[{}]close frame socket channel", iDevice.getSerialNumber());
@@ -111,8 +112,17 @@ public class ScrcpyFrameClient {
     }
 
     public ByteBuffer read() throws IOException {
+        if (readBuffer == null) {
+            // 为了降低闲置时的内存消耗，只有read的时候才去创建buffer，disconnect时将readBuffer置null，使readBuffer可以被回收
+            readBuffer = ByteBuffer.allocate(2 * 1024 * 1024);
+        }
         readBuffer.clear();
         socketChannel.read(readBuffer);
-        return ByteBuffer.wrap(readBuffer.array(), 0, readBuffer.position());
+        byte[] arr = readBuffer.array();
+        boolean isNalu = (arr[0] == 0 && arr[1] == 0 && arr[2] == 0 && arr[3] == 1)
+                || (arr[0] == 0 && arr[1] == 0 && arr[2] == 1);
+        return isNalu
+                ? ByteBuffer.wrap(readBuffer.array(), 0, readBuffer.position())
+                : null;
     }
 }

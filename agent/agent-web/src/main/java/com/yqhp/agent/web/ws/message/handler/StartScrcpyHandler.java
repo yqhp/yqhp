@@ -80,7 +80,7 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
                 log.info("[{}]start reading frames", deviceDriver.getDeviceId());
                 while (session.isOpen()) {
                     ByteBuffer frame = scrcpyFrameClient.read();
-                    blockingQueue.put(frame);
+                    if (frame != null) blockingQueue.put(frame);
                 }
                 log.info("[{}]stop reading frames", deviceDriver.getDeviceId());
             } catch (Throwable cause) {
