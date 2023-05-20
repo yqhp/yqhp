@@ -33,6 +33,15 @@ public class YQHP implements JShellVar {
     }
 
     /**
+     * 异步任务，统一使用该方法执行
+     *
+     * @since 0.0.1
+     */
+    public void runAsync(Runnable runnable) {
+        deviceDriver.runAsync(runnable);
+    }
+
+    /**
      * @since 0.0.1
      */
     public AppiumDriver appiumDriver() {
@@ -84,6 +93,9 @@ public class YQHP implements JShellVar {
     }
 
     /**
+     * 在android设备内执行shell命令
+     * 注意: 这是在设备内部执行的命令，所以不需要加"adb shell"
+     *
      * @since 0.0.1
      */
     public String androidShell(String shellCommand) {

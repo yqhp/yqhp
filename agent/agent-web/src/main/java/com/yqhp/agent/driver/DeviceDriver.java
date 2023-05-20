@@ -52,6 +52,7 @@ public abstract class DeviceDriver {
     private OutputStream appiumLogOutput;
 
     private volatile JShellContext jshellContext;
+    private volatile ThreadGroup threadGroup;
 
     public DeviceDriver(Device device) {
         this.device = device;
@@ -215,7 +216,7 @@ public abstract class DeviceDriver {
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
-            synchronized (DeviceDriver.class) {
+            synchronized (this) {
                 if (jshellContext == null) {
                     log.info("[{}]init jshell context...", device.getId());
                     jshellContext = new JShellContext();
@@ -277,6 +278,31 @@ public abstract class DeviceDriver {
         }
     }
 
+    public synchronized ThreadGroup getOrCreateThreadGroup() {
+        if (threadGroup == null) {
+            log.info("[{}]init thread group...", device.getId());
+            threadGroup = new ThreadGroup("thread-group-device-" + device.getId());
+            log.info("[{}]init thread group completed", device.getId());
+        }
+        return threadGroup;
+    }
+
+    /**
+     * 统一使用该方法执行异步任务。这样的好处是，stopThreadGroup可以立即停止正在执行的任务。避免出现死循环永远无法停止的情况
+     */
+    public void runAsync(Runnable runnable) {
+        Thread thread = new Thread(getOrCreateThreadGroup(), runnable);
+        thread.start();
+    }
+
+    public synchronized void stopThreadGroup() {
+        if (threadGroup != null) {
+            log.info("[{}]stop thread group", device.getId());
+            threadGroup.stop();
+            threadGroup = null;
+        }
+    }
+
     public void release() {
         stopReceiveDeviceLog();
         stopReceiveAppiumLog();
@@ -284,5 +310,6 @@ public abstract class DeviceDriver {
         stopAppiumService();
         capabilities = null;
         closeJShellContext();
+        stopThreadGroup();
     }
 }

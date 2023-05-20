@@ -38,6 +38,9 @@ public class JShellX implements Closeable {
     @Override
     public void close() {
         codeAnalysis = null;
+        // LocalExecutionControl提供的stop方法，可以立即停止当前jshell实例正在执行的线程
+        // 如: jshell执行了一个死循环代码，如果不调用stop，死循环会一直执行
+        jShell.stop();
         jShell.close();
     }
 
