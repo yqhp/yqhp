@@ -15,7 +15,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 为了减轻调用方负担，这里对外提供的api，都不抛受检异常，使用@SneakyThrows自动抛出非受检异常
@@ -163,22 +162,22 @@ public class AppiumDriverWrapper {
     /**
      * @since 0.0.1
      */
-    public Optional<WebElement> findQuietly(By by) {
+    public WebElement findQuietly(By by) {
         try {
-            return Optional.of(find(by));
+            return find(by);
         } catch (NoSuchElementException | StaleElementReferenceException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
     /**
      * @since 0.0.1
      */
-    public Optional<WebElement> findQuietly(By by, Duration timeout) {
+    public WebElement findQuietly(By by, Duration timeout) {
         try {
-            return Optional.of(find(by, timeout));
+            return find(by, timeout);
         } catch (TimeoutException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
