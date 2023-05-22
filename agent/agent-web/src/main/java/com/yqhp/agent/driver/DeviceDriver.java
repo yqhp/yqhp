@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -48,7 +49,6 @@ public abstract class DeviceDriver {
     @Getter
     private AppiumDriver appiumDriver;
     private AppiumDriverLocalService appiumService;
-    private ByteArrayOutputStream appiumLogBuffer;
     private OutputStream appiumLogOutput;
 
     private volatile JShellContext jshellContext;
@@ -102,10 +102,13 @@ public abstract class DeviceDriver {
         int port = LocalPortProvider.getAppiumServiceAvailablePort();
         AppiumServiceBuilder builder = new AppiumServiceBuilder()
                 .usingPort(port)
+                .withIPAddress("127.0.0.1")
+                .withTimeout(Duration.ofMinutes(1))
+                .withArgument(GeneralServerFlag.RELAXED_SECURITY)
+                .withArgument(GeneralServerFlag.SESSION_OVERRIDE)
+                .withArgument(GeneralServerFlag.LOG_TIMESTAMP)
+                .withArgument(GeneralServerFlag.LOCAL_TIMEZONE);
 //                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
-                .withArgument(GeneralServerFlag.SESSION_OVERRIDE, "")
-                .withArgument(GeneralServerFlag.LOG_TIMESTAMP, "")
-                .withArgument(GeneralServerFlag.LOCAL_TIMEZONE, "");
         String appiumJsPath = ApplicationContextUtils.getProperty("agent.appium.js-path");
         if (StringUtils.isNotBlank(appiumJsPath)) {
             builder.withAppiumJS(new File(appiumJsPath));
@@ -119,8 +122,12 @@ public abstract class DeviceDriver {
 
     public synchronized void stopAppiumService() {
         if (appiumServiceIsRunning()) {
-            log.info("[{}]stop appium service", device.getId());
+            log.info("[{}]stop appium service...1", device.getId());
             appiumService.stop();
+            if (appiumServiceIsRunning()) {
+                log.info("[{}]stop appium service...2", device.getId());
+                appiumService.stop();
+            }
             appiumService = null;
         }
     }
@@ -135,15 +142,16 @@ public abstract class DeviceDriver {
         }
 
         log.info("[{}]receive appium log", device.getId());
-        appiumLogBuffer = new ByteArrayOutputStream();
         appiumLogOutput = new OutputStream() {
+
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
             @Override
             public void write(int c) {
+                bos.write(c);
                 if (c == '\n') {
-                    consumer.accept(appiumLogBuffer.toString());
-                    appiumLogBuffer.reset();
-                } else {
-                    appiumLogBuffer.write(c);
+                    consumer.accept(bos.toString());
+                    bos.reset();
                 }
             }
         };
@@ -162,12 +170,6 @@ public abstract class DeviceDriver {
                 log.error("close appiumLogOutput err", e);
             }
             appiumLogOutput = null;
-            try {
-                appiumLogBuffer.close();
-            } catch (IOException e) {
-                log.error("close appiumLogBuffer err", e);
-            }
-            appiumLogBuffer = null;
         }
     }
 

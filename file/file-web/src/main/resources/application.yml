@@ -24,6 +24,7 @@ spring:
 
 oss:
   minio:
+    public-endpoint:
     endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
     bucket: yqhp
     accessKey: ${MINIO_ACCESS_KEY:yqhp}

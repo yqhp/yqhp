@@ -4,6 +4,7 @@ import com.yqhp.common.minio.config.MinioProperties;
 import com.yqhp.common.minio.exception.MinioException;
 import io.minio.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -18,11 +19,13 @@ import java.io.IOException;
 public class MinioTemplate {
 
     private final MinioClient minioClient;
+    private final String publicEndpoint;
     private final String endpoint;
     private final String bucket;
 
     public MinioTemplate(MinioClient minioClient, MinioProperties minioProperties) {
         this.minioClient = minioClient;
+        this.publicEndpoint = minioProperties.getPublicEndpoint();
         this.endpoint = minioProperties.getEndpoint();
         this.bucket = minioProperties.getBucket();
     }
@@ -147,7 +150,8 @@ public class MinioTemplate {
      * 需要bucket Access Policy设置为public
      */
     public String getFileUrl(String fileKey) {
-        return endpoint + "/" + bucket + "/" + fileKey;
+        return (StringUtils.hasText(publicEndpoint) ? publicEndpoint : endpoint)
+                + "/" + bucket + "/" + fileKey;
     }
 
     public String getPresignedObjectUrl(GetPresignedObjectUrlArgs args) {
