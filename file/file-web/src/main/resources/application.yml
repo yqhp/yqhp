@@ -24,8 +24,14 @@ spring:
 
 oss:
   minio:
-    public-endpoint:
+    public-endpoint: ${MINIO_PUBLIC_ENDPOINT}
     endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
-    bucket: yqhp
+    bucket: ${MINIO_BUCKET:yqhp}
     accessKey: ${MINIO_ACCESS_KEY:yqhp}
     secretKey: ${MINIO_SECRET_KEY:yqhp@123..Aa88}
+
+logging:
+  level:
+    root: info
+  file:
+    name: ${user.home}/yqhp/logs/${spring.application.name}.log

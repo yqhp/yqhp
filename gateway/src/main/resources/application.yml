@@ -47,3 +47,9 @@ spring:
 
 gw:
   hello: world
+
+logging:
+  level:
+    root: info
+  file:
+    name: ${user.home}/yqhp/logs/${spring.application.name}.log

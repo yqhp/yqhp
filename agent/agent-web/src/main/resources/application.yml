@@ -31,8 +31,8 @@ zk:
   addr: ${ZK_ADDR:127.0.0.1:2181}
 
 agent:
-  baseDir: '@project.basedir@'
-  version: '@project.version@'
+  baseDir: @project.basedir@
+  version: @project.version@
   android:
     enabled: true
     adb-path:
@@ -56,3 +56,8 @@ agent:
   plugin:
     base-dir: ${agent.baseDir}/vendor/plugins
 
+logging:
+  level:
+    root: info
+  file:
+    name: ${user.home}/yqhp/logs/${spring.application.name}.log

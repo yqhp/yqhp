@@ -55,3 +55,9 @@ mybatis-plus:
 #  d for days
 token:
   expire: 365d
+
+logging:
+  level:
+    root: info
+  file:
+    name: ${user.home}/yqhp/logs/${spring.application.name}.log
