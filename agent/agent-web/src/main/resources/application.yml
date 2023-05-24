@@ -31,13 +31,13 @@ zk:
   addr: ${ZK_ADDR:127.0.0.1:2181}
 
 agent:
-  baseDir: @project.basedir@
   version: @project.version@
+  download-dir: ${user.home}/yqhp/agent/download
   android:
     enabled: true
     adb-path:
     scrcpy-version: 1.25
-    scrcpy-server-path: ${agent.baseDir}/vendor/scrcpy/scrcpy-server-v1.25
+    scrcpy-server-path: ${user.home}/yqhp/agent/vendor/scrcpy/scrcpy-server-v1.25
   iOS:
     realDevice:
       enabled: false
@@ -54,10 +54,10 @@ agent:
   appium:
     js-path:
   plugin:
-    base-dir: ${agent.baseDir}/vendor/plugins
+    base-dir: ${agent.download-dir}/plugins
 
 logging:
   level:
     root: info
   file:
-    name: ${user.home}/yqhp/logs/${spring.application.name}.log
+    name: ${user.home}/yqhp/agent/logs/${spring.application.name}.log

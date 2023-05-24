@@ -3,6 +3,7 @@ package com.yqhp.agent.jshell;
 import com.yqhp.agent.androidtools.AndroidUtils;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellVar;
 import io.appium.java_client.AppiumDriver;
@@ -70,7 +71,7 @@ public class YQHP implements JShellVar {
      */
     @SneakyThrows
     public File downloadFile(String url, String filename) {
-        return FileUtils.downloadIfAbsent(url, filename);
+        return FileUtils.downloadIfAbsent(url, filename, new File(Properties.getDownloadDir()));
     }
 
     /**
@@ -80,7 +81,7 @@ public class YQHP implements JShellVar {
      */
     @SneakyThrows
     public File downloadFile(String url) {
-        return FileUtils.downloadIfAbsent(url);
+        return FileUtils.downloadIfAbsent(url, new File(Properties.getDownloadDir()));
     }
 
     /**

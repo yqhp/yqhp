@@ -3,6 +3,7 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.jshell.YQHP;
+import com.yqhp.agent.web.config.Properties;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.CompletionItem;
@@ -14,6 +15,7 @@ import com.yqhp.console.repository.enums.ViewType;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.remote.SupportsContextSwitching;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
@@ -22,7 +24,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -64,7 +65,7 @@ public abstract class DeviceDriver {
 
     public void installApp(String uri) throws IOException {
         File app = uri.startsWith("http")
-                ? FileUtils.downloadIfAbsent(uri)
+                ? FileUtils.downloadIfAbsent(uri, new File(Properties.getDownloadDir()))
                 : new File(uri);
         installApp(app);
     }
@@ -74,8 +75,7 @@ public abstract class DeviceDriver {
     protected abstract ViewType viewType();
 
     public boolean isNativeContext() {
-        String context = (String) getOrCreateAppiumDriver()
-                .execute(DriverCommand.GET_CURRENT_CONTEXT_HANDLE).getValue();
+        String context = ((SupportsContextSwitching) getOrCreateAppiumDriver()).getContext();
         return "NATIVE_APP".equals(context);
     }
 
@@ -109,7 +109,7 @@ public abstract class DeviceDriver {
                 .withArgument(GeneralServerFlag.LOG_TIMESTAMP)
                 .withArgument(GeneralServerFlag.LOCAL_TIMEZONE);
 //                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
-        String appiumJsPath = ApplicationContextUtils.getProperty("agent.appium.js-path");
+        String appiumJsPath = Properties.getAppiumJsPath();
         if (StringUtils.isNotBlank(appiumJsPath)) {
             builder.withAppiumJS(new File(appiumJsPath));
         }

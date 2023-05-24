@@ -6,9 +6,9 @@ import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.scrcpy.Scrcpy;
 import com.yqhp.agent.scrcpy.ScrcpyFrameClient;
 import com.yqhp.agent.scrcpy.ScrcpyOptions;
+import com.yqhp.agent.web.config.Properties;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
-import com.yqhp.common.web.util.ApplicationContextUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.RemoteEndpoint;
@@ -45,8 +45,8 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
         os.info(uid, "starting scrcpy...");
         Scrcpy scrcpy = ((AndroidDeviceDriver) deviceDriver).getScrcpy();
         scrcpy.start(
-                ApplicationContextUtils.getProperty("agent.android.scrcpy-server-path"),
-                ApplicationContextUtils.getProperty("agent.android.scrcpy-version"),
+                Properties.getScrcpyServerPath(),
+                Properties.getScrcpyVersion(),
                 input.getData(),
                 LocalPortProvider.getScrcpyAvailablePort(),
                 Duration.ofSeconds(30), // start timeout

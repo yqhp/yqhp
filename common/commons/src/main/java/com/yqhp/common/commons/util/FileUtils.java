@@ -23,12 +23,16 @@ public class FileUtils {
     }
 
     public static File downloadIfAbsent(String url) throws IOException {
-        String filename = org.apache.commons.io.FilenameUtils.getName(url);
-        return downloadIfAbsent(url, filename);
+        return downloadIfAbsent(url, (File) null);
     }
 
     public static File downloadIfAbsent(String url, String filename) throws IOException {
         return downloadIfAbsent(url, filename, null);
+    }
+
+    public static File downloadIfAbsent(String url, File dir) throws IOException {
+        String filename = org.apache.commons.io.FilenameUtils.getName(url);
+        return downloadIfAbsent(url, filename, dir);
     }
 
     /**

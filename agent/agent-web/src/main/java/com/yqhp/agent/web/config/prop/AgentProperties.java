@@ -13,7 +13,7 @@ import java.time.Duration;
 public class AgentProperties {
 
     private String version;
-    private String baseDir;
+    private String downloadDir;
 
     private Android android = new Android();
     private IOS iOS = new IOS();
