@@ -94,6 +94,13 @@ public class YQHP implements JShellVar {
     }
 
     /**
+     * @since 0.0.1
+     */
+    public void installApp(File file) {
+        deviceDriver.installApp(file);
+    }
+
+    /**
      * 在android设备内执行shell命令
      * 注意: 这是在设备内部执行的命令，所以不需要加"adb shell"
      *
