@@ -6,6 +6,8 @@ on:
     paths:
       - README.MD
       - .github/workflows/DockerHub.yml
+  workflow_dispatch:
+      
 jobs:
   dockerHubDescription:
     if: startsWith(github.repository, 'tony252/yqhp')
