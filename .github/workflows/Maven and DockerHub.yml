@@ -32,6 +32,6 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./auth
           push: true
           tags: tony252/yqhp:latest
