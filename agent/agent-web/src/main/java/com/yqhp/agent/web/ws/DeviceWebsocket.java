@@ -37,6 +37,7 @@ public class DeviceWebsocket {
         deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
         this.token = token;
         messageHandler = new MessageHandler();
+        WebsocketSessionPool.addSession(session);
     }
 
     /**
