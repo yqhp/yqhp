@@ -1,4 +1,4 @@
-name: ci
+name: Maven and Push DockerHub
 
 on:
   push:
