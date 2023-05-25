@@ -2,7 +2,6 @@
 FROM maven:3.8.6-jdk-11 AS builder
 
 # add pom.xml and source code
-add ./ /
 
 # package jar
 RUN mvn clean package
