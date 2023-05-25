@@ -1,4 +1,4 @@
-name: Maven and Push DockerHub
+name: Maven Push DockerHub
 
 on:
   push:
