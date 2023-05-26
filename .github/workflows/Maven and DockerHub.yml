@@ -26,11 +26,14 @@ jobs:
     needs: install
     runs-on: ubuntu-latest
     steps:
-      - name: Cache  packages
+      - name: Cache maven packages
         uses: actions/cache@v3
         with:
           path: |
-            ~/auth/
+            ~/auth
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/auth-web-0.0.1.jar') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
