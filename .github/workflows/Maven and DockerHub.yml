@@ -19,29 +19,28 @@ jobs:
         with:
           java-version: "11"
           distribution: "adopt"
-          cache: maven
       - name: Build with Maven
-        run:  mvn install        
+        run:  mvn install 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: auth
+          path: |
+            auth
+        
+        
+        
   auth:
     needs: install
     runs-on: ubuntu-latest
     steps:
-      - name: Cache maven packages
-        uses: actions/cache@v3
+      - uses: actions/download-artifact@v3
         with:
-          path: |
-            ~/auth
-          key: ${{ hashFiles('**/auth-web-0.0.1.jar') }}
-          restore-keys: |
-            auth-web-0.0.1.jar
-      -
-        run: java -jar auth-web-0.0.1.jar
+          name: auth
+      - name: Display structure of downloaded files
+        run: ls -R          
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: auth
-        run: cd auth     
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
