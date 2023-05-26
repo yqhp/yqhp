@@ -118,7 +118,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: gateway
-      - run: ls -R
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
