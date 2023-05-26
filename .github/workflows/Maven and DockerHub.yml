@@ -24,23 +24,19 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: auth
-          path: |
-            auth
+          path: auth
       - uses: actions/upload-artifact@v3
         with:
           name: console
-          path: |
-            console            
+          path: console            
       - uses: actions/upload-artifact@v3
         with:
           name: file
-          path: |
-            file            
+          path: file            
       - uses: actions/upload-artifact@v3
         with:
           name: gateway
-          path: |
-            gateway            
+          path: gateway            
         
   auth:
     needs: install
