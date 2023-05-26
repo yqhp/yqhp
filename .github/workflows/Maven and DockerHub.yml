@@ -25,7 +25,12 @@ jobs:
         with:
           name: auth
           path: |
-            ./auth
+            auth
+      - uses: actions/upload-artifact@v3
+        with:
+          name: console
+          path: |
+            console            
         
         
         
@@ -56,4 +61,6 @@ jobs:
         with:
           context: ./
           push: true
-          tags: tony252/yqhp:latest
+          tags: 
+            tony252/yqhp:latest
+            tony252/yqhp:0.0.1
