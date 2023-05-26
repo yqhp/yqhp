@@ -31,9 +31,9 @@ jobs:
         with:
           path: |
             ~/auth
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/auth-web-0.0.1.jar') }}
+          key: ${{ hashFiles('**/auth-web-0.0.1.jar') }}
           restore-keys: |
-            ${{ runner.os }}-maven-
+            auth-web-0.0.1.jar
       -
         run: java -jar auth-web-0.0.1.jar
       -
