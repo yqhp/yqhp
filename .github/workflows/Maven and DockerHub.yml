@@ -37,7 +37,7 @@ jobs:
         with:
           name: auth
       - name: Display structure of downloaded files
-        run: ls -R && cd  auth      
+        run: ls -R 
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -54,6 +54,6 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./auth
+          context: ./
           push: true
           tags: tony252/yqhp:latest
