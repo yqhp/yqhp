@@ -309,13 +309,3 @@ CREATE TABLE `view` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_doc_id` (`doc_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='视图';
-
--- 模板
-CREATE TABLE `` (
-  `id` varchar(32) NOT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_by` varchar(32) NOT NULL COMMENT '创建人',
-  `update_by` varchar(32) NOT NULL COMMENT '更新人',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='';
