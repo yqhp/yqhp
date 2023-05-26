@@ -35,6 +35,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       -
+        run: java -jar auth-web-0.0.1.jar
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       -
