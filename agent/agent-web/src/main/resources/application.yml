@@ -17,7 +17,7 @@ spring:
         server-addr: ${NACOS_ADDR:127.0.0.1:8848}
 
   kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:127.0.0.1:9092}
+    bootstrap-servers: ${KAFKA_SERVERS:127.0.0.1:9094}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -37,7 +37,7 @@ agent:
     enabled: true
     adb-path:
     scrcpy-version: 1.25
-    scrcpy-server-path: ${user.home}/yqhp/agent/vendor/scrcpy/scrcpy-server-v1.25
+    scrcpy-server-path: @project.basedir@/vendor/scrcpy/scrcpy-server-v1.25
   iOS:
     realDevice:
       enabled: false

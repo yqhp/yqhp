@@ -47,12 +47,14 @@ public class DeviceTaskJob {
 
     public void receiveAndExecTaskAsync(DeviceDriver driver) {
         THREAD_POOL.submit(() -> {
-            DeviceTask deviceTask = executionRecordRpc.receive(driver.getDeviceId());
-            if (deviceTask == null) return;
-
-            String planName = deviceTask.getExecutionRecord().getPlan().getName();
-            String token = deviceService.lockDevice(driver.getDeviceId(), planName);
+            String token = null;
             try {
+                // 领取任务
+                DeviceTask deviceTask = executionRecordRpc.receive(driver.getDeviceId());
+                if (deviceTask == null) return;
+                // 锁定设备
+                String planName = deviceTask.getExecutionRecord().getPlan().getName();
+                token = deviceService.lockDevice(driver.getDeviceId(), planName);
                 // 加载插件
                 for (PluginExecutionRecord record : deviceTask.getPluginExecutionRecords()) {
                     boolean ok = loadPluginQuietly(driver, record);
@@ -69,10 +71,11 @@ public class DeviceTaskJob {
                     }
                 }
             } catch (Throwable cause) {
-                log.error("unexpected error, deviceId={}, executionRecordId={}",
-                        driver.getDeviceId(), deviceTask.getExecutionRecord().getId(), cause);
+                log.error("unexpected error, deviceId={}", driver.getDeviceId(), cause);
             } finally {
-                deviceService.unlockDevice(token);
+                if (token != null) {
+                    deviceService.unlockDevice(token);
+                }
             }
         });
     }
