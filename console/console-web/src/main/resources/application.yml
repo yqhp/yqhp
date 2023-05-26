@@ -33,7 +33,7 @@ spring:
   #          config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin@123";'
 
   datasource:
-    url: jdbc:mysql://${CONSOLE_MYSQL_HOST:127.0.0.1:3306}/console?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://${CONSOLE_MYSQL_ADDR:127.0.0.1:3306}/console?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
     username: ${CONSOLE_MYSQL_USERNAME:root}
     password: ${CONSOLE_MYSQL_PWD:yqhp@123..Aa88}
     driver-class-name: com.mysql.cj.jdbc.Driver

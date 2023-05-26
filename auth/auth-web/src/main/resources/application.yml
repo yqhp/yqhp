@@ -16,7 +16,7 @@ spring:
       discovery:
         server-addr: ${NACOS_ADDR:127.0.0.1:8848}
   datasource:
-    url: jdbc:mysql://${AUTH_MYSQL_HOST:127.0.0.1:3306}/auth?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://${AUTH_MYSQL_ADDR:127.0.0.1:3306}/auth?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
     username: ${AUTH_MYSQL_USERNAME:root}
     password: ${AUTH_MYSQL_PWD:yqhp@123..Aa88}
     driver-class-name: com.mysql.cj.jdbc.Driver

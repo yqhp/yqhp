@@ -12,7 +12,7 @@ public class CodeGenerator {
     public static void main(String[] args) {
         AutoGenerator generator = new AutoGenerator();
         generator.setDataSource(dataSourceConfig(
-                "jdbc:mysql://" + System.getenv("CONSOLE_MYSQL_HOST") + "/console?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8",
+                "jdbc:mysql://" + System.getenv("CONSOLE_MYSQL_ADDR") + "/console?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8",
                 "com.mysql.cj.jdbc.Driver",
                 System.getenv("CONSOLE_MYSQL_USERNAME"),
                 System.getenv("CONSOLE_MYSQL_PWD")
