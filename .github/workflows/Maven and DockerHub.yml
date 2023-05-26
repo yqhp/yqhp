@@ -31,8 +31,16 @@ jobs:
           name: console
           path: |
             console            
-        
-        
+      - uses: actions/upload-artifact@v3
+        with:
+          name: file
+          path: |
+            file            
+      - uses: actions/upload-artifact@v3
+        with:
+          name: gateway
+          path: |
+            gateway            
         
   auth:
     needs: install
@@ -61,6 +69,6 @@ jobs:
         with:
           context: ./
           push: true
-          tags: 
+          tags: |
             tony252/yqhp:latest
             tony252/yqhp:0.0.1
