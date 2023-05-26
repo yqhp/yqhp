@@ -26,6 +26,11 @@ jobs:
     needs: install
     runs-on: ubuntu-latest
     steps:
+      - name: Cache  packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/auth/
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
