@@ -11,8 +11,8 @@ RUN mvn clean package
 From openjdk:11-jre-slim
 
 # copy jar from the first stage
-COPY --from=builder auth-web/target/auth-sdk-gateway-0.0.1.jar auth-sdk-gateway-0.0.1.jar
+COPY --from=builder auth-web/target/auth-web-0.0.1.jar auth-web-0.0.1.jar
 
 EXPOSE 8811
 
-CMD ["java", "-jar", "auth-sdk-gateway-0.0.1.jar"]
+CMD ["java", "-jar", "auth-web-0.0.1.jar"]
