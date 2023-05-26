@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  auth:
-    runs-on: ubuntu-latest
+  install:
+    runs-on:  ubuntu-latest
     steps:
       -
         name: Checkout
@@ -22,6 +22,10 @@ jobs:
           cache: maven
       - name: Build with Maven
         run:  mvn install        
+  auth:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
