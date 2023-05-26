@@ -2,10 +2,11 @@
 FROM maven:3.8.6-jdk-11 AS builder
 
 # add pom.xml and source code
-ADD ./ /
+ADD ..
+RUN mvn verify clean 
 
 # package jar
-RUN mvn clean package
+RUN mvn install
 
 # Second stage: minimal runtime environment
 From openjdk:11-jre-slim
