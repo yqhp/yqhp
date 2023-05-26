@@ -10,7 +10,7 @@ RUN mvn verify clean
 RUN mvn install
 
 # Second stage: minimal runtime environment
-From openjdk:11-jre-slim
+From openjdk:11-jre-slim-buster
 
 # copy jar from the first stage
 COPY --from=builder auth-web/target/auth-web-0.0.1.jar auth-web-0.0.1.jar
