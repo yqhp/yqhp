@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  maven-install:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
           path: gateway
 
   auth:
-    needs: install
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
@@ -62,7 +62,7 @@ jobs:
             tony252/yqhp-auth:0.0.1
 
   console:
-    needs: install
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
@@ -87,7 +87,7 @@ jobs:
             tony252/yqhp-console:0.0.1
 
   file:
-    needs: install
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
@@ -112,7 +112,7 @@ jobs:
             tony252/yqhp-file:0.0.1
 
   gateway:
-    needs: install
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
