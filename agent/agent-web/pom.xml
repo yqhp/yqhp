@@ -12,6 +12,11 @@
     <artifactId>agent-web</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- 注意: dependencies发生变化，需要更新这个版本号  -->
+        <lib.version>v1</lib.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.yqhp</groupId>
@@ -124,7 +129,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}.lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/lib.${lib.version}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -137,7 +142,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>${project.build.finalName}.lib/</classpathPrefix>
+                            <classpathPrefix>lib.${lib.version}/</classpathPrefix>
                             <mainClass>com.yqhp.agent.web.AgentApplication</mainClass>
                         </manifest>
                     </archive>
