@@ -15,6 +15,7 @@ spring:
     nacos:
       discovery:
         server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        ip: ${NACOS_DISCOVERY_IP}
   datasource:
     url: jdbc:mysql://${AUTH_MYSQL_ADDR:127.0.0.1:3306}/auth?characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
     username: ${AUTH_MYSQL_USERNAME:root}
