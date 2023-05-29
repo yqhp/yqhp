@@ -21,7 +21,7 @@ jobs:
           name: auth
           path: auth/auth-web
 
-  auth:
+  docker:
     needs: build
     runs-on: ubuntu-latest
     steps:

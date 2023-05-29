@@ -21,7 +21,7 @@ jobs:
           name: file
           path: file/file-web
 
-  file:
+  docker:
     needs: build
     runs-on: ubuntu-latest
     steps:

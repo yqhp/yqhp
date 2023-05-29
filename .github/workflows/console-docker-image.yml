@@ -21,7 +21,7 @@ jobs:
           name: console
           path: console/console-web
 
-  console:
+  docker:
     needs: build
     runs-on: ubuntu-latest
     steps:

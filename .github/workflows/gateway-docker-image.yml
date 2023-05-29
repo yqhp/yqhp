@@ -21,7 +21,7 @@ jobs:
           name: gateway
           path: gateway
 
-  gateway:
+  docker:
     needs: build
     runs-on: ubuntu-latest
     steps:
