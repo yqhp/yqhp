@@ -15,6 +15,7 @@ spring:
     nacos:
       discovery:
         server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        ip: ${NACOS_DISCOVERY_IP:}
 
   kafka:
     bootstrap-servers: ${KAFKA_SERVERS:127.0.0.1:9094}
