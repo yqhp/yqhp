@@ -92,7 +92,7 @@ services:
       - "18888:18888"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，跨主机调用需要调整为宿主机ip
+#      - NACOS_DISCOVERY_IP= # 该服务注册到nacos的ip，跨主机调用需要设置为宿主机ip
     restart: always
     depends_on:
       - nacos
@@ -105,7 +105,7 @@ services:
       - "8811:8811"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，跨主机调用需要调整为宿主机ip
+#      - NACOS_DISCOVERY_IP= # 该服务注册到nacos的ip，跨主机调用需要设置为宿主机ip
       - AUTH_MYSQL_ADDR=mysql:3306
       - AUTH_MYSQL_USERNAME=root
       - AUTH_MYSQL_PWD=yqhp@123..Aa88
@@ -126,7 +126,7 @@ services:
       - "8866:8866"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，跨主机调用需要调整为宿主机ip
+#      - NACOS_DISCOVERY_IP= # 该服务注册到nacos的ip，跨主机调用需要设置为宿主机ip
       - MINIO_PUBLIC_ENDPOINT=http://minio:9000 # 注意，MINIO_PUBLIC_ENDPOINT是文件上传后返回的下载地址前缀，需要调整为可用的地址，如:http://宿主机地址:9000
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_BUCKET=yqhp
@@ -145,7 +145,7 @@ services:
       - "8887:8887"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，跨主机调用需要调整为宿主机ip
+#      - NACOS_DISCOVERY_IP= # 该服务注册到nacos的ip，跨主机调用需要设置为宿主机ip
       - CONSOLE_MYSQL_ADDR=mysql:3306
       - CONSOLE_MYSQL_USERNAME=root
       - CONSOLE_MYSQL_PWD=yqhp@123..Aa88
