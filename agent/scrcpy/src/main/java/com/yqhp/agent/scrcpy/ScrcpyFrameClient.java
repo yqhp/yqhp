@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 /**
  * @author jiangyitao
@@ -18,6 +19,7 @@ import java.time.Duration;
 @Slf4j
 public class ScrcpyFrameClient {
 
+    private static final int NALU_START_CODE_LENGTH = 4;
     private static final String REMOTE_SOCKET_NAME = "scrcpy";
 
     @Getter
@@ -27,7 +29,6 @@ public class ScrcpyFrameClient {
     private ScrcpyOptions scrcpyOptions;
     private int localPort;
 
-    private ByteBuffer readBuffer;
     private SocketChannel socketChannel;
 
     ScrcpyFrameClient(IDevice iDevice) {
@@ -69,7 +70,6 @@ public class ScrcpyFrameClient {
     }
 
     void disconnect() {
-        readBuffer = null;
         if (socketChannel != null) {
             try {
                 log.info("[{}]close frame socket channel", iDevice.getSerialNumber());
@@ -111,18 +111,43 @@ public class ScrcpyFrameClient {
         }
     }
 
-    public ByteBuffer read() throws IOException {
-        if (readBuffer == null) {
-            // 为了降低闲置时的内存消耗，只有read的时候才去创建buffer，disconnect时将readBuffer置null，使readBuffer可以被回收
-            readBuffer = ByteBuffer.allocate(2 * 1024 * 1024);
+    public void readFrame(Consumer<ByteBuffer> consumer) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(2 * 1024 * 1024);
+        while (socketChannel != null && socketChannel.read(buffer) != -1) {
+            buffer.flip(); // 切换为读模式
+
+            // 消费buffer中全部nalu
+            while (buffer.remaining() > NALU_START_CODE_LENGTH) {
+                int naluStart = buffer.position();
+                buffer.position(naluStart + NALU_START_CODE_LENGTH);
+                int naluEnd = findNALUEndPosition(buffer);
+                if (naluEnd == -1) {
+                    buffer.position(naluStart);
+                    break;
+                }
+                byte[] naluData = new byte[naluEnd - naluStart];
+                buffer.position(naluStart);
+                buffer.get(naluData);
+                consumer.accept(ByteBuffer.wrap(naluData));
+            }
+
+            buffer.compact(); // 切换为写模式，并将剩余的数据移到缓冲区的开头
         }
-        readBuffer.clear();
-        socketChannel.read(readBuffer);
-        byte[] arr = readBuffer.array();
-        boolean isNalu = (arr[0] == 0 && arr[1] == 0 && arr[2] == 0 && arr[3] == 1)
-                || (arr[0] == 0 && arr[1] == 0 && arr[2] == 1);
-        return isNalu
-                ? ByteBuffer.wrap(readBuffer.array(), 0, readBuffer.position())
-                : null;
+    }
+
+    private int findNALUEndPosition(ByteBuffer buffer) {
+        int startPosition = buffer.position();
+        int remaining = buffer.remaining();
+
+        for (int i = 0; i < remaining - 3; i++) {
+            if (buffer.get(startPosition + i) == 0x00 &&
+                    buffer.get(startPosition + i + 1) == 0x00 &&
+                    buffer.get(startPosition + i + 2) == 0x00 &&
+                    buffer.get(startPosition + i + 3) == 0x01) {
+                return startPosition + i;
+            }
+        }
+
+        return -1;
     }
 }
