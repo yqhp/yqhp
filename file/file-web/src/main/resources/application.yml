@@ -35,4 +35,4 @@ logging:
   level:
     root: info
   file:
-    name: ~/yqhp/file/logs/${spring.application.name}.log
+    name: logs/${spring.application.name}.log

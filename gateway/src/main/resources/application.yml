@@ -53,4 +53,4 @@ logging:
   level:
     root: info
   file:
-    name: ~/yqhp/gateway/logs/${spring.application.name}.log
+    name: logs/${spring.application.name}.log

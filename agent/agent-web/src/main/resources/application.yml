@@ -33,7 +33,7 @@ zk:
 
 agent:
   version: @project.version@
-  download-dir: ~/yqhp/agent/download
+  download-dir: download
   android:
     enabled: true
     adb-path:
@@ -61,4 +61,4 @@ logging:
   level:
     root: info
   file:
-    name: ~/yqhp/agent/logs/${spring.application.name}.log
+    name: logs/${spring.application.name}.log
