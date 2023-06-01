@@ -61,4 +61,4 @@ logging:
   level:
     root: info
   file:
-    name: ${user.home}/yqhp/auth/logs/${spring.application.name}.log
+    name: ~/yqhp/auth/logs/${spring.application.name}.log
