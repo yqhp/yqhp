@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,18 +16,6 @@ jobs:
           distribution: "adopt"
       - name: Build with Maven
         run: mvn install
-      - uses: actions/upload-artifact@v3
-        with:
-          name: auth
-          path: auth/auth-web
-
-  docker:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: auth
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -40,7 +28,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./
+          context: ./auth/auth-web
           push: true
           tags: |
             jiangyitao/yqhp-auth:latest
