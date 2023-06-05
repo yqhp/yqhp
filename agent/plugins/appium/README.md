@@ -51,4 +51,8 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
 
 var d = new CustomAppiumDriver();
 ```
+
+## API
+
+[查看](https://github.com/yqhp/yqhp/blob/main/agent/plugins/appium/src/main/java/com/yqhp/plugin/appium/AppiumDriverWrapper.java)
  
