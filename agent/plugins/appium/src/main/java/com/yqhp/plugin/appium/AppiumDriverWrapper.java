@@ -76,6 +76,8 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 休眠
+     *
      * @since 0.0.1
      */
     @SneakyThrows
@@ -85,6 +87,8 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 通过id查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement id(String id) {
@@ -92,13 +96,35 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 通过id查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement id(String id, Duration duration) {
-        return find(By.id(id), duration);
+    public WebElement _id(String id) {
+        return _find(By.id(id));
     }
 
     /**
+     * 通过id查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.1
+     */
+    public WebElement id(String id, Duration timeout) {
+        return find(By.id(id), timeout);
+    }
+
+    /**
+     * 通过id查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _id(String id, Duration timeout) {
+        return _find(By.id(id), timeout);
+    }
+
+    /**
+     * 通过content-desc查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement desc(String desc) {
@@ -106,13 +132,35 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 通过content-desc查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement desc(String desc, Duration duration) {
-        return find(AppiumBy.accessibilityId(desc), duration);
+    public WebElement _desc(String desc) {
+        return _find(AppiumBy.accessibilityId(desc));
     }
 
     /**
+     * 通过content-desc查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.1
+     */
+    public WebElement desc(String desc, Duration timeout) {
+        return find(AppiumBy.accessibilityId(desc), timeout);
+    }
+
+    /**
+     * 通过content-desc查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _desc(String desc, Duration timeout) {
+        return _find(AppiumBy.accessibilityId(desc), timeout);
+    }
+
+    /**
+     * 通过xpath查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement xpath(String xpath) {
@@ -120,32 +168,76 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 通过xpath查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement xpath(String xpath, Duration duration) {
-        return find(By.xpath(xpath), duration);
+    public WebElement _xpath(String xpath) {
+        return _find(By.xpath(xpath));
     }
 
     /**
+     * 通过xpath查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.1
+     */
+    public WebElement xpath(String xpath, Duration timeout) {
+        return find(By.xpath(xpath), timeout);
+    }
+
+    /**
+     * 通过xpath查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _xpath(String xpath, Duration timeout) {
+        return _find(By.xpath(xpath), timeout);
+    }
+
+    /**
+     * 通过text查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement text(String text) {
-        return uia(textUiSelector(text));
+        return uia(uiSelectorText(text));
     }
 
     /**
+     * 通过text查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement text(String text, Duration duration) {
-        return uia(textUiSelector(text), duration);
+    public WebElement _text(String text) {
+        return _uia(uiSelectorText(text));
     }
 
-    private String textUiSelector(String text) {
+    /**
+     * 通过text查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.1
+     */
+    public WebElement text(String text, Duration timeout) {
+        return uia(uiSelectorText(text), timeout);
+    }
+
+    /**
+     * 通过text查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _text(String text, Duration timeout) {
+        return _uia(uiSelectorText(text), timeout);
+    }
+
+    private String uiSelectorText(String text) {
         Validate.notBlank(text, "text cannot be blank");
         return "new UiSelector().text(\"" + text + "\")";
     }
 
     /**
+     * 通过uiautomator查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement uia(String uiautomatorText) {
@@ -153,35 +245,35 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 通过uiautomator查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement uia(String uiautomatorText, Duration duration) {
-        return find(AppiumBy.androidUIAutomator(uiautomatorText), duration);
+    public WebElement _uia(String uiautomatorText) {
+        return _find(AppiumBy.androidUIAutomator(uiautomatorText));
     }
 
     /**
+     * 通过uiautomator查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
-    public WebElement findQuietly(By by) {
-        try {
-            return find(by);
-        } catch (NoSuchElementException | StaleElementReferenceException e) {
-            return null;
-        }
+    public WebElement uia(String uiautomatorText, Duration timeout) {
+        return find(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
     }
 
     /**
+     * 通过uiautomator查找元素(找不到则返回null)
+     *
      * @since 0.0.1
      */
-    public WebElement findQuietly(By by, Duration timeout) {
-        try {
-            return find(by, timeout);
-        } catch (TimeoutException e) {
-            return null;
-        }
+    public WebElement _uia(String uiautomatorText, Duration timeout) {
+        return _find(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
     }
 
     /**
+     * 查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement find(By by) {
@@ -189,6 +281,8 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 查找元素(找不到则抛出异常)
+     *
      * @since 0.0.1
      */
     public WebElement find(By by, Duration timeout) {
@@ -197,6 +291,34 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _find(By by) {
+        try {
+            return find(by);
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 查找元素(找不到则返回null)
+     *
+     * @since 0.0.1
+     */
+    public WebElement _find(By by, Duration timeout) {
+        try {
+            return find(by, timeout);
+        } catch (TimeoutException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取元素中心点坐标
+     *
      * @since 0.0.1
      */
     public Point getCenter(WebElement element) {
@@ -217,6 +339,19 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 点击元素中心坐标
+     *
+     * @param pause 按下时长
+     * @since 0.0.1
+     */
+    public void tap(WebElement element, Duration pause) {
+        Point center = getCenter(element);
+        tap(center.x, center.y, pause);
+    }
+
+    /**
+     * 点击坐标
+     *
      * @since 0.0.1
      */
     public void tap(int x, int y) {
@@ -224,28 +359,15 @@ public class AppiumDriverWrapper {
     }
 
     /**
-     * @param downUpPauseDuration 鼠标按下到抬起间隔时间
+     * 点击坐标
+     *
+     * @param pause 按下时长
      * @since 0.0.1
      */
-    public void tap(int x, int y, Duration downUpPauseDuration) {
+    public void tap(int x, int y, Duration pause) {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence seq = createTapSeq(finger, x, y, downUpPauseDuration);
+        Sequence seq = createTapSeq(finger, x, y, pause);
         driver.perform(List.of(seq));
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public void longPress(WebElement element) {
-        Point center = getCenter(element);
-        longPress(center.x, center.y);
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public void longPress(int x, int y) {
-        tap(x, y, Duration.ofSeconds(1));
     }
 
     /**
@@ -259,6 +381,20 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 双击元素中心点
+     *
+     * @param pause 每次点击按下时长
+     * @param gap   两次点击间隔时间
+     * @since 0.0.1
+     */
+    public void doubleTap(WebElement element, Duration pause, Duration gap) {
+        Point center = getCenter(element);
+        doubleTap(center.x, center.y, pause, gap);
+    }
+
+    /**
+     * 双击坐标
+     *
      * @since 0.0.1
      */
     public void doubleTap(int x, int y) {
@@ -266,33 +402,37 @@ public class AppiumDriverWrapper {
     }
 
     /**
-     * @param downUpPauseDuration 鼠标按下到抬起间隔时间
-     * @param tapGapDuration      两次点击间隔时间
+     * 双击坐标
+     *
+     * @param pause 每次点击按下时长
+     * @param gap   两次点击间隔时间
      * @since 0.0.1
      */
-    public void doubleTap(int x, int y, Duration downUpPauseDuration, Duration tapGapDuration) {
+    public void doubleTap(int x, int y, Duration pause, Duration gap) {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence seq = createTapSeq(finger, x, y, downUpPauseDuration)
-                .addAction(new Pause(finger, tapGapDuration))
+        Sequence seq = createTapSeq(finger, x, y, pause)
+                .addAction(new Pause(finger, gap))
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
-                .addAction(new Pause(finger, downUpPauseDuration))
+                .addAction(new Pause(finger, pause))
                 .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
         driver.perform(List.of(seq));
     }
 
     /**
-     * @param downUpPauseDuration 鼠标按下到抬起间隔时间
+     * @param pause 按下时长
      * @since 0.0.1
      */
-    private Sequence createTapSeq(PointerInput finger, int x, int y, Duration downUpPauseDuration) {
+    private Sequence createTapSeq(PointerInput finger, int x, int y, Duration pause) {
         return new Sequence(finger, 1)
                 .addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, y)) // 移动到x,y
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg())) // 鼠标左按下
-                .addAction(new Pause(finger, downUpPauseDuration)) // 暂停
+                .addAction(new Pause(finger, pause)) // 暂停
                 .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg())); // 鼠标左抬起
     }
 
     /**
+     * 滑动屏幕
+     *
      * @since 0.0.1
      */
     public void scroll(Direction direction) {
@@ -300,6 +440,9 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 滑动屏幕
+     *
+     * @param duration duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scroll(Direction direction, Duration duration) {
@@ -309,6 +452,8 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 在容器内滑动
+     *
      * @since 0.0.1
      */
     public void scrollIn(WebElement container, Direction direction) {
@@ -316,6 +461,9 @@ public class AppiumDriverWrapper {
     }
 
     /**
+     * 在容器内滑动
+     *
+     * @param duration duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scrollIn(WebElement container, Direction direction, Duration duration) {
@@ -323,8 +471,9 @@ public class AppiumDriverWrapper {
     }
 
     /**
-     * 在容器内滚动
+     * 在容器内滑动
      *
+     * @param duration duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scrollIn(Rectangle rect, Direction direction, Duration duration) {
@@ -346,7 +495,9 @@ public class AppiumDriverWrapper {
     }
 
     /**
-     * @param duration 滑动持续时间
+     * 滑动
+     *
+     * @param duration duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scroll(int startX, int startY, int endX, int endY, Duration duration) {
@@ -356,8 +507,7 @@ public class AppiumDriverWrapper {
     }
 
     /**
-     * @param duration 滑动持续时间
-     * @return
+     * @param duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     private Sequence createScrollSeq(PointerInput finger, int startX, int startY, int endX, int endY, Duration duration) {
