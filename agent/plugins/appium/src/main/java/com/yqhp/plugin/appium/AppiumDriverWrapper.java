@@ -442,7 +442,7 @@ public class AppiumDriverWrapper {
     /**
      * 滑动屏幕
      *
-     * @param duration duration 从起点滑到终点持续时间
+     * @param duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scroll(Direction direction, Duration duration) {
@@ -463,7 +463,7 @@ public class AppiumDriverWrapper {
     /**
      * 在容器内滑动
      *
-     * @param duration duration 从起点滑到终点持续时间
+     * @param duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scrollIn(WebElement container, Direction direction, Duration duration) {
@@ -473,7 +473,7 @@ public class AppiumDriverWrapper {
     /**
      * 在容器内滑动
      *
-     * @param duration duration 从起点滑到终点持续时间
+     * @param duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scrollIn(Rectangle rect, Direction direction, Duration duration) {
@@ -497,7 +497,7 @@ public class AppiumDriverWrapper {
     /**
      * 滑动
      *
-     * @param duration duration 从起点滑到终点持续时间
+     * @param duration 从起点滑到终点持续时间
      * @since 0.0.1
      */
     public void scroll(int startX, int startY, int endX, int endY, Duration duration) {
