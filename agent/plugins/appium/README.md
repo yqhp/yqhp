@@ -34,17 +34,8 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
     }
 
     /**
-     * 停止app
-     * 
-     * @param appId  android: package name | ios: bundle id
-     */
-    boolean stopApp(String appId) {
-        return ((InteractsWithApps) driver()).terminateApp(appId);
-    }
-
-    /**
      * 启动app
-     * 
+     *
      * @param appId  android: package name | ios: bundle id
      */
     void startApp(String appId) {
@@ -52,16 +43,39 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
     }
 
     /**
-     * 如果app不存在则安装
+     * 停止app
      * 
-     * @param appUri url or filePath
      * @param appId  android: package name | ios: bundle id
      */
-    void installAppIfAbsent(String appUri, String appId) {
-        boolean isAppInstalled = ((InteractsWithApps) driver()).isAppInstalled(appId);
-        if (!isAppInstalled) {
-            yqhp.installApp(appUri);
-        }
+    boolean stopApp(String appId) {
+        return ((InteractsWithApps) driver()).terminateApp(appId);
+    }
+    
+    /**
+     * 安装app
+     * 
+     * @param appUri app url or filePath
+     */
+    void installApp(String appUri) {
+        yqhp.installApp(appUri);
+    }
+
+    /**
+     * app是否已安装
+     * 
+     * @param appId android: package name | ios: bundle id
+     */
+    boolean isAppInstalled(String appId) {
+        return ((InteractsWithApps) driver()).isAppInstalled(appId);
+    }
+
+    /**
+     * 卸载app
+     *
+     * @param appId android: package name | ios: bundle id
+     */
+    boolean uninstallApp(String appId) {
+        return ((InteractsWithApps) driver()).removeApp(appId);
     }
 
     /**
