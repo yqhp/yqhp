@@ -33,17 +33,42 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
         pressAndroidKey(AndroidKey.BACK);
     }
 
-    // 停止app
+    /**
+     * 停止app
+     * 
+     * @param appId  android: package name | ios: bundle id
+     */
     boolean stopApp(String appId) {
         return ((InteractsWithApps) driver()).terminateApp(appId);
     }
 
-    // 启动app
+    /**
+     * 启动app
+     * 
+     * @param appId  android: package name | ios: bundle id
+     */
     void startApp(String appId) {
         ((InteractsWithApps) driver()).activateApp(appId);
     }
 
-    // 清除apk数据, 相当于重新安装了app
+    /**
+     * 如果app不存在则安装
+     * 
+     * @param appUri url or filePath
+     * @param appId  android: package name | ios: bundle id
+     */
+    void installAppIfAbsent(String appUri, String appId) {
+        boolean isAppInstalled = ((InteractsWithApps) driver()).isAppInstalled(appId);
+        if (!isAppInstalled) {
+            yqhp.installApp(appUri);
+        }
+    }
+
+    /**
+     * 清除apk数据, 相当于重新安装了app
+     *
+     * @param pkg  package name
+     */
     void clearApkData(String pkg) {
         yqhp.androidShell("pm clear " + pkg);
     }
