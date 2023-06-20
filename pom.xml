@@ -20,7 +20,6 @@
 
     <properties>
         <revision>0.0.1</revision>
-        <hutool.version>5.3.8</hutool.version>
         <junixsocket.version>2.6.2</junixsocket.version>
         <jwt.version>0.11.5</jwt.version>
         <!-- 覆盖spring-boot-dependencies，解决appium.java-client依赖冲突 -->
@@ -213,17 +212,7 @@
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-core</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-extra</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-crypto</artifactId>
-                <version>${hutool.version}</version>
+                <version>5.3.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

@@ -15,7 +15,7 @@
  */
 package com.yqhp.agent.common;
 
-import cn.hutool.core.net.NetUtil;
+import com.yqhp.common.commons.util.SocketUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -68,7 +68,7 @@ public class LocalPortProvider {
 
         int res = -1;
         for (; ; ) {
-            boolean available = NetUtil.isUsableLocalPort(curr);
+            boolean available = SocketUtils.isPortAvailable(curr);
             if (available) {
                 res = curr;
             }
