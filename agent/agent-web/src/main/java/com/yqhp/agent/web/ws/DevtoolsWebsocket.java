@@ -16,7 +16,7 @@
 package com.yqhp.agent.web.ws;
 
 import com.android.ddmlib.IDevice;
-import com.yqhp.agent.devicediscovery.android.AndroidDevice;
+import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class DevtoolsWebsocket {
         DeviceDriver deviceDriver = DeviceWebsocket.deviceService.getDeviceDriverByToken(token);
 
         localPort = SocketUtils.findAvailableTcpPort();
-        iDevice = ((AndroidDevice) (deviceDriver.getDevice())).getIDevice();
+        iDevice = ((AndroidDeviceDriver) deviceDriver).getIDevice();
         log.info("[devtools][{}]createForward {} -> {}", session.getId(), localPort, socket);
         iDevice.createForward(localPort, socket, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 

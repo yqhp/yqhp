@@ -20,6 +20,8 @@ import com.android.ddmlib.logcat.LogCatListener;
 import com.android.ddmlib.logcat.LogCatMessage;
 import com.android.ddmlib.logcat.LogCatReceiverTask;
 import com.yqhp.agent.androidtools.AndroidUtils;
+import com.yqhp.agent.androidtools.browser.Browser;
+import com.yqhp.agent.androidtools.browser.ChromeDevtools;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.scrcpy.Scrcpy;
@@ -38,6 +40,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -153,6 +156,10 @@ public class AndroidDeviceDriver extends DeviceDriver {
             logcatReceiverTask.stop();
             logcatReceiverTask = null;
         }
+    }
+
+    public List<Browser> listBrowser() {
+        return ChromeDevtools.listBrowser(getIDevice());
     }
 
     @Override

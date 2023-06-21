@@ -15,8 +15,9 @@
  */
 package com.yqhp.agent.jshell;
 
+import com.android.ddmlib.IDevice;
 import com.yqhp.agent.androidtools.AndroidUtils;
-import com.yqhp.agent.devicediscovery.android.AndroidDevice;
+import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.FileUtils;
@@ -122,7 +123,7 @@ public class YQHP implements JShellVar {
      * @since 0.0.1
      */
     public String androidShell(String shellCommand) {
-        AndroidDevice device = (AndroidDevice) deviceDriver.getDevice();
-        return AndroidUtils.executeShellCommand(device.getIDevice(), shellCommand);
+        IDevice iDevice = ((AndroidDeviceDriver) deviceDriver).getIDevice();
+        return AndroidUtils.executeShellCommand(iDevice, shellCommand);
     }
 }

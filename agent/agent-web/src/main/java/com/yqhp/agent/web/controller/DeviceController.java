@@ -15,6 +15,7 @@
  */
 package com.yqhp.agent.web.controller;
 
+import com.yqhp.agent.androidtools.browser.Browser;
 import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.agent.driver.Hierarchy;
 import com.yqhp.agent.web.service.DeviceService;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author jiangyitao
@@ -58,6 +60,11 @@ public class DeviceController {
     @GetMapping("/dumpHierarchy")
     public Hierarchy dumpHierarchy(@RequestHeader("deviceToken") String token) {
         return deviceService.dumpHierarchy(token);
+    }
+
+    @GetMapping("/browser")
+    public List<Browser> listBrowser(@RequestHeader("deviceToken") String token) {
+        return deviceService.listBrowser(token);
     }
 
     @GetMapping("/screenshot")

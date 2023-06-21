@@ -15,6 +15,7 @@
  */
 package com.yqhp.agent.web.service.impl;
 
+import com.yqhp.agent.androidtools.browser.Browser;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
 import com.yqhp.agent.devicediscovery.ios.IOSEmulator;
@@ -152,6 +153,11 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
+    private String createDeviceToken(String deviceId) {
+        String data = System.currentTimeMillis() + RandomStringUtils.randomAlphanumeric(8) + deviceId;
+        return DigestUtils.md5Hex(data);
+    }
+
     @Override
     public void unlockDevice(String token) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
@@ -218,6 +224,12 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public List<Browser> listBrowser(String token) {
+        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
+        return ((AndroidDeviceDriver) deviceDriver).listBrowser();
+    }
+
+    @Override
     public OSSFile screenshotByToken(String token, boolean isTmpFile) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
         return screenshot(deviceDriver, isTmpFile);
@@ -251,8 +263,4 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceDriver.getDeviceInfo();
     }
 
-    private String createDeviceToken(String deviceId) {
-        String data = System.currentTimeMillis() + RandomStringUtils.randomAlphanumeric(8) + deviceId;
-        return DigestUtils.md5Hex(data);
-    }
 }

@@ -15,6 +15,7 @@
  */
 package com.yqhp.agent.web.service;
 
+import com.yqhp.agent.androidtools.browser.Browser;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.DeviceInfo;
@@ -47,6 +48,8 @@ public interface DeviceService {
     void installAppByToken(String token, MultipartFile app);
 
     Hierarchy dumpHierarchy(String token);
+
+    List<Browser> listBrowser(String token);
 
     OSSFile screenshotByToken(String token, boolean isTmpFile);
 
