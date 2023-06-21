@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  * @author jiangyitao
  */
 @Slf4j
-public class ChromeDevTools {
+public class ChromeDevtools {
 
     private static final String LIST_SOCKET_COMMAND;
 
