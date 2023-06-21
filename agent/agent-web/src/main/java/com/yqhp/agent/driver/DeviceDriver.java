@@ -96,9 +96,12 @@ public abstract class DeviceDriver {
 
     public Hierarchy dumpHierarchy() {
         Hierarchy hierarchy = new Hierarchy();
-        String pageSource = getOrCreateAppiumDriver().getPageSource();
-        hierarchy.setPageSource(pageSource);
-        hierarchy.setViewType(viewType());
+        hierarchy.setNative(isNativeContext());
+        if (hierarchy.isNative()) {
+            String pageSource = getOrCreateAppiumDriver().getPageSource();
+            hierarchy.setPageSource(pageSource);
+            hierarchy.setViewType(viewType());
+        }
         return hierarchy;
     }
 

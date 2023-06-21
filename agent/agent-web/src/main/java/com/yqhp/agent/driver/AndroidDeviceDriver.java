@@ -67,7 +67,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
 
     @Override
     protected ViewType viewType() {
-        return isNativeContext() ? ViewType.ANDROID_NATIVE : ViewType.ANDROID_WEB;
+        return ViewType.ANDROID_NATIVE;
     }
 
     @Override

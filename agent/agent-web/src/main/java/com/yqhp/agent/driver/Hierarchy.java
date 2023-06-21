@@ -23,6 +23,7 @@ import lombok.Data;
  */
 @Data
 public class Hierarchy {
+    private boolean isNative;
     private ViewType viewType;
     private String pageSource;
 }

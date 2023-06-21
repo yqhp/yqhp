@@ -27,9 +27,8 @@ import lombok.Getter;
 public enum ViewType implements BaseEnum<Integer> {
 
     ANDROID_NATIVE(1),
-    ANDROID_WEB(2),
     iOS_NATIVE(3),
-    iOS_WEB(4);
+    ;
 
     @EnumValue
     @JsonValue

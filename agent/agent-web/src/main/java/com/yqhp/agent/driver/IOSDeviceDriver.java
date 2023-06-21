@@ -45,7 +45,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     @Override
     protected ViewType viewType() {
-        return isNativeContext() ? ViewType.iOS_NATIVE : ViewType.iOS_WEB;
+        return ViewType.iOS_NATIVE;
     }
 
     @Override
