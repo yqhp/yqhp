@@ -106,6 +106,7 @@ public class DevtoolsWebsocket {
         devtoolsWS = HTTP_CLIENT.newWebSocketBuilder()
                 .buildAsync(URI.create("ws://localhost:" + localPort + "/devtools/page/" + page), devtoolsWSListener)
                 .join();
+        WebsocketSessionPool.addSession(session);
     }
 
     @OnError
