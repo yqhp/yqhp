@@ -47,8 +47,11 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private final List<String> whitePaths = List.of(
             "/auth/token",
             AUTH_USER_INFO_PATH,
-            "/agent/device/token/**",
-            "/console/executionRecord/*/report"
+            "/agent/device/devtools/**",
+            "/agent/device/scrcpy/**",
+            "/agent/device/jshellExecution/**",
+            "/agent/device/jshellSuggestions/**",
+            "/agent/device/appiumLog/**"
     );
 
     private final WebClient authWebClient;

@@ -31,7 +31,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/token/{token}/appiumLog")
+@ServerEndpoint(value = "/device/appiumLog/token/{token}")
 public class AppiumLogWebsocket extends DeviceWebsocket {
 
     @OnOpen

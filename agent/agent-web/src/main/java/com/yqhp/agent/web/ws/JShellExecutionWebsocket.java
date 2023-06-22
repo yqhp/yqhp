@@ -30,7 +30,7 @@ import javax.websocket.server.ServerEndpoint;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/token/{token}/jshellExecution")
+@ServerEndpoint(value = "/device/jshellExecution/token/{token}")
 public class JShellExecutionWebsocket extends DeviceWebsocket {
     @OnOpen
     @Override

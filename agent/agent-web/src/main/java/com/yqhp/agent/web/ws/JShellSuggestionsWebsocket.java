@@ -29,7 +29,7 @@ import javax.websocket.server.ServerEndpoint;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/token/{token}/jshellSuggestions")
+@ServerEndpoint(value = "/device/jshellSuggestions/token/{token}")
 public class JShellSuggestionsWebsocket extends DeviceWebsocket {
     @OnOpen
     @Override
