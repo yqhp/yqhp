@@ -85,7 +85,7 @@ services:
       - yqhp-gateway
 
   yqhp-gateway:
-    image: "jiangyitao/yqhp-gateway:0.0.2"
+    image: "jiangyitao/yqhp-gateway:0.0.3"
     networks:
       - yqhp-network
     ports:

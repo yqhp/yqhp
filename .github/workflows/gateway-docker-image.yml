@@ -32,4 +32,4 @@ jobs:
           push: true
           tags: |
             jiangyitao/yqhp-gateway:latest
-            jiangyitao/yqhp-gateway:0.0.2
+            jiangyitao/yqhp-gateway:0.0.3
