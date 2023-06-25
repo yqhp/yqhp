@@ -2,7 +2,7 @@ version: '3'
 
 services:
   nacos:
-    image: nacos/nacos-server:1.4.2
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/nacos-server:1.4.2
     networks:
       - yqhp-network
     ports:
@@ -11,7 +11,7 @@ services:
       MODE: standalone
 
   zookeeper:
-    image: 'bitnami/zookeeper:3.6'
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/bitnami-zookeeper:3.6
     networks:
       - yqhp-network
     ports:
@@ -22,7 +22,7 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
 
   kafka:
-    image: 'bitnami/kafka:3.4'
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/bitnami-kafka:3.4
     networks:
       - yqhp-network
     ports:
@@ -37,7 +37,7 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
 
   redis:
-    image: "bitnami/redis:6.2.10"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/bitnami-redis:6.2.10
     networks:
       - yqhp-network
     ports:
@@ -48,7 +48,7 @@ services:
       - REDIS_PASSWORD=yqhp@123..Aa88
 
   mysql:
-    image: mysql/mysql-server:5.7
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/mysql-server:5.7
     networks:
       - yqhp-network
     ports:
@@ -61,7 +61,7 @@ services:
       MYSQL_ROOT_HOST: '%'
 
   minio:
-    image: "bitnami/minio:2023.3.24"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/bitnami-minio:2023.3.24
     networks:
       - yqhp-network
     ports:
@@ -74,7 +74,7 @@ services:
       - MINIO_ROOT_PASSWORD=yqhp@123..Aa88
 
   yqhp-web-ui:
-    image: "jiangyitao/yqhp-web-ui:0.0.3"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-web-ui:0.0.3
     networks:
       - yqhp-network
     ports:
@@ -85,7 +85,7 @@ services:
       - yqhp-gateway
 
   yqhp-gateway:
-    image: "jiangyitao/yqhp-gateway:0.0.3"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-gateway:0.0.3
     networks:
       - yqhp-network
     ports:
@@ -98,7 +98,7 @@ services:
       - nacos
 
   yqhp-auth:
-    image: "jiangyitao/yqhp-auth:0.0.1"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-auth:0.0.1
     networks:
       - yqhp-network
     ports:
@@ -119,7 +119,7 @@ services:
       - redis
 
   yqhp-file:
-    image: "jiangyitao/yqhp-file:0.0.1"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-file:0.0.1
     networks:
       - yqhp-network
     ports:
@@ -138,7 +138,7 @@ services:
       - minio
 
   yqhp-console:
-    image: "jiangyitao/yqhp-console:0.0.1"
+    image: registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:0.0.1
     networks:
       - yqhp-network
     ports:
