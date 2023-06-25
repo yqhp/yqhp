@@ -53,7 +53,7 @@ agent:
       #  d for days
       scan-period: 30s
   appium:
-    js-path:
+    js-path: ${APPIUM_JS_PATH:}
   plugin:
     base-dir: ${agent.download-dir}/plugins
 
