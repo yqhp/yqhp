@@ -23,6 +23,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
+          registry: registry.cn-hangzhou.aliyuncs.com
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PWD }}
       - name: Build and push
@@ -31,5 +32,5 @@ jobs:
           context: ./console/console-web
           push: true
           tags: |
-            jiangyitao/yqhp-console:latest
-            jiangyitao/yqhp-console:0.0.1
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:latest
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:0.0.1
