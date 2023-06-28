@@ -25,7 +25,6 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.io.File;
 import java.net.URL;
 import java.util.function.Consumer;
 
@@ -39,18 +38,8 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    public void installApp(File app) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected ViewType viewType() {
         return ViewType.iOS_NATIVE;
-    }
-
-    @Override
-    public File screenshot() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

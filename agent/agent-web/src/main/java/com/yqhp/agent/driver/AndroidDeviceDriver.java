@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -71,11 +70,6 @@ public class AndroidDeviceDriver extends DeviceDriver {
     @Override
     protected ViewType viewType() {
         return ViewType.ANDROID_NATIVE;
-    }
-
-    @Override
-    public File screenshot() throws IOException {
-        return AndroidUtils.screenshot(getIDevice());
     }
 
     @Override

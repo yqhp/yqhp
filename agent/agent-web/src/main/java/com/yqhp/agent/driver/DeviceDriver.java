@@ -29,6 +29,7 @@ import com.yqhp.common.web.util.ApplicationContextUtils;
 import com.yqhp.console.repository.enums.ViewType;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
@@ -38,6 +39,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -85,7 +87,9 @@ public abstract class DeviceDriver {
         installApp(app);
     }
 
-    public abstract void installApp(File app);
+    public void installApp(File app) {
+        ((InteractsWithApps) getOrCreateAppiumDriver()).installApp(app.getAbsolutePath());
+    }
 
     protected abstract ViewType viewType();
 
@@ -105,7 +109,9 @@ public abstract class DeviceDriver {
         return hierarchy;
     }
 
-    public abstract File screenshot() throws IOException;
+    public File screenshot() {
+        return getOrCreateAppiumDriver().getScreenshotAs(OutputType.FILE);
+    }
 
     public abstract DeviceInfo getDeviceInfo();
 
