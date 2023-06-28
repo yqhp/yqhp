@@ -203,16 +203,16 @@ public class DeviceServiceImpl implements DeviceService {
     public void installAppByToken(String token, MultipartFile app) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
 
-        File apk = null;
+        File appFile = null;
         try {
-            apk = MultipartFileUtils.toTempFile(app);
-            deviceDriver.installApp(apk);
+            appFile = MultipartFileUtils.toTempFile(app);
+            deviceDriver.installApp(appFile);
         } catch (Exception e) {
             log.error("install {} err", app.getOriginalFilename(), e);
             throw new ServiceException(ResponseCodeEnum.INSTALL_APP_FAIL, e.getMessage());
         } finally {
-            if (apk != null && !apk.delete()) {
-                log.warn("delete {} fail", apk);
+            if (appFile != null && !appFile.delete()) {
+                log.warn("delete {} fail", appFile);
             }
         }
     }
