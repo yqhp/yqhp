@@ -141,7 +141,7 @@ RUN appium driver install --source=npm appium-uiautomator2-driver@${APPIUM_DRIVE
 # 以下为yqhp-agent
 #==============
 COPY agent/agent-web/target/*.jar agent.jar
-COPY agent/agent-web/target/lib.v2 lib.v2
+COPY agent/agent-web/target/lib.v3 lib.v3
 COPY vendor vendor
 
 EXPOSE 10004
