@@ -32,7 +32,7 @@ services:
     environment:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://127.0.0.1:9094 # 注意，其他主机要连kafka，需要把127.0.0.1修改为宿主机地址，其他主机通过宿主机地址:9094连接
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://${MY_IP}:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
 
@@ -92,7 +92,7 @@ services:
       - "18888:18888"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，设置为宿主机ip
+      - NACOS_DISCOVERY_IP=${MY_IP} # 该服务注册到nacos的ip，设置为宿主机ip
     restart: always
     depends_on:
       - nacos
@@ -105,7 +105,7 @@ services:
       - "8811:8811"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，设置为宿主机ip
+      - NACOS_DISCOVERY_IP=${MY_IP} # 该服务注册到nacos的ip，设置为宿主机ip
       - AUTH_MYSQL_ADDR=mysql:3306
       - AUTH_MYSQL_USERNAME=root
       - AUTH_MYSQL_PWD=yqhp@123..Aa88
@@ -126,8 +126,8 @@ services:
       - "8866:8866"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，设置为宿主机ip
-      - MINIO_PUBLIC_ENDPOINT=http://127.0.0.1:9000 # 注意，MINIO_PUBLIC_ENDPOINT是文件上传后返回的下载地址前缀，需要调整为可用的地址，如:http://宿主机地址:9000
+      - NACOS_DISCOVERY_IP=${MY_IP} # 该服务注册到nacos的ip，设置为宿主机ip
+      - MINIO_PUBLIC_ENDPOINT=http://${MY_IP}:9000 # 注意，MINIO_PUBLIC_ENDPOINT是文件上传后返回的下载地址前缀，需要调整为可用的地址，如:http://宿主机地址:9000
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_BUCKET=yqhp
       - MINIO_ACCESS_KEY=yqhp
@@ -145,7 +145,7 @@ services:
       - "8887:8887"
     environment:
       - NACOS_ADDR=nacos:8848
-      - NACOS_DISCOVERY_IP=127.0.0.1 # 该服务注册到nacos的ip，设置为宿主机ip
+      - NACOS_DISCOVERY_IP=${MY_IP} # 该服务注册到nacos的ip，设置为宿主机ip
       - CONSOLE_MYSQL_ADDR=mysql:3306
       - CONSOLE_MYSQL_USERNAME=root
       - CONSOLE_MYSQL_PWD=yqhp@123..Aa88
