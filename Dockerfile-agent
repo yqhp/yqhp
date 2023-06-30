@@ -145,6 +145,7 @@ COPY agent/agent-web/target/lib.v3 lib.v3
 COPY vendor vendor
 
 COPY start_agent.sh start_agent.sh
+RUN chmod +x /start_agent.sh
 
 EXPOSE 10004
 
