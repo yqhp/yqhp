@@ -136,9 +136,6 @@ USER 1300:1301
 ENV APPIUM_DRIVER_UIAUTOMATOR2_VERSION="2.29.0"
 RUN appium driver install --source=npm appium-uiautomator2-driver@${APPIUM_DRIVER_UIAUTOMATOR2_VERSION}
 
-# https://github.com/appium/appium-docker-android/blob/master/Appium/start.sh
-RUN chown -R 1300:1301 .android
-
 #==============
 # 以上配置主要来自https://github.com/appium/appium-docker-android/blob/master/Appium/Dockerfile
 # 以下为yqhp-agent
@@ -147,6 +144,9 @@ COPY agent/agent-web/target/*.jar agent.jar
 COPY agent/agent-web/target/lib.v3 lib.v3
 COPY vendor vendor
 
+COPY start_agent.sh start_agent.sh
+RUN chown 1300:1301 start_agent.sh
+
 EXPOSE 10004
 
-CMD ["java", "-jar", "agent.jar"]
+CMD ./start_agent.sh
