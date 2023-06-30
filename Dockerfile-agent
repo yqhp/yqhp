@@ -144,6 +144,8 @@ USER 1300:1301
 ENV APPIUM_DRIVER_UIAUTOMATOR2_VERSION="2.29.0"
 RUN appium driver install --source=npm appium-uiautomator2-driver@${APPIUM_DRIVER_UIAUTOMATOR2_VERSION}
 
+RUN chmod +x start_agent.sh
+
 EXPOSE 10004
 
 CMD ./start_agent.sh
