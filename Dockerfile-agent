@@ -137,7 +137,7 @@ ENV APPIUM_DRIVER_UIAUTOMATOR2_VERSION="2.29.0"
 RUN appium driver install --source=npm appium-uiautomator2-driver@${APPIUM_DRIVER_UIAUTOMATOR2_VERSION}
 
 # https://github.com/appium/appium-docker-android/blob/master/Appium/start.sh
-sudo chown -R 1300:1301 .android
+RUN chown -R 1300:1301 .android
 
 #==============
 # 以上配置主要来自https://github.com/appium/appium-docker-android/blob/master/Appium/Dockerfile
