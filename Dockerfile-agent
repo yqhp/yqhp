@@ -127,7 +127,7 @@ RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash && \
 RUN chown -R 1300:1301 /usr/lib/node_modules/appium
 
 COPY agent/agent-web/target/*.jar agent.jar
-COPY agent/agent-web/target/lib.v3 lib.v3
+COPY agent/agent-web/target/lib.v4 lib.v4
 COPY vendor vendor
 
 COPY start_agent.sh start_agent.sh
