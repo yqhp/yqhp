@@ -20,7 +20,6 @@ import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.agent.driver.Hierarchy;
-import com.yqhp.file.model.OSSFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -51,9 +50,9 @@ public interface DeviceService {
 
     List<Browser> listBrowser(String token);
 
-    OSSFile screenshotByToken(String token, boolean isTmpFile);
+    String screenshotByToken(String token);
 
-    OSSFile screenshotById(String deviceId, boolean isTmpFile);
+    String screenshotById(String deviceId);
 
     DeviceInfo getDeviceInfo(String deviceId);
 }

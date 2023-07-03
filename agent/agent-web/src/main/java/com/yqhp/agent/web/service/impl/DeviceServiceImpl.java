@@ -30,8 +30,6 @@ import com.yqhp.common.zkdevice.ZkDeviceManager;
 import com.yqhp.common.zookeeper.ZkTemplate;
 import com.yqhp.console.repository.enums.DevicePlatform;
 import com.yqhp.console.repository.enums.DeviceType;
-import com.yqhp.file.model.OSSFile;
-import com.yqhp.file.rpc.FileRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -67,15 +65,12 @@ public class DeviceServiceImpl implements DeviceService {
      */
     private static final ConcurrentHashMap<String, DeviceDriver> DEVICE_DRIVERS = new ConcurrentHashMap<>();
 
-    private final FileRpc fileRpc;
     private final ZkDeviceManager zkDeviceManager;
     private final String location;
 
-    public DeviceServiceImpl(FileRpc fileRpc,
-                             ZkTemplate zkTemplate,
+    public DeviceServiceImpl(ZkTemplate zkTemplate,
                              ServiceInstance serviceInstance,
                              ServerProperties serverProperties) {
-        this.fileRpc = fileRpc;
         this.zkDeviceManager = new ZkDeviceManager(zkTemplate);
 //        String authority = serviceInstance.getUri().getAuthority(); // 192.168.31.247:-1，端口有问题
         String authority = serviceInstance.getHost() + ":" + serverProperties.getPort();
@@ -230,30 +225,23 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public OSSFile screenshotByToken(String token, boolean isTmpFile) {
+    public String screenshotByToken(String token) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        return screenshot(deviceDriver, isTmpFile);
+        return screenshot(deviceDriver);
     }
 
     @Override
-    public OSSFile screenshotById(String deviceId, boolean isTmpFile) {
+    public String screenshotById(String deviceId) {
         DeviceDriver deviceDriver = getDeviceDriverById(deviceId);
-        return screenshot(deviceDriver, isTmpFile);
+        return screenshot(deviceDriver);
     }
 
-    private OSSFile screenshot(DeviceDriver deviceDriver, boolean isTmpFile) {
-        File img = null;
+    private String screenshot(DeviceDriver deviceDriver) {
         try {
-            img = deviceDriver.screenshot();
-            MultipartFile multipartFile = MultipartFileUtils.toMultipartFile(img);
-            return fileRpc.uploadFile(multipartFile, isTmpFile);
+            return deviceDriver.screenshotAsBase64();
         } catch (Exception e) {
-            log.error("screenshot err", e);
+            log.error("[{}]screenshot err", deviceDriver.getDeviceId(), e);
             throw new ServiceException(ResponseCodeEnum.SCREENSHOT_FAIL, e.getMessage());
-        } finally {
-            if (img != null && !img.delete()) {
-                log.warn("delete {} fail", img);
-            }
         }
     }
 

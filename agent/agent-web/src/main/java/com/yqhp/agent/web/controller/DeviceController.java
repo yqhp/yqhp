@@ -20,7 +20,6 @@ import com.yqhp.agent.driver.DeviceInfo;
 import com.yqhp.agent.driver.Hierarchy;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.auth.model.CurrentUser;
-import com.yqhp.file.model.OSSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -68,8 +67,8 @@ public class DeviceController {
     }
 
     @GetMapping("/screenshot")
-    public OSSFile screenshotByToken(@RequestHeader("deviceToken") String token) {
-        return deviceService.screenshotByToken(token, true);
+    public String screenshotByToken(@RequestHeader("deviceToken") String token) {
+        return deviceService.screenshotByToken(token);
     }
 
     /**
@@ -77,8 +76,8 @@ public class DeviceController {
      */
     @GetMapping("/{deviceId}/screenshot")
     @PreAuthorize("hasAuthority('admin')")
-    public OSSFile screenshotById(@PathVariable String deviceId) {
-        return deviceService.screenshotById(deviceId, false);
+    public String screenshotById(@PathVariable String deviceId) {
+        return deviceService.screenshotById(deviceId);
     }
 
     @GetMapping("/{deviceId}/info")

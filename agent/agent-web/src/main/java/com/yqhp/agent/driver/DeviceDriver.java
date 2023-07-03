@@ -109,8 +109,8 @@ public abstract class DeviceDriver {
         return hierarchy;
     }
 
-    public File screenshot() {
-        return getOrCreateAppiumDriver().getScreenshotAs(OutputType.FILE);
+    public String screenshotAsBase64() {
+        return getOrCreateAppiumDriver().getScreenshotAs(OutputType.BASE64);
     }
 
     public abstract DeviceInfo getDeviceInfo();
