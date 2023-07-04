@@ -57,15 +57,17 @@ public class AndroidUtils {
     }
 
     public static void screenshot(IDevice iDevice, String formatName, File imgFile) throws IOException {
-        RawImage rawImg;
+        // asBufferedImage方法非常慢
+        BufferedImage image = screenshotAsRawImage(iDevice).asBufferedImage();
+        ImageIO.write(image, formatName, imgFile);
+    }
+
+    public static RawImage screenshotAsRawImage(IDevice iDevice) {
         try {
-            rawImg = iDevice.getScreenshot();
+            return iDevice.getScreenshot();
         } catch (Exception e) {
             throw new ScreenshotException(e);
         }
-
-        BufferedImage image = rawImg.asBufferedImage();
-        ImageIO.write(image, formatName, imgFile);
     }
 
     public static String getSystemVersion(IDevice iDevice) {
