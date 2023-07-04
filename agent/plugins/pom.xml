@@ -13,5 +13,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>appium</module>
+        <module>easyimg</module>
     </modules>
 </project>

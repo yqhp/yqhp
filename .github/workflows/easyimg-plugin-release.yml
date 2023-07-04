@@ -1,4 +1,4 @@
-name: Appium Plugin Release
+name: Easyimg Plugin Release
 
 on:
   workflow_dispatch:
@@ -20,8 +20,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GIT_TOKEN }}
-          file: agent/plugins/appium/target/*.jar
-          tag: appium-plugin@0.0.1
+          file: agent/plugins/easyimg/target/*.jar
+          tag: easyimg-plugin@0.0.1
           overwrite: true
           file_glob: true
           body: ""
