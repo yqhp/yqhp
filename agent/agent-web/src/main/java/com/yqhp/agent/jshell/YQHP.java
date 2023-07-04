@@ -123,7 +123,14 @@ public class YQHP implements JShellVar {
      * @since 0.0.1
      */
     public String androidShell(String shellCommand) {
+        return AndroidUtils.executeShellCommand(getIDevice(), shellCommand);
+    }
+
+    /**
+     * @since 0.0.5
+     */
+    public IDevice getIDevice() {
         IDevice iDevice = ((AndroidDeviceDriver) deviceDriver).getIDevice();
-        return AndroidUtils.executeShellCommand(iDevice, shellCommand);
+        return iDevice;
     }
 }
