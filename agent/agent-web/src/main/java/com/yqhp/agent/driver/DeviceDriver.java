@@ -246,6 +246,7 @@ public abstract class DeviceDriver {
                 if (jshellContext == null) {
                     log.info("[{}]init jshell context...", device.getId());
                     jshellContext = new JShellContext();
+                    jshellContext.getJShellX().eval("String print(Object o) { return String.valueOf(o); }");
                     jshellContext.injectVar(new YQHP(this));
                     log.info("[{}]init jshell context completed", device.getId());
                 }
