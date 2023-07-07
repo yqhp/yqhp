@@ -24,6 +24,7 @@
         <module>jshell</module>
         <module>repository-code-generator</module>
         <module>kafka-message</module>
+        <module>opencv</module>
     </modules>
 
 </project>

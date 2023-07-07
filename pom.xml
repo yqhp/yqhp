@@ -83,6 +83,11 @@
                 <artifactId>common-jshell</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yqhp</groupId>
+                <artifactId>common-opencv</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!--common above-->
 
             <!-- agent below-->
@@ -363,6 +368,12 @@
                 <version>${rest-assured.version}</version>
             </dependency>
             <!-- 覆盖spring-boot-dependencies end -->
+
+            <dependency>
+                <groupId>org.openpnp</groupId>
+                <artifactId>opencv</artifactId>
+                <version>[4.3.0,)</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
