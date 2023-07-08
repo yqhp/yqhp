@@ -15,16 +15,15 @@
  */
 package com.yqhp.common.opencv;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import nu.pattern.OpenCV;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.imgcodecs.Imgcodecs;
+import org.apache.commons.lang3.Validate;
+import org.opencv.core.*;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.Feature2D;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
@@ -32,31 +31,11 @@ import org.opencv.imgproc.Imgproc;
 @Slf4j
 public class TemplateMatcher {
 
-    @Data
-    @AllArgsConstructor
-    public static class Result {
-        public final Rect rect;
-        public final double score;
-    }
-
     static {
-        log.info("opencv loading...");
-        OpenCV.loadShared();
-        log.info("opencv loaded");
+        OpencvLoader.load();
     }
 
-    public static Rect match(String imgPath, String templatePath, double threshold) {
-        Mat img = Imgcodecs.imread(imgPath);
-        Mat template = Imgcodecs.imread(templatePath);
-        return match(img, template, threshold);
-    }
-
-    public static Rect match(Mat img, Mat template, double threshold) {
-        Result result = match(img, template);
-        return result.score >= threshold ? result.rect : null;
-    }
-
-    private static Result match(Mat img, Mat template) {
+    public static TemplateMatchResult match(Mat img, Mat template) {
         // opencv matchTemplate
         int resultCols = img.cols() - template.cols() + 1;
         int resultRows = img.rows() - template.rows() + 1;
@@ -66,7 +45,34 @@ public class TemplateMatcher {
         // 转换opencvResult
         Core.MinMaxLocResult mmr = Core.minMaxLoc(opencvResult);
         Rect rect = new Rect((int) mmr.maxLoc.x, (int) mmr.maxLoc.y, template.width(), template.height());
-        return new Result(rect, mmr.maxVal);
+        return new TemplateMatchResult(rect, mmr.maxVal);
+    }
+
+    public static List<KeyPoint> match(Mat img, Mat template, Feature2D feature2D) {
+        Validate.notNull(img);
+        Validate.notNull(template);
+        Validate.notNull(feature2D);
+
+        // 检测和计算 图像的关键点和描述符
+        MatOfKeyPoint imgKeyPoints = new MatOfKeyPoint();
+        Mat imgDescriptors = new Mat();
+        feature2D.detectAndCompute(img, new Mat(), imgKeyPoints, imgDescriptors);
+        MatOfKeyPoint templateKeyPoints = new MatOfKeyPoint();
+        Mat templateDescriptors = new Mat();
+        feature2D.detectAndCompute(template, new Mat(), templateKeyPoints, templateDescriptors);
+
+        // 使用Brute-Force匹配器对描述符进行匹配
+        MatOfDMatch matches = new MatOfDMatch();
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+        matcher.match(imgDescriptors, templateDescriptors, matches);
+
+        // 根据距离筛选匹配结果
+        List<KeyPoint> imgKeyPointsList = imgKeyPoints.toList();
+        double distance = 0.1 * 0.5 * Math.max(img.cols(), img.rows());
+        return matches.toList().stream()
+                .filter(match -> match.distance < distance)
+                .map(match -> imgKeyPointsList.get(match.queryIdx))
+                .collect(Collectors.toList());
     }
 
 }
