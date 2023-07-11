@@ -66,7 +66,7 @@ public class TemplateMatcher {
         DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
         matcher.match(imgDescriptors, templateDescriptors, matches);
 
-        // 根据距离筛选匹配结果
+        // 筛选匹配结果
         List<KeyPoint> imgKeyPointsList = imgKeyPoints.toList();
         double distance = 0.1 * 0.5 * Math.max(img.cols(), img.rows());
         return matches.toList().stream()
