@@ -25,6 +25,7 @@ import com.yqhp.agent.devicediscovery.ios.IOSRealDeviceDiscovery;
 import com.yqhp.agent.web.config.prop.AgentProperties;
 import com.yqhp.agent.web.service.DeviceService;
 import lombok.extern.slf4j.Slf4j;
+import nu.pattern.OpenCV;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
@@ -113,6 +114,10 @@ public class AgentLifecycle implements SmartLifecycle {
                 }
             });
         }
+
+        log.info("opencv loading...");
+        OpenCV.loadShared();
+        log.info("opencv loaded");
     }
 
     @Override
