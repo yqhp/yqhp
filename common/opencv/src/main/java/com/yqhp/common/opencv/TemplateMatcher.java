@@ -31,10 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TemplateMatcher {
 
-    static {
-        OpencvLoader.load();
-    }
-
     public static TemplateMatchResult match(Mat img, Mat template) {
         // opencv matchTemplate
         int resultCols = img.cols() - template.cols() + 1;
