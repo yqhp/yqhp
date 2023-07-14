@@ -13,18 +13,34 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.common.opencv;
+package com.yqhp.plugin.easyimg;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.opencv.core.Rect;
+
+import java.awt.*;
 
 /**
  * @author jiangyitao
  */
 @Data
 @AllArgsConstructor
-public class TemplateMatchResult {
-    public final Rect rect;
-    public final double score;
+public class RectX {
+
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+
+    public RectX(Rect rect) {
+        x = rect.x;
+        y = rect.y;
+        width = rect.width;
+        height = rect.height;
+    }
+
+    public Point center() {
+        return new Point(x + width / 2, y + height / 2);
+    }
 }

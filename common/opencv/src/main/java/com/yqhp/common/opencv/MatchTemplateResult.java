@@ -15,20 +15,16 @@
  */
 package com.yqhp.common.opencv;
 
-import org.apache.commons.lang3.Validate;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.opencv.core.Rect;
 
 /**
  * @author jiangyitao
  */
-public class OpencvUtils {
-
-    public static Mat toGray(Mat img) {
-        Validate.notNull(img);
-        Mat grayImg = new Mat();
-        Imgproc.cvtColor(img, grayImg, Imgproc.COLOR_BGR2GRAY);
-        return grayImg;
-    }
-
+@Data
+@AllArgsConstructor
+public class MatchTemplateResult {
+    public final Rect rect;
+    public final double score;
 }
