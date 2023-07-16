@@ -17,17 +17,14 @@ package com.yqhp.common.opencv;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.*;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Feature2D;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.opencv.core.CvType.CV_32F;
 
 /**
  * @author jiangyitao
@@ -48,11 +45,15 @@ public class OpencvEngine {
         // 转换opencvResult
         Core.MinMaxLocResult mmr = Core.minMaxLoc(opencvResult);
         Rect rect = new Rect((int) mmr.maxLoc.x, (int) mmr.maxLoc.y, template.width(), template.height());
+
+        // debug
+//        Imgproc.rectangle(img, rect, new Scalar(0, 255, 0));
+//        Imgcodecs.imwrite("/Users/jiangyitao/Desktop/opencv_test/match_template_result.png", img);
+
         return new MatchTemplateResult(rect, mmr.maxVal);
     }
 
-    public static List<Point> matchFeature(Mat img, Mat template, Feature2D feature2D,
-                                           double distanceThreshold, int clusterCount) {
+    public static Rect matchFeature(Mat img, Mat template, Feature2D feature2D, double distanceThreshold) {
         Validate.notNull(img);
         Validate.notNull(template);
         Validate.notNull(feature2D);
@@ -71,86 +72,70 @@ public class OpencvEngine {
         DescriptorMatcher.create(DescriptorMatcher.FLANNBASED)
                 .knnMatch(templateDesc, imgDesc, matches, 2);
 
-        // debug
-//        Mat outImg = new Mat();
-//        org.opencv.features2d.Features2d.drawMatchesKnn(template, templateKP, img, imgKP, matches, outImg);
-//        org.opencv.highgui.HighGui.imshow("", outImg);
-//        org.opencv.highgui.HighGui.waitKey(0);
-
         List<DMatch> goodMatches = new ArrayList<>();
-        if (matches.size() == 1) {
-            Collections.addAll(goodMatches, matches.get(0).toArray());
-        } else {
-            for (MatOfDMatch match : matches) {
-                DMatch[] dMatches = match.toArray();
-                if (dMatches[0].distance < dMatches[1].distance * distanceThreshold) {
-                    goodMatches.add(dMatches[0]);
-                }
+        for (MatOfDMatch match : matches) {
+            DMatch[] dMatches = match.toArray();
+            if (dMatches[0].distance < dMatches[1].distance * distanceThreshold) {
+                goodMatches.add(dMatches[0]);
             }
+        }
+        if (goodMatches.size() < 4) {
+            return null;
         }
 
         KeyPoint[] imgKPArr = imgKP.toArray();
-        // img goodPoints
-        List<Point> goodPoints = goodMatches.stream()
-                .map(good -> imgKPArr[good.trainIdx].pt)
-                .collect(Collectors.toList());
-        return getLargestClusterPoints(goodPoints, clusterCount);
+        KeyPoint[] templateKPArr = templateKP.toArray();
+        List<Point> scenePoints = new ArrayList<>();
+        List<Point> objPoints = new ArrayList<>();
+        for (DMatch goodMatch : goodMatches) {
+            scenePoints.add(imgKPArr[goodMatch.trainIdx].pt);
+            objPoints.add(templateKPArr[goodMatch.queryIdx].pt);
+        }
+        MatOfPoint2f scenePointsMat = new MatOfPoint2f();
+        scenePointsMat.fromList(scenePoints);
+        MatOfPoint2f objPointsMat = new MatOfPoint2f();
+        objPointsMat.fromList(objPoints);
+        // 使用 findHomography 寻找匹配上的关键点的变换
+        Mat homography = Calib3d.findHomography(objPointsMat, scenePointsMat, Calib3d.RANSAC, 3);
+
+        // 透视变换(Perspective Transformation)是将图片投影到一个新的视平面(Viewing Plane)，也称作投影映射(Projective Mapping)
+        Mat templateCorners = new Mat(4, 1, CvType.CV_32FC2);
+        Mat templateTransformResult = new Mat(4, 1, CvType.CV_32FC2);
+        templateCorners.put(0, 0, 0, 0);
+        templateCorners.put(1, 0, template.cols(), 0);
+        templateCorners.put(2, 0, template.cols(), template.rows());
+        templateCorners.put(3, 0, 0, template.rows());
+        // 使用 perspectiveTransform 将模板图进行透视变以矫正图象得到标准图片
+        Core.perspectiveTransform(templateCorners, templateTransformResult, homography);
+
+        // A --- B
+        // |     |
+        // D --- C
+        double[] pointA = templateTransformResult.get(0, 0);
+        double[] pointB = templateTransformResult.get(1, 0);
+        double[] pointC = templateTransformResult.get(2, 0);
+        double[] pointD = templateTransformResult.get(3, 0);
+
+        // debug
+//        Mat subMat = img.submat((int) pointA[1], (int) pointC[1], (int) pointD[0], (int) pointB[0]);
+//        Imgcodecs.imwrite("/Users/jiangyitao/Desktop/opencv_test/原图中的匹配图.png", subMat);
+//        // 将匹配的图像用四条线框出来
+//        Imgproc.line(img, new Point(pointA), new Point(pointB), new Scalar(0, 255, 0), 4); // 上 A->B
+//        Imgproc.line(img, new Point(pointB), new Point(pointC), new Scalar(0, 255, 0), 4); // 右 B->C
+//        Imgproc.line(img, new Point(pointC), new Point(pointD), new Scalar(0, 255, 0), 4); // 下 C->D
+//        Imgproc.line(img, new Point(pointD), new Point(pointA), new Scalar(0, 255, 0), 4); // 左 D->A
+//        MatOfDMatch goodMatchesMat = new MatOfDMatch();
+//        goodMatchesMat.fromList(goodMatches);
+//        Mat matchOutput = new Mat(img.rows() * 2, img.cols() * 2, Imgcodecs.IMREAD_COLOR);
+//        Features2d.drawMatches(template, templateKP, img, imgKP, goodMatchesMat, matchOutput, new Scalar(0, 255, 0), new Scalar(255, 0, 0), new MatOfByte(), 2);
+//        Imgcodecs.imwrite("/Users/jiangyitao/Desktop/opencv_test/特征点匹配过程.png", matchOutput);
+//        Imgcodecs.imwrite("/Users/jiangyitao/Desktop/opencv_test/模板图在原图中的位置.png", img);
+
+        int x = (int) pointA[0];
+        int y = (int) pointA[1];
+        int width = (int) (pointB[0] - pointA[0]);
+        int height = (int) (pointD[1] - pointA[1]);
+        return new Rect(x, y, width, height);
     }
 
-    // 这个函数由chatgpt生成, cool
-    private static List<Point> getLargestClusterPoints(List<Point> points, int clusterCount) {
-        if (points == null || points.size() == 0) {
-            return new ArrayList<>();
-        }
-
-        if (points.size() < clusterCount) {
-            clusterCount = 1;
-        }
-
-        // 转换点列表为MatOfPoint2f
-        MatOfPoint2f matOfPoint = new MatOfPoint2f();
-        matOfPoint.fromList(points);
-
-        // 转换为CV_32F类型的Mat
-        Mat samples = new Mat(matOfPoint.rows(), matOfPoint.cols(), CV_32F);
-        matOfPoint.convertTo(samples, CV_32F);
-
-        // 设置KMeans参数
-        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
-        int attempts = 5;
-        int flags = Core.KMEANS_PP_CENTERS;
-
-        // 进行KMeans聚类
-        Mat labels = new Mat();
-        Mat centers = new Mat();
-        Core.kmeans(samples, clusterCount, labels, criteria, attempts, flags, centers);
-
-        // 计算每个簇的点数
-        int[] clusterSizes = new int[clusterCount];
-        for (int i = 0; i < labels.rows(); i++) {
-            int label = (int) labels.get(i, 0)[0];
-            clusterSizes[label]++;
-        }
-
-        // 找到包含最多点的簇的索引
-        int largestClusterIndex = 0;
-        int largestClusterSize = 0;
-        for (int i = 0; i < clusterCount; i++) {
-            if (clusterSizes[i] > largestClusterSize) {
-                largestClusterIndex = i;
-                largestClusterSize = clusterSizes[i];
-            }
-        }
-
-        // 获取包含最多点的簇的点列表
-        List<Point> largestClusterPoints = new ArrayList<>();
-        for (int i = 0; i < labels.rows(); i++) {
-            int label = (int) labels.get(i, 0)[0];
-            if (label == largestClusterIndex) {
-                largestClusterPoints.add(points.get(i));
-            }
-        }
-
-        return largestClusterPoints;
-    }
 }
