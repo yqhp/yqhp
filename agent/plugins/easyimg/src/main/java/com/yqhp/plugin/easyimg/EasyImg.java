@@ -26,6 +26,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.features2d.SIFT;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openqa.selenium.OutputType;
@@ -207,25 +209,9 @@ public class EasyImg {
             return new RectX(matchTemplateResult.rect);
         }
 
-//        // 特征匹配
-//        List<Point> points = OpencvEngine.matchFeature(img, template, SIFT.create(), threshold, 3);
-//        if (CollectionUtils.isEmpty(points)) {
-//            return null;
-//        }
-//
-//        int minX = Integer.MAX_VALUE;
-//        int maxX = Integer.MIN_VALUE;
-//        int minY = Integer.MAX_VALUE;
-//        int maxY = Integer.MIN_VALUE;
-//        for (Point point : points) {
-//            minX = (int) Math.min(minX, point.x);
-//            maxX = (int) Math.max(maxX, point.x);
-//            minY = (int) Math.min(minY, point.y);
-//            maxY = (int) Math.max(maxY, point.y);
-//        }
-//
-//        return new RectX(minX, minY, maxX - minX + 1, maxY - minY + 1);
-        return null;
+        // 特征匹配
+        Rect rect = OpencvEngine.matchFeature(img, template, SIFT.create(), threshold);
+        return rect != null ? new RectX(rect) : null;
     }
 
     private int getARGB(RawImage img, int x, int y) {
