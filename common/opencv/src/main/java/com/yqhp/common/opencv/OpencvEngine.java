@@ -135,6 +135,9 @@ public class OpencvEngine {
         int y = (int) pointA[1];
         int width = (int) (pointB[0] - pointA[0]);
         int height = (int) (pointD[1] - pointA[1]);
+        if (x <= 0 || y <= 0 || width <= 0 || height <= 0) {
+            return null;
+        }
         return new Rect(x, y, width, height);
     }
 

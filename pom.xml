@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>com.yqhp</groupId>
                 <artifactId>common-opencv</artifactId>
-                <version>${revision}</version>
+                <version>0.0.2</version>
             </dependency>
             <!--common above-->
 

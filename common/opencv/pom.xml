@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>common-opencv</artifactId>
+    <version>0.0.2</version>
 
     <dependencies>
         <dependency>
