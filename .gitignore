@@ -56,3 +56,6 @@ target/
 Thumbs.db
 Servers
 .metadata
+
+### yqhp ignore ###
+download
