@@ -5,7 +5,7 @@
 ```groovy
 import com.yqhp.plugin.appium.*;
 
-var d = new AppiumDriverWrapper(yqhp.appiumDriver());
+var d = new AppiumDriverWrapper(device.appiumDriver());
 ```
 
 ### 方式2（推荐）
@@ -18,7 +18,7 @@ import com.yqhp.plugin.appium.*;
 class CustomAppiumDriver extends AppiumDriverWrapper {
 
     CustomAppiumDriver() {
-        super(yqhp.appiumDriver());
+        super(device.appiumDriver());
     }
 
     void pressAndroidKey(AndroidKey key) {
@@ -57,7 +57,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param appUri app url or filePath
      */
     void installApp(String appUri) {
-        yqhp.installApp(appUri);
+        device.installApp(appUri);
     }
 
     /**
@@ -84,7 +84,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param pkg  package name
      */
     void clearApkData(String pkg) {
-        yqhp.androidShell("pm clear " + pkg);
+        device.androidShell("pm clear " + pkg);
     }
 }
 

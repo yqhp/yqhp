@@ -11,11 +11,11 @@
 
     <artifactId>agent-web</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.8</version>
+    <version>0.2.0</version>
 
     <properties>
         <!-- 注意: dependencies发生变化，需要更新这个版本号  -->
-        <lib.version>v8</lib.version>
+        <lib.version>v20</lib.version>
     </properties>
 
     <dependencies>
@@ -79,6 +79,10 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>

@@ -17,17 +17,11 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.Device;
-import com.yqhp.agent.jshell.YQHP;
+import com.yqhp.agent.jshell.DeviceYQHP;
 import com.yqhp.agent.web.config.Properties;
-import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.commons.util.FileUtils;
-import com.yqhp.common.jshell.CompletionItem;
 import com.yqhp.common.jshell.JShellContext;
-import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.common.jshell.TriggerSuggestRequest;
-import com.yqhp.common.web.util.ApplicationContextUtils;
 import com.yqhp.console.repository.enums.ViewType;
-import com.yqhp.console.repository.jsonfield.PluginDTO;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -41,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,14 +42,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.time.Duration;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * @author jiangyitao
  */
 @Slf4j
-public abstract class DeviceDriver {
+public abstract class DeviceDriver extends Driver {
 
     @Getter
     protected final Device device;
@@ -69,15 +60,17 @@ public abstract class DeviceDriver {
     private AppiumDriverLocalService appiumService;
     private OutputStream appiumLogOutput;
 
-    private volatile JShellContext jshellContext;
-    private volatile ThreadGroup threadGroup;
-
     public DeviceDriver(Device device) {
         this.device = device;
     }
 
     public String getDeviceId() {
         return device.getId();
+    }
+
+    @Override
+    public void injectVar(JShellContext context) {
+        context.injectVar(new DeviceYQHP(this));
     }
 
     public void installApp(String uri) throws IOException {
@@ -240,103 +233,13 @@ public abstract class DeviceDriver {
 
     protected abstract AppiumDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities);
 
-    public JShellContext getOrCreateJShellContext() {
-        if (jshellContext == null) {
-            synchronized (this) {
-                if (jshellContext == null) {
-                    log.info("[{}]init jshell context...", device.getId());
-                    jshellContext = new JShellContext();
-                    jshellContext.getJShellX().eval("String print(Object o) { return String.valueOf(o); }");
-                    jshellContext.injectVar(new YQHP(this));
-                    log.info("[{}]init jshell context completed", device.getId());
-                }
-            }
-        }
-        return jshellContext;
-    }
-
-    public JShellEvalResult jshellEval(String input) {
-        return getOrCreateJShellContext().getJShellX().eval(input);
-    }
-
-    public JShellEvalResult jshellEval(String input, Consumer<JShellEvalResult> consumer) {
-        return getOrCreateJShellContext().getJShellX().eval(input, consumer);
-    }
-
-    public List<JShellEvalResult> jshellAnalysisAndEval(String input) {
-        return getOrCreateJShellContext().getJShellX().analysisAndEval(input);
-    }
-
-    public List<JShellEvalResult> jshellAnalysisAndEval(String input, Consumer<JShellEvalResult> consumer) {
-        return getOrCreateJShellContext().getJShellX().analysisAndEval(input, consumer);
-    }
-
-    public List<CompletionItem> jshellSuggestions(TriggerSuggestRequest request) {
-        return getOrCreateJShellContext().getJShellX().getSuggestions(request);
-    }
-
-    private static final PluginService PLUGIN_SERVICE = ApplicationContextUtils.getBean(PluginService.class);
-
-    public List<File> jshellLoadPlugin(PluginDTO plugin) throws IOException {
-        List<File> files = PLUGIN_SERVICE.downloadIfAbsent(plugin);
-        jshellAddToClasspath(files);
-        return files;
-    }
-
-    public void jshellAddToClasspath(List<File> files) {
-        if (CollectionUtils.isEmpty(files)) {
-            return;
-        }
-        for (File file : files) {
-            jshellAddToClasspath(file.getAbsolutePath());
-        }
-    }
-
-    public void jshellAddToClasspath(String path) {
-        Assert.hasText(path, "path must has text");
-        getOrCreateJShellContext().getJShellX().getJShell().addToClasspath(path);
-    }
-
-    public synchronized void closeJShellContext() {
-        if (jshellContext != null) {
-            log.info("[{}]close jshell context", device.getId());
-            jshellContext.close();
-            jshellContext = null;
-        }
-    }
-
-    public synchronized ThreadGroup getOrCreateThreadGroup() {
-        if (threadGroup == null) {
-            log.info("[{}]init thread group...", device.getId());
-            threadGroup = new ThreadGroup("thread-group-device-" + device.getId());
-            log.info("[{}]init thread group completed", device.getId());
-        }
-        return threadGroup;
-    }
-
-    /**
-     * 统一使用该方法执行异步任务。这样的好处是，stopThreadGroup可以立即停止正在执行的任务。避免出现死循环永远无法停止的情况
-     */
-    public void runAsync(Runnable runnable) {
-        Thread thread = new Thread(getOrCreateThreadGroup(), runnable);
-        thread.start();
-    }
-
-    public synchronized void stopThreadGroup() {
-        if (threadGroup != null) {
-            log.info("[{}]stop thread group", device.getId());
-            threadGroup.stop();
-            threadGroup = null;
-        }
-    }
-
+    @Override
     public void release() {
         stopReceiveDeviceLog();
         stopReceiveAppiumLog();
         quitAppiumDriver();
         stopAppiumService();
         capabilities = null;
-        closeJShellContext();
-        stopThreadGroup();
+        super.release();
     }
 }

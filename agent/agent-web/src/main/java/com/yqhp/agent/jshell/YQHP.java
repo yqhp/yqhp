@@ -15,14 +15,10 @@
  */
 package com.yqhp.agent.jshell;
 
-import com.android.ddmlib.IDevice;
-import com.yqhp.agent.androidtools.AndroidUtils;
-import com.yqhp.agent.driver.AndroidDeviceDriver;
-import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.agent.driver.Driver;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellVar;
-import io.appium.java_client.AppiumDriver;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -37,11 +33,11 @@ import java.io.File;
 @Slf4j
 public class YQHP implements JShellVar {
 
-    private final DeviceDriver deviceDriver;
+    protected final Driver driver;
 
-    public YQHP(DeviceDriver deviceDriver) {
-        Assert.notNull(deviceDriver, "deviceDriver can not be null");
-        this.deviceDriver = deviceDriver;
+    public YQHP(Driver driver) {
+        Assert.notNull(driver, "driver cannot be null");
+        this.driver = driver;
     }
 
     @Override
@@ -55,29 +51,7 @@ public class YQHP implements JShellVar {
      * @since 0.0.1
      */
     public void runAsync(Runnable runnable) {
-        deviceDriver.runAsync(runnable);
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public AppiumDriver appiumDriver() {
-        return deviceDriver.getOrCreateAppiumDriver();
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public AppiumDriver refreshAppiumDriver() {
-        return deviceDriver.refreshAppiumDriver();
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public YQHP cap(String key, Object value) {
-        deviceDriver.setCapability(key, value);
-        return this;
+        driver.runAsync(runnable);
     }
 
     /**
@@ -98,38 +72,5 @@ public class YQHP implements JShellVar {
     @SneakyThrows
     public File downloadFile(String url) {
         return FileUtils.downloadIfAbsent(url, new File(Properties.getDownloadDir()));
-    }
-
-    /**
-     * @param uri url or filePath
-     * @since 0.0.1
-     */
-    @SneakyThrows
-    public void installApp(String uri) {
-        deviceDriver.installApp(uri);
-    }
-
-    /**
-     * @since 0.0.1
-     */
-    public void installApp(File file) {
-        deviceDriver.installApp(file);
-    }
-
-    /**
-     * 在android设备内执行shell命令
-     * 注意: 这是在设备内部执行的命令，所以不需要加"adb shell"
-     *
-     * @since 0.0.1
-     */
-    public String androidShell(String shellCommand) {
-        return AndroidUtils.executeShellCommand(getIDevice(), shellCommand);
-    }
-
-    /**
-     * @since 0.0.5
-     */
-    public IDevice getIDevice() {
-        return ((AndroidDeviceDriver) deviceDriver).getIDevice();
     }
 }
