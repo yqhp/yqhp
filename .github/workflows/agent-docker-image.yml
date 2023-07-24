@@ -34,4 +34,4 @@ jobs:
           push: true
           tags: |
             registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-agent:latest
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-agent:0.0.8
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-agent:0.2.0
