@@ -130,7 +130,6 @@ public class YQHP implements JShellVar {
      * @since 0.0.5
      */
     public IDevice getIDevice() {
-        IDevice iDevice = ((AndroidDeviceDriver) deviceDriver).getIDevice();
-        return iDevice;
+        return ((AndroidDeviceDriver) deviceDriver).getIDevice();
     }
 }

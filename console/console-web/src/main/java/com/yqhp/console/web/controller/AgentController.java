@@ -15,29 +15,46 @@
  */
 package com.yqhp.console.web.controller;
 
+import com.yqhp.console.model.vo.AgentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jiangyitao
  */
 @RestController
 @RequestMapping("/agent")
-@PreAuthorize("hasAuthority('admin')")
 public class AgentController {
 
     @Autowired
     private DiscoveryClient discoveryClient;
 
-    @GetMapping("/all")
-    public List<ServiceInstance> getAgentInstances() {
+    @PreAuthorize("hasAuthority('admin')")
+    @GetMapping("/instance")
+    public List<ServiceInstance> listAgentInstance() {
         return discoveryClient.getInstances("agent-service");
+    }
+
+    @GetMapping("/info")
+    public List<AgentInfo> listAgentInfo() {
+        return listAgentInstance().stream().map(instance -> {
+            AgentInfo agentInfo = new AgentInfo();
+            agentInfo.setLocation(Base64Utils.encodeToUrlSafeString((instance.getHost() + ":" + instance.getPort()).getBytes()));
+            agentInfo.setAgentVersion(instance.getMetadata().get("agent.version"));
+            agentInfo.setJavaVersion(instance.getMetadata().get("java.version"));
+            agentInfo.setOsVersion(instance.getMetadata().get("os.version"));
+            agentInfo.setOsName(instance.getMetadata().get("os.name"));
+            agentInfo.setOsArch(instance.getMetadata().get("os.arch"));
+            return agentInfo;
+        }).collect(Collectors.toList());
     }
 }
