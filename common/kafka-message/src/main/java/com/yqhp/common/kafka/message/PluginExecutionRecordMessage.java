@@ -28,7 +28,6 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PluginExecutionRecordMessage implements InputConverter<PluginExecutionRecord> {
     private String id;
-    private String deviceId;
     private ExecutionStatus status;
     private Long startTime;
     private Long endTime;
