@@ -15,8 +15,7 @@
  */
 package com.yqhp.agent.web.ws.device;
 
-import com.yqhp.agent.web.ws.message.handler.JShellEvalHandler;
-import com.yqhp.agent.web.ws.message.handler.JShellLoadPluginHandler;
+import com.yqhp.agent.web.ws.message.handler.JShellSuggestionsHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
@@ -28,14 +27,12 @@ import javax.websocket.server.ServerEndpoint;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/jshellExecution/token/{token}")
-public class JShellExecutionWebsocket extends DeviceWebsocket {
+@ServerEndpoint(value = "/device/jshellSuggestions/token/{token}")
+public class DeviceJShellSuggestionsWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {
-        messageHandler
-                .register(new JShellLoadPluginHandler(session, deviceDriver))
-                .register(new JShellEvalHandler(session, deviceDriver));
+        messageHandler.register(new JShellSuggestionsHandler(session, deviceDriver));
     }
 
 }

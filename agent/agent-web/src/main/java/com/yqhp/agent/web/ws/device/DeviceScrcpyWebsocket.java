@@ -29,7 +29,7 @@ import javax.websocket.server.ServerEndpoint;
 @Slf4j
 @Controller
 @ServerEndpoint(value = "/device/scrcpy/token/{token}")
-public class ScrcpyWebsocket extends DeviceWebsocket {
+public class DeviceScrcpyWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {

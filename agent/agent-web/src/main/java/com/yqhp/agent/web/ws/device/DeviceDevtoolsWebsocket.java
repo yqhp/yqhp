@@ -39,7 +39,7 @@ import java.util.concurrent.CompletionStage;
 @Slf4j
 @Controller
 @ServerEndpoint(value = "/device/devtools/token/{token}/socket/{socket}/page/{page}")
-public class DevtoolsWebsocket {
+public class DeviceDevtoolsWebsocket {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 

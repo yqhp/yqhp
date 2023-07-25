@@ -29,7 +29,7 @@ import java.io.IOException;
 @Slf4j
 @Controller
 @ServerEndpoint(value = "/device/appiumLog/token/{token}")
-public class AppiumLogWebsocket extends DeviceWebsocket {
+public class DeviceAppiumLogWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {
