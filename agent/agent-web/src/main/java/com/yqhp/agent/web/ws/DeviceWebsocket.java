@@ -41,7 +41,7 @@ public class DeviceWebsocket {
 
     protected DeviceDriver deviceDriver;
     protected String token;
-    protected MessageHandler messageHandler;
+    protected MessageHandler messageHandler = new MessageHandler();
 
     /**
      * 注意，子类Override需要带上@OnOpen才能生效
@@ -51,8 +51,12 @@ public class DeviceWebsocket {
         log.info("[{}]onOpen, token:{}", session.getId(), token);
         deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
         this.token = token;
-        messageHandler = new MessageHandler();
         WebsocketSessionPool.addSession(session);
+        onOpened(session);
+    }
+
+    protected void onOpened(Session session) {
+
     }
 
     /**
@@ -73,6 +77,11 @@ public class DeviceWebsocket {
     @OnClose
     public void onClose(Session session) {
         log.info("[{}]onClose", session.getId());
+        onClosed();
+    }
+
+    protected void onClosed() {
+
     }
 
     /**

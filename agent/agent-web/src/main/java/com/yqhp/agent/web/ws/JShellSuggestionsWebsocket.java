@@ -19,9 +19,7 @@ import com.yqhp.agent.web.ws.message.handler.JShellSuggestionsHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 /**
@@ -31,10 +29,10 @@ import javax.websocket.server.ServerEndpoint;
 @Controller
 @ServerEndpoint(value = "/device/jshellSuggestions/token/{token}")
 public class JShellSuggestionsWebsocket extends DeviceWebsocket {
-    @OnOpen
+
     @Override
-    public void onOpen(@PathParam("token") String token, Session session) {
-        super.onOpen(token, session);
-        messageHandler.addInputHandler(new JShellSuggestionsHandler(session, deviceDriver));
+    protected void onOpened(Session session) {
+        messageHandler.register(new JShellSuggestionsHandler(session, deviceDriver));
     }
+
 }

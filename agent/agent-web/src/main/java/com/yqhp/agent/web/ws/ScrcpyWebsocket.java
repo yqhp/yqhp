@@ -20,10 +20,7 @@ import com.yqhp.agent.web.ws.message.handler.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 /**
@@ -34,23 +31,19 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/device/scrcpy/token/{token}")
 public class ScrcpyWebsocket extends DeviceWebsocket {
 
-    @OnOpen
     @Override
-    public void onOpen(@PathParam("token") String token, Session session) {
-        super.onOpen(token, session);
+    protected void onOpened(Session session) {
         AndroidDeviceDriver driver = (AndroidDeviceDriver) deviceDriver;
         messageHandler
-                .addInputHandler(new StartScrcpyHandler(session, driver))
-                .addInputHandler(new ScrcpyKeyHandler(driver))
-                .addInputHandler(new ScrcpyTextHandler(driver))
-                .addInputHandler(new ScrcpyTouchHandler(driver))
-                .addInputHandler(new ScrcpyScrollHandler(driver));
+                .register(new StartScrcpyHandler(session, driver))
+                .register(new ScrcpyKeyHandler(driver))
+                .register(new ScrcpyTextHandler(driver))
+                .register(new ScrcpyTouchHandler(driver))
+                .register(new ScrcpyScrollHandler(driver));
     }
 
-    @OnClose
     @Override
-    public void onClose(Session session) {
-        super.onClose(session);
+    protected void onClosed() {
         if (token != null) deviceService.unlockDevice(token);
     }
 

@@ -35,7 +35,7 @@ public class MessageHandler {
 
     private final Map<Command, InputHandler<?>> handlers = new HashMap<>();
 
-    public MessageHandler addInputHandler(InputHandler<?> handler) {
+    public MessageHandler register(InputHandler<?> handler) {
         handlers.put(handler.command(), handler);
         return this;
     }

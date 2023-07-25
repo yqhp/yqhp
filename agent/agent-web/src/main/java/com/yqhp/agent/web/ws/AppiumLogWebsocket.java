@@ -18,11 +18,8 @@ package com.yqhp.agent.web.ws;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 
@@ -34,10 +31,8 @@ import java.io.IOException;
 @ServerEndpoint(value = "/device/appiumLog/token/{token}")
 public class AppiumLogWebsocket extends DeviceWebsocket {
 
-    @OnOpen
     @Override
-    public void onOpen(@PathParam("token") String token, Session session) {
-        super.onOpen(token, session);
+    protected void onOpened(Session session) {
         RemoteEndpoint.Basic remote = session.getBasicRemote();
         deviceDriver.receiveAppiumLog(appiumLog -> {
             if (session.isOpen()) {
@@ -50,10 +45,8 @@ public class AppiumLogWebsocket extends DeviceWebsocket {
         });
     }
 
-    @OnClose
     @Override
-    public void onClose(Session session) {
-        super.onClose(session);
+    protected void onClosed() {
         if (deviceDriver != null) {
             deviceDriver.stopReceiveAppiumLog();
         }
