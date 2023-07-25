@@ -18,6 +18,7 @@ package com.yqhp.console.web.common;
 import com.yqhp.common.zkdevice.ZkDevice;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ZkDeviceContainer {
 
-    private static final ConcurrentHashMap<String, ZkDevice> ZK_DEVICES = new ConcurrentHashMap<>();
+    private static final Map<String, ZkDevice> ZK_DEVICES = new ConcurrentHashMap<>();
 
     public static void add(ZkDevice zkDevice) {
         ZK_DEVICES.put(zkDevice.getId(), zkDevice);

@@ -19,6 +19,7 @@ import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WebsocketSessionPool {
 
-    private static final ConcurrentHashMap<String, Session> SESSIONS = new ConcurrentHashMap<>();
+    private static final Map<String, Session> SESSIONS = new ConcurrentHashMap<>();
 
     public static void addSession(Session session) {
         if (session == null) return;

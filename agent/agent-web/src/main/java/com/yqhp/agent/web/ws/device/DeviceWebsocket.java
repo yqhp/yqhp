@@ -18,13 +18,8 @@ package com.yqhp.agent.web.ws.device;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.ws.BaseWebsocket;
-import com.yqhp.agent.web.ws.WebsocketSessionPool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 
 /**
  * @author jiangyitao
@@ -40,21 +35,9 @@ public class DeviceWebsocket extends BaseWebsocket {
     }
 
     protected DeviceDriver deviceDriver;
-    protected String token;
 
-    /**
-     * 注意，子类Override需要带上@OnOpen才能生效
-     */
-    @OnOpen
-    public void onOpen(@PathParam("token") String token, Session session) {
-        log.info("[{}]onOpen, token:{}", session.getId(), token);
-        deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
-        this.token = token;
-        WebsocketSessionPool.addSession(session);
-        onOpened(session);
-    }
-
-    protected void onOpened(Session session) {
-
+    @Override
+    protected void checkToken(String token) {
+        deviceDriver = deviceService.getDeviceDriverByToken(token);
     }
 }

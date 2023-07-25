@@ -20,10 +20,8 @@ import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.agent.web.ws.message.handler.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
+import javax.websocket.*;
+import javax.websocket.server.PathParam;
 
 /**
  * @author jiangyitao
@@ -32,6 +30,27 @@ import javax.websocket.Session;
 public class BaseWebsocket {
 
     protected MessageHandler messageHandler = new MessageHandler();
+    protected String token;
+
+    /**
+     * 注意，子类Override需要带上@OnOpen才能生效
+     */
+    @OnOpen
+    public void onOpen(@PathParam("token") String token, Session session) {
+        log.info("[{}]onOpen, token:{}", session.getId(), token);
+        checkToken(token); // 检查token，抛出异常进入@OnError
+        this.token = token;
+        WebsocketSessionPool.addSession(session);
+        onOpened(session);
+    }
+
+    protected void checkToken(String token) {
+
+    }
+
+    protected void onOpened(Session session) {
+
+    }
 
     /**
      * 注意，子类Override需要带上@OnError注解生效

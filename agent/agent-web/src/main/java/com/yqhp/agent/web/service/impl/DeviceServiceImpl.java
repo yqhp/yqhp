@@ -44,6 +44,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -58,12 +59,12 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * token : DeviceDriver
      */
-    private static final ConcurrentHashMap<String, DeviceDriver> LOCKED_DEVICE_DRIVERS = new ConcurrentHashMap<>();
+    private static final Map<String, DeviceDriver> LOCKED_DEVICE_DRIVERS = new ConcurrentHashMap<>();
 
     /**
      * deviceId : DeviceDriver
      */
-    private static final ConcurrentHashMap<String, DeviceDriver> DEVICE_DRIVERS = new ConcurrentHashMap<>();
+    private static final Map<String, DeviceDriver> DEVICE_DRIVERS = new ConcurrentHashMap<>();
 
     private final ZkDeviceManager zkDeviceManager;
     private final String location;
