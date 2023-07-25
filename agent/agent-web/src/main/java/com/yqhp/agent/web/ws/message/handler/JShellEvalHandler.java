@@ -15,19 +15,24 @@
  */
 package com.yqhp.agent.web.ws.message.handler;
 
-import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.agent.driver.Driver;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
+import com.yqhp.agent.web.ws.message.OutputSender;
 
 import javax.websocket.Session;
 
 /**
  * @author jiangyitao
  */
-public class JShellEvalHandler extends DefaultInputHandler<String> {
+public class JShellEvalHandler extends InputHandler<String> {
 
-    public JShellEvalHandler(Session session, DeviceDriver deviceDriver) {
-        super(session, deviceDriver);
+    private final OutputSender os;
+    private final Driver driver;
+
+    public JShellEvalHandler(Session session, Driver driver) {
+        os = new OutputSender(session, command());
+        this.driver = driver;
     }
 
     @Override
@@ -37,7 +42,7 @@ public class JShellEvalHandler extends DefaultInputHandler<String> {
 
     @Override
     protected void handle(Input<String> input) {
-        deviceDriver.jshellAnalysisAndEval(input.getData(), (result) ->
+        driver.jshellAnalysisAndEval(input.getData(), (result) ->
                 os.info(input.getUid(), result)
         );
     }

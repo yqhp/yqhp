@@ -15,9 +15,10 @@
  */
 package com.yqhp.agent.web.ws.message.handler;
 
-import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.agent.driver.Driver;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
+import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.common.jshell.TriggerSuggestRequest;
 
 import javax.websocket.Session;
@@ -25,10 +26,14 @@ import javax.websocket.Session;
 /**
  * @author jiangyitao
  */
-public class JShellSuggestionsHandler extends DefaultInputHandler<TriggerSuggestRequest> {
+public class JShellSuggestionsHandler extends InputHandler<TriggerSuggestRequest> {
 
-    public JShellSuggestionsHandler(Session session, DeviceDriver deviceDriver) {
-        super(session, deviceDriver);
+    private final OutputSender os;
+    private final Driver driver;
+
+    public JShellSuggestionsHandler(Session session, Driver driver) {
+        os = new OutputSender(session, command());
+        this.driver = driver;
     }
 
     @Override
@@ -38,6 +43,6 @@ public class JShellSuggestionsHandler extends DefaultInputHandler<TriggerSuggest
 
     @Override
     protected void handle(Input<TriggerSuggestRequest> input) {
-        os.info(input.getUid(), deviceDriver.jshellSuggestions(input.getData()));
+        os.info(input.getUid(), driver.jshellSuggestions(input.getData()));
     }
 }

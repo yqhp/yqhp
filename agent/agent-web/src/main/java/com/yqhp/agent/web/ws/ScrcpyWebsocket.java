@@ -15,6 +15,7 @@
  */
 package com.yqhp.agent.web.ws;
 
+import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.web.ws.message.handler.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -37,12 +38,13 @@ public class ScrcpyWebsocket extends DeviceWebsocket {
     @Override
     public void onOpen(@PathParam("token") String token, Session session) {
         super.onOpen(token, session);
+        AndroidDeviceDriver driver = (AndroidDeviceDriver) deviceDriver;
         messageHandler
-                .addInputHandler(new StartScrcpyHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyKeyHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyTextHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyTouchHandler(session, deviceDriver))
-                .addInputHandler(new ScrcpyScrollHandler(session, deviceDriver));
+                .addInputHandler(new StartScrcpyHandler(session, driver))
+                .addInputHandler(new ScrcpyKeyHandler(driver))
+                .addInputHandler(new ScrcpyTextHandler(driver))
+                .addInputHandler(new ScrcpyTouchHandler(driver))
+                .addInputHandler(new ScrcpyScrollHandler(driver));
     }
 
     @OnClose

@@ -15,9 +15,10 @@
  */
 package com.yqhp.agent.web.ws.message.handler;
 
-import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.agent.driver.Driver;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
+import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 
 import javax.websocket.Session;
@@ -26,10 +27,14 @@ import java.io.IOException;
 /**
  * @author jiangyitao
  */
-public class JShellLoadPluginHandler extends DefaultInputHandler<PluginDTO> {
+public class JShellLoadPluginHandler extends InputHandler<PluginDTO> {
 
-    public JShellLoadPluginHandler(Session session, DeviceDriver deviceDriver) {
-        super(session, deviceDriver);
+    private final OutputSender os;
+    private final Driver driver;
+
+    public JShellLoadPluginHandler(Session session, Driver driver) {
+        os = new OutputSender(session, command());
+        this.driver = driver;
     }
 
     @Override
@@ -39,9 +44,9 @@ public class JShellLoadPluginHandler extends DefaultInputHandler<PluginDTO> {
 
     @Override
     protected void handle(Input<PluginDTO> input) throws IOException {
-        os.info(input.getUid(), "加载中...");
-        deviceDriver.jshellLoadPlugin(input.getData());
-        os.ok(input.getUid(), "加载完成");
+        os.info(input.getUid(), "loading...");
+        driver.jshellLoadPlugin(input.getData());
+        os.ok(input.getUid(), "loading completed");
     }
 
 }

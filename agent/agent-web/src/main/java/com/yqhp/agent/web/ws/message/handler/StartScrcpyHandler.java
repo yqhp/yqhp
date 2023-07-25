@@ -17,13 +17,13 @@ package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.driver.AndroidDeviceDriver;
-import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.scrcpy.Scrcpy;
 import com.yqhp.agent.scrcpy.ScrcpyFrameClient;
 import com.yqhp.agent.scrcpy.ScrcpyOptions;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
+import com.yqhp.agent.web.ws.message.OutputSender;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.RemoteEndpoint;
@@ -39,13 +39,19 @@ import java.util.concurrent.SynchronousQueue;
  * @author jiangyitao
  */
 @Slf4j
-public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
+public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
 
     private static final ExecutorService START_SCRCPY_THREAD_POOL = Executors.newCachedThreadPool();
     private static final ExecutorService READ_SCRCPY_FRAME_THREAD_POOL = Executors.newCachedThreadPool();
 
-    public StartScrcpyHandler(Session session, DeviceDriver deviceDriver) {
-        super(session, deviceDriver);
+    private final Session session;
+    private final OutputSender os;
+    private final AndroidDeviceDriver driver;
+
+    public StartScrcpyHandler(Session session, AndroidDeviceDriver driver) {
+        this.session = session;
+        os = new OutputSender(session, command());
+        this.driver = driver;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
         String uid = input.getUid();
 
         os.info(uid, "starting scrcpy...");
-        Scrcpy scrcpy = ((AndroidDeviceDriver) deviceDriver).getScrcpy();
+        Scrcpy scrcpy = driver.getScrcpy();
         scrcpy.start(
                 Properties.getScrcpyServerPath(),
                 Properties.getScrcpyVersion(),
@@ -77,14 +83,14 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
             RemoteEndpoint.Basic remote = session.getBasicRemote();
             try {
                 os.ok(uid, "start sending frames...");
-                log.info("[{}]start sending frames...", deviceDriver.getDeviceId());
+                log.info("[{}]start sending frames...", driver.getDeviceId());
                 while (session.isOpen()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     remote.sendBinary(frame);
                 }
-                log.info("[{}]stop sending frames", deviceDriver.getDeviceId());
+                log.info("[{}]stop sending frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop sending frames, cause: {}", deviceDriver.getDeviceId(),
+                log.info("[{}]stop sending frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
@@ -92,17 +98,17 @@ public class StartScrcpyHandler extends DefaultInputHandler<ScrcpyOptions> {
 
         READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
             try {
-                log.info("[{}]start reading frames", deviceDriver.getDeviceId());
+                log.info("[{}]start reading frames", driver.getDeviceId());
                 scrcpyFrameClient.readFrame(frame -> {
                     try {
                         blockingQueue.put(frame);
                     } catch (InterruptedException e) {
-                        log.warn("[{}]put frame interrupted", deviceDriver.getDeviceId());
+                        log.warn("[{}]put frame interrupted", driver.getDeviceId());
                     }
                 });
-                log.info("[{}]stop reading frames", deviceDriver.getDeviceId());
+                log.info("[{}]stop reading frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop reading frames, cause: {}", deviceDriver.getDeviceId(),
+                log.info("[{}]stop reading frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
                 sendFrameThread.interrupt();
