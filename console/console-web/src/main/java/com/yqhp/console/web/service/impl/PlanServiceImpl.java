@@ -162,7 +162,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         // 保存设备plugin执行记录
         List<PluginDTO> plugins = pluginService.listDTOByProjectId(plan.getProjectId());
         if (!plugins.isEmpty()) {
-            List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>();
+            List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>(deviceIds.size() * plugins.size());
             for (String deviceId : deviceIds) {
                 pluginExecutionRecords.addAll(plugins.stream().map(plugin -> {
                     PluginExecutionRecord record = new PluginExecutionRecord();
@@ -243,7 +243,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             }
         }
 
-        List<Doc> initDocs = docService.listPkgTreeSortedAndAvailableByProjectIdAndKind(plan.getProjectId(), DocKind.JSH_INIT);
+        List<Doc> initDocs = docService.scanPkgTree(plan.getProjectId(), DocKind.JSH_INIT);
         if (initDocs.isEmpty()) {
             return result;
         }

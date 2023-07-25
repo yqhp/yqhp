@@ -48,7 +48,7 @@ public class DocController {
 
     @GetMapping("/init")
     public List<Doc> listInit(@NotBlank(message = "projectId不能为空") String projectId) {
-        return docService.listPkgTreeSortedAndAvailableByProjectIdAndKind(projectId, DocKind.JSH_INIT);
+        return docService.scanPkgTree(projectId, DocKind.JSH_INIT);
     }
 
     @PostMapping

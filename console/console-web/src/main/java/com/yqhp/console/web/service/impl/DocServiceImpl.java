@@ -229,10 +229,10 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
     /**
      * doc的weight只能保证同一个目录有序
-     * 这个方法返回pkgTree从上往下排序的doc
+     * 这个方法返回pkgTree从上往下排序的可用doc
      */
     @Override
-    public List<Doc> listPkgTreeSortedAndAvailableByProjectIdAndKind(String projectId, DocKind kind) {
+    public List<Doc> scanPkgTree(String projectId, DocKind kind) {
         Assert.hasText(projectId, "projectId must has text");
         Assert.notNull(kind, "kind cannot be null");
 
