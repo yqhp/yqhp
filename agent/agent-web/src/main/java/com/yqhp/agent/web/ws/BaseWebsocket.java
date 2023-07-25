@@ -15,49 +15,23 @@
  */
 package com.yqhp.agent.web.ws;
 
-import com.yqhp.agent.driver.DeviceDriver;
-import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.ws.message.Output;
 import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.agent.web.ws.message.handler.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.Session;
 
 /**
  * @author jiangyitao
  */
 @Slf4j
-public class DeviceWebsocket {
+public class BaseWebsocket {
 
-    public static DeviceService deviceService;
-
-    @Autowired
-    public void setDeviceService(DeviceService deviceService) {
-        DeviceWebsocket.deviceService = deviceService;
-    }
-
-    protected DeviceDriver deviceDriver;
-    protected String token;
     protected MessageHandler messageHandler = new MessageHandler();
-
-    /**
-     * 注意，子类Override需要带上@OnOpen才能生效
-     */
-    @OnOpen
-    public void onOpen(@PathParam("token") String token, Session session) {
-        log.info("[{}]onOpen, token:{}", session.getId(), token);
-        deviceDriver = deviceService.getDeviceDriverByToken(token); // 检查token，抛出异常进入@OnError
-        this.token = token;
-        WebsocketSessionPool.addSession(session);
-        onOpened(session);
-    }
-
-    protected void onOpened(Session session) {
-
-    }
 
     /**
      * 注意，子类Override需要带上@OnError注解生效

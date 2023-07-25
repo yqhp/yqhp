@@ -13,43 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.web.ws;
+package com.yqhp.agent.web.ws.device;
 
+import com.yqhp.agent.web.ws.message.handler.JShellEvalHandler;
+import com.yqhp.agent.web.ws.message.handler.JShellLoadPluginHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
-import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 
 /**
  * @author jiangyitao
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/appiumLog/token/{token}")
-public class AppiumLogWebsocket extends DeviceWebsocket {
+@ServerEndpoint(value = "/device/jshellExecution/token/{token}")
+public class JShellExecutionWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {
-        RemoteEndpoint.Basic remote = session.getBasicRemote();
-        deviceDriver.receiveAppiumLog(appiumLog -> {
-            if (session.isOpen()) {
-                try {
-                    remote.sendText(appiumLog);
-                } catch (IOException e) {
-                    log.warn("send error, log:{}, cause:{}", appiumLog, e.getMessage());
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onClosed() {
-        if (deviceDriver != null) {
-            deviceDriver.stopReceiveAppiumLog();
-        }
+        messageHandler
+                .register(new JShellLoadPluginHandler(session, deviceDriver))
+                .register(new JShellEvalHandler(session, deviceDriver));
     }
 
 }

@@ -13,10 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.web.ws;
+package com.yqhp.agent.web.ws.device;
 
-import com.yqhp.agent.web.ws.message.handler.JShellEvalHandler;
-import com.yqhp.agent.web.ws.message.handler.JShellLoadPluginHandler;
+import com.yqhp.agent.driver.AndroidDeviceDriver;
+import com.yqhp.agent.web.ws.message.handler.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
@@ -28,14 +28,23 @@ import javax.websocket.server.ServerEndpoint;
  */
 @Slf4j
 @Controller
-@ServerEndpoint(value = "/device/jshellExecution/token/{token}")
-public class JShellExecutionWebsocket extends DeviceWebsocket {
+@ServerEndpoint(value = "/device/scrcpy/token/{token}")
+public class ScrcpyWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {
+        AndroidDeviceDriver driver = (AndroidDeviceDriver) deviceDriver;
         messageHandler
-                .register(new JShellLoadPluginHandler(session, deviceDriver))
-                .register(new JShellEvalHandler(session, deviceDriver));
+                .register(new StartScrcpyHandler(session, driver))
+                .register(new ScrcpyKeyHandler(driver))
+                .register(new ScrcpyTextHandler(driver))
+                .register(new ScrcpyTouchHandler(driver))
+                .register(new ScrcpyScrollHandler(driver));
+    }
+
+    @Override
+    protected void onClosed() {
+        if (token != null) deviceService.unlockDevice(token);
     }
 
 }

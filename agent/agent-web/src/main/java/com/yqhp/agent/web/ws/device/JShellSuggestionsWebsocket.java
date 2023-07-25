@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.web.ws;
+package com.yqhp.agent.web.ws.device;
 
 import com.yqhp.agent.web.ws.message.handler.JShellSuggestionsHandler;
 import lombok.extern.slf4j.Slf4j;
