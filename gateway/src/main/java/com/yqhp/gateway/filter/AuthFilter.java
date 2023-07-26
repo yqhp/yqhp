@@ -52,7 +52,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/agent/device/scrcpy/**",
             "/agent/device/jshellExecution/**",
             "/agent/device/jshellSuggestions/**",
-            "/agent/device/appiumLog/**"
+            "/agent/device/appiumLog/**",
+            "/agent/jshellExecution/**",
+            "/agent/jshellSuggestions/**"
     );
 
     private final WebClient authWebClient;
