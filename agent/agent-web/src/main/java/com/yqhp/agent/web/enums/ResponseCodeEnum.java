@@ -30,6 +30,8 @@ public enum ResponseCodeEnum implements ResponseCode {
     INVALID_DEVICE_TOKEN(1002, "非法设备token"),
     INSTALL_APP_FAIL(1003, "安装APP失败"),
     SCREENSHOT_FAIL(1004, "截图失败"),
+
+    INVALID_AGENT_TOKEN(2000, "非法agent token"),
     ;
 
     private final int code;
