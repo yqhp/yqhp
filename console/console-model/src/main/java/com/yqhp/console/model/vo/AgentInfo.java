@@ -23,6 +23,8 @@ import lombok.Data;
 @Data
 public class AgentInfo {
     private String location;
+    private String host;
+    private Integer port;
     private String agentVersion;
     private String javaVersion;
     private String osVersion;
