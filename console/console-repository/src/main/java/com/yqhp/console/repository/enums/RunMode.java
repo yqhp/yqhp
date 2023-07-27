@@ -26,8 +26,9 @@ import lombok.Getter;
 @Getter
 public enum RunMode implements BaseEnum<Integer> {
 
-    EFFICIENT(1), // 高效模式，平均分配
-    COMPATIBLE(2), // 兼容模式，执行同一份
+    NO_DEVICE(0), // [agent]
+    EFFICIENT(1), // [device]高效模式，平均分配action
+    COMPATIBLE(2), // [device]兼容模式，执行同一份action
     ;
 
     @EnumValue

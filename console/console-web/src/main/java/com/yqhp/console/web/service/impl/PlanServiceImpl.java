@@ -143,10 +143,24 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Override
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
-        // 分配docs, deviceId->docs
-        Map<String, List<Doc>> deviceDocsMap = assignDocs(plan);
-        Set<String> deviceIds = deviceDocsMap.keySet();
         String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
+
+        // 检查设备模式配置的device
+        List<String> deviceIds = null;
+        if (isDeviceMode(plan)) {
+            deviceIds = planDeviceService.listEnabledAndSortedDeviceIdByPlanId(plan.getId());
+            if (CollectionUtils.isEmpty(deviceIds)) {
+                throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DEVICES_NOT_FOUND);
+            }
+        }
+        // 检查配置的action
+        List<String> actionIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
+        List<Doc> planActions = docService.listAvailableInIds(actionIds).stream()
+                .sorted(Comparator.comparingInt(doc -> actionIds.indexOf(doc.getId()))) // listAvailableInIds返回的结果乱序，重新排一下
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(planActions)) {
+            throw new ServiceException(ResponseCodeEnum.AVAILABLE_PLAN_ACTIONS_NOT_FOUND);
+        }
 
         // 保存计划执行记录
         ExecutionRecord executionRecord = new ExecutionRecord();
@@ -159,102 +173,119 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         executionRecord.setUpdateBy(createBy);
         executionRecordService.save(executionRecord);
 
-        // 保存设备plugin执行记录
         List<PluginDTO> plugins = pluginService.listDTOByProjectId(plan.getProjectId());
-        if (!plugins.isEmpty()) {
-            List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>(deviceIds.size() * plugins.size());
-            for (String deviceId : deviceIds) {
-                pluginExecutionRecords.addAll(plugins.stream().map(plugin -> {
-                    PluginExecutionRecord record = new PluginExecutionRecord();
-                    record.setId(snowflake.nextIdStr());
-                    record.setProjectId(plan.getProjectId());
-                    record.setPlanId(plan.getId());
-                    record.setExecutionRecordId(executionRecord.getId());
-                    record.setDeviceId(deviceId);
-                    record.setPluginId(plugin.getId());
-                    record.setPlugin(plugin); // 保留提交执行时的plugin
-                    record.setStatus(ExecutionStatus.TODO);
-                    record.setCreateBy(createBy);
-                    record.setUpdateBy(createBy);
-                    return record;
-                }).collect(Collectors.toList()));
+        List<Doc> initDocs = docService.scanPkgTree(plan.getProjectId(), DocKind.JSH_INIT);
+        List<DocExecutionRecord> docExecutionRecords = new ArrayList<>();
+        List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>();
+        Set<String> finalDeviceIds = null;
+        if (isDeviceMode(plan)) {
+            // 给设备分配action, deviceId -> List<Doc>
+            Map<String, List<Doc>> deviceActionsMap = assignActionsToDevices(plan.getRunMode(), deviceIds, planActions);
+            // 高效模式下，有的device可能分不到action，以finalDeviceIds为准
+            finalDeviceIds = deviceActionsMap.keySet();
+            if (!plugins.isEmpty()) {
+                for (String deviceId : finalDeviceIds) {
+                    for (PluginDTO plugin : plugins) {
+                        PluginExecutionRecord record = createPluginExecutionRecord(plugin, plan, executionRecord.getId(), deviceId, createBy);
+                        pluginExecutionRecords.add(record);
+                    }
+                }
             }
+            deviceActionsMap.forEach((deviceId, actions) -> {
+                for (Doc doc : initDocs) {
+                    DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), deviceId, createBy);
+                    docExecutionRecords.add(record);
+                }
+                for (Doc doc : actions) {
+                    DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), deviceId, createBy);
+                    docExecutionRecords.add(record);
+                }
+            });
+        } else { // 非设备模式
+            for (PluginDTO plugin : plugins) {
+                PluginExecutionRecord record = createPluginExecutionRecord(plugin, plan, executionRecord.getId(), "", createBy);
+                pluginExecutionRecords.add(record);
+            }
+            for (Doc doc : initDocs) {
+                DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), "", createBy);
+                docExecutionRecords.add(record);
+            }
+            for (Doc doc : planActions) {
+                DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), "", createBy);
+                docExecutionRecords.add(record);
+            }
+        }
+
+        if (!pluginExecutionRecords.isEmpty()) {
             pluginExecutionRecordService.saveBatch(pluginExecutionRecords);
         }
-
-        // 保存设备doc执行记录
-        List<DocExecutionRecord> docExecutionRecords = new ArrayList<>();
-        deviceDocsMap.forEach((deviceId, docs) ->
-                docExecutionRecords.addAll(docs.stream().map((doc) -> {
-                    DocExecutionRecord record = new DocExecutionRecord();
-                    record.setId(snowflake.nextIdStr());
-                    record.setProjectId(plan.getProjectId());
-                    record.setPlanId(plan.getId());
-                    record.setExecutionRecordId(executionRecord.getId());
-                    record.setDeviceId(deviceId);
-                    record.setDocId(doc.getId());
-                    record.setDocKind(doc.getKind());
-                    record.setDoc(doc); // 保留提交执行时的doc
-                    record.setStatus(ExecutionStatus.TODO);
-                    record.setCreateBy(createBy);
-                    record.setUpdateBy(createBy);
-                    return record;
-                }).collect(Collectors.toList()))
-        );
         docExecutionRecordService.saveBatch(docExecutionRecords);
 
-        for (String deviceId : deviceIds) {
-            executionRecordService.push(deviceId, executionRecord.getId());
+        if (isDeviceMode(plan)) {
+            for (String deviceId : finalDeviceIds) {
+                executionRecordService.push(deviceId, executionRecord.getId());
+            }
+        } else {
+            // TODO send kafka
         }
+    }
+
+    private boolean isDeviceMode(Plan plan) {
+        return !RunMode.NO_DEVICE.equals(plan.getRunMode());
     }
 
     /**
      * @return deviceId -> List<Doc>
      */
-    private Map<String, List<Doc>> assignDocs(Plan plan) {
-        List<String> deviceIds = planDeviceService.listEnabledAndSortedDeviceIdByPlanId(plan.getId());
-        if (CollectionUtils.isEmpty(deviceIds)) {
-            throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DEVICES_NOT_FOUND);
-        }
-        List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        // listAvailableInIds返回的结果乱序，重新排一下
-        List<Doc> planDocs = docService.listAvailableInIds(docIds).stream()
-                .sorted(Comparator.comparingInt(doc -> docIds.indexOf(doc.getId())))
-                .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(planDocs)) {
-            throw new ServiceException(ResponseCodeEnum.AVAILABLE_PLAN_DOCS_NOT_FOUND);
-        }
-
-        HashMap<String, List<Doc>> result = new HashMap<>();
-        if (RunMode.COMPATIBLE.equals(plan.getRunMode())) {
+    private Map<String, List<Doc>> assignActionsToDevices(RunMode runMode, List<String> deviceIds, List<Doc> actions) {
+        Map<String, List<Doc>> result = new HashMap<>();
+        if (RunMode.COMPATIBLE.equals(runMode)) {
             // 兼容模式，执行同一份
             for (String deviceId : deviceIds) {
-                result.put(deviceId, planDocs);
+                result.put(deviceId, actions);
             }
-        } else if (RunMode.EFFICIENT.equals(plan.getRunMode())) {
+        } else if (RunMode.EFFICIENT.equals(runMode)) {
             // 高效模式，平均分
             int i = 0;
             int deviceCount = deviceIds.size();
-            for (Doc doc : planDocs) {
+            for (Doc doc : actions) {
                 if (i == deviceCount) i = 0;
                 String deviceId = deviceIds.get(i);
                 result.computeIfAbsent(deviceId, k -> new ArrayList<>()).add(doc);
                 i++;
             }
         }
-
-        List<Doc> initDocs = docService.scanPkgTree(plan.getProjectId(), DocKind.JSH_INIT);
-        if (initDocs.isEmpty()) {
-            return result;
-        }
-        // 高效模式下，有的设备可能分不到doc，以result.keySet()为准
-        for (String deviceId : result.keySet()) {
-            List<Doc> devicePlanDocs = result.get(deviceId);
-            List<Doc> deviceAllDocs = new ArrayList<>(initDocs.size() + devicePlanDocs.size());
-            deviceAllDocs.addAll(initDocs);
-            deviceAllDocs.addAll(devicePlanDocs);
-            result.put(deviceId, deviceAllDocs);
-        }
         return result;
+    }
+
+    private DocExecutionRecord createDocExecutionRecord(Doc doc, Plan plan, String executionRecordId, String deviceId, String createBy) {
+        DocExecutionRecord record = new DocExecutionRecord();
+        record.setId(snowflake.nextIdStr());
+        record.setProjectId(plan.getProjectId());
+        record.setPlanId(plan.getId());
+        record.setExecutionRecordId(executionRecordId);
+        record.setDeviceId(deviceId);
+        record.setDocId(doc.getId());
+        record.setDocKind(doc.getKind());
+        record.setDoc(doc); // 保留提交执行时的doc
+        record.setStatus(ExecutionStatus.TODO);
+        record.setCreateBy(createBy);
+        record.setUpdateBy(createBy);
+        return record;
+    }
+
+    private PluginExecutionRecord createPluginExecutionRecord(PluginDTO plugin, Plan plan, String executionRecordId, String deviceId, String createBy) {
+        PluginExecutionRecord record = new PluginExecutionRecord();
+        record.setId(snowflake.nextIdStr());
+        record.setProjectId(plan.getProjectId());
+        record.setPlanId(plan.getId());
+        record.setExecutionRecordId(executionRecordId);
+        record.setDeviceId(deviceId);
+        record.setPluginId(plugin.getId());
+        record.setPlugin(plugin); // 保留提交执行时的plugin
+        record.setStatus(ExecutionStatus.TODO);
+        record.setCreateBy(createBy);
+        record.setUpdateBy(createBy);
+        return record;
     }
 }
