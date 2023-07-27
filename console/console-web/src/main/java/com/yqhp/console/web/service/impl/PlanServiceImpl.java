@@ -226,7 +226,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                 executionRecordService.push(deviceId, executionRecord.getId());
             }
         } else {
-            // TODO send kafka
+            executionRecordService.push(executionRecord, pluginExecutionRecords, docExecutionRecords);
         }
     }
 

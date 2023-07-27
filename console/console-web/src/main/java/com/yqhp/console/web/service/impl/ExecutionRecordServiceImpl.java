@@ -25,8 +25,8 @@ import com.yqhp.console.model.dto.DeviceExecutionResult;
 import com.yqhp.console.model.dto.DevicePluginExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
-import com.yqhp.console.model.vo.DeviceTask;
 import com.yqhp.console.model.vo.ExecutionReport;
+import com.yqhp.console.model.vo.Task;
 import com.yqhp.console.repository.entity.Device;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.ExecutionRecord;
@@ -34,6 +34,7 @@ import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.ExecutionRecordMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
+import com.yqhp.console.web.kafka.MessageProducer;
 import com.yqhp.console.web.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,8 @@ public class ExecutionRecordServiceImpl
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
+    private MessageProducer producer;
+    @Autowired
     private PluginExecutionRecordService pluginExecutionRecordService;
     @Autowired
     private DocExecutionRecordService docExecutionRecordService;
@@ -83,6 +86,17 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
+    public void push(ExecutionRecord executionRecord,
+                     List<PluginExecutionRecord> pluginExecutionRecords,
+                     List<DocExecutionRecord> docExecutionRecords) {
+        Task task = new Task();
+        task.setExecutionRecord(executionRecord);
+        task.setPluginExecutionRecords(pluginExecutionRecords);
+        task.setDocExecutionRecords(docExecutionRecords);
+        producer.sendTask(task);
+    }
+
+    @Override
     public boolean removePushed(String deviceId, String executionRecordId) {
         // 第2个参数count
         // count > 0: Remove elements equal to element moving from head to tail.
@@ -93,7 +107,7 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
-    public DeviceTask receive(String deviceId) {
+    public Task receiveDeviceTask(String deviceId) {
         String executionRecordId = redisTemplate.opsForList().rightPop(getDeviceRedisKey(deviceId));
         if (executionRecordId == null) {
             return null;
@@ -105,7 +119,7 @@ public class ExecutionRecordServiceImpl
             return null;
         }
 
-        DeviceTask task = new DeviceTask();
+        Task task = new Task();
         task.setExecutionRecord(executionRecord);
         List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordService
                 .listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId);

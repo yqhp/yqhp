@@ -13,14 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.common.kafka.message;
+package com.yqhp.agent.web.service;
+
+import com.yqhp.agent.driver.Driver;
+import com.yqhp.console.model.vo.Task;
 
 /**
  * @author jiangyitao
  */
-public class Topics {
-    public static final String DOC_EXECUTION_RECORD = "doc-execution-record"; // 40个分区
-    public static final String PLUGIN_EXECUTION_RECORD = "plugin-execution-record"; // 40个分区
-    public static final String EXECUTION_REPORT = "execution-report"; // 20个分区
-    public static final String TASK = "task"; // 40个分区
+public interface TaskService {
+    void execute(Driver driver, Task task);
 }

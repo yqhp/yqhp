@@ -18,6 +18,7 @@ package com.yqhp.console.web.kafka;
 import com.yqhp.common.commons.util.JacksonUtils;
 import com.yqhp.common.kafka.message.Topics;
 import com.yqhp.console.model.vo.ExecutionReport;
+import com.yqhp.console.model.vo.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -37,4 +38,8 @@ public class MessageProducer {
         kafkaTemplate.send(Topics.EXECUTION_REPORT, JacksonUtils.writeValueAsString(report));
     }
 
+    public void sendTask(Task task) {
+        Assert.notNull(task, "task cannot be null");
+        kafkaTemplate.send(Topics.TASK, JacksonUtils.writeValueAsString(task));
+    }
 }

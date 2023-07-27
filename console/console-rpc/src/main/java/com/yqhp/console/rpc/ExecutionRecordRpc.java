@@ -15,7 +15,7 @@
  */
 package com.yqhp.console.rpc;
 
-import com.yqhp.console.model.vo.DeviceTask;
+import com.yqhp.console.model.vo.Task;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface ExecutionRecordRpc {
 
     @GetMapping("/receive")
-    DeviceTask receive(@RequestParam("deviceId") String deviceId);
+    Task receiveDeviceTask(@RequestParam("deviceId") String deviceId);
 
 }

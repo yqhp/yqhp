@@ -48,16 +48,13 @@ public class NacosMetadataConfig {
     public NacosWatch nacosWatch(NacosServiceManager nacosServiceManager,
                                  NacosDiscoveryProperties nacosDiscoveryProperties) {
         Map<String, String> metadata = nacosDiscoveryProperties.getMetadata();
-
-        metadata.put("java.version", System.getProperty("java.version", "unknown"));
-        metadata.put("os.name", System.getProperty("os.name", "unknown"));
-        metadata.put("os.arch", System.getProperty("os.arch", "unknown"));
-        metadata.put("os.version", System.getProperty("os.version", "unknown"));
+        metadata.put("java.version", System.getProperty("java.version"));
+        metadata.put("os.name", System.getProperty("os.name"));
+        metadata.put("os.arch", System.getProperty("os.arch"));
+        metadata.put("os.version", System.getProperty("os.version"));
         metadata.put("agent.version", agentProperties.getVersion());
-        String appiumJs = agentProperties.getAppium().getJsPath();
-        String appiumVersion = AppiumServer.version(appiumJs);
-        metadata.put("appium.version", appiumVersion != null ? appiumVersion : "unknown");
-
+        metadata.put("agent.description", agentProperties.getDescription());
+        metadata.put("appium.version", AppiumServer.version(agentProperties.getAppium().getJsPath()));
         return new NacosWatch(nacosServiceManager, nacosDiscoveryProperties);
     }
 

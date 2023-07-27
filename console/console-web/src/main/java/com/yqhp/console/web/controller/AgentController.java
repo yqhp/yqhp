@@ -49,9 +49,8 @@ public class AgentController {
         return listAgentInstance().stream().map(instance -> {
             AgentInfo agentInfo = new AgentInfo();
             agentInfo.setLocation(Base64Utils.encodeToUrlSafeString((instance.getHost() + ":" + instance.getPort()).getBytes()));
-            agentInfo.setHost(instance.getHost());
-            agentInfo.setPort(instance.getPort());
-            agentInfo.setAgentVersion(instance.getMetadata().get("agent.version"));
+            agentInfo.setVersion(instance.getMetadata().get("agent.version"));
+            agentInfo.setDescription(instance.getMetadata().get("agent.description"));
             agentInfo.setJavaVersion(instance.getMetadata().get("java.version"));
             agentInfo.setOsVersion(instance.getMetadata().get("os.version"));
             agentInfo.setOsName(instance.getMetadata().get("os.name"));

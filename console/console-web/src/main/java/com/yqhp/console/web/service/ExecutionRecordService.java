@@ -19,9 +19,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
-import com.yqhp.console.model.vo.DeviceTask;
 import com.yqhp.console.model.vo.ExecutionReport;
+import com.yqhp.console.model.vo.Task;
+import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.ExecutionRecord;
+import com.yqhp.console.repository.entity.PluginExecutionRecord;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,9 +34,11 @@ import java.util.List;
 public interface ExecutionRecordService extends IService<ExecutionRecord> {
     void push(String deviceId, String executionRecordId);
 
+    void push(ExecutionRecord executionRecord, List<PluginExecutionRecord> pluginExecutionRecords, List<DocExecutionRecord> docExecutionRecords);
+
     boolean removePushed(String deviceId, String executionRecordId);
 
-    DeviceTask receive(String deviceId);
+    Task receiveDeviceTask(String deviceId);
 
     ExecutionRecord getExecutionRecordById(String id);
 

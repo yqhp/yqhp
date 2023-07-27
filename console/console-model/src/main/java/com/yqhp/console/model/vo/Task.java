@@ -26,7 +26,7 @@ import java.util.List;
  * @author jiangyitao
  */
 @Data
-public class DeviceTask {
+public class Task {
     private List<PluginExecutionRecord> pluginExecutionRecords;
     private List<DocExecutionRecord> docExecutionRecords;
     private ExecutionRecord executionRecord;
