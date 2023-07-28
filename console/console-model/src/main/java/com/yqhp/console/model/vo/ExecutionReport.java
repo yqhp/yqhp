@@ -23,6 +23,7 @@ import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.repository.entity.Project;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -31,9 +32,11 @@ import java.util.Map;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionReport {
+    private String id;
     private Project project;
     private Plan plan;
     private String creator;
+    private LocalDateTime createTime;
 
     // 设备
     private Map<String, Device> devices;

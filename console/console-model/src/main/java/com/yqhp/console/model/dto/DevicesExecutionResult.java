@@ -18,7 +18,6 @@ package com.yqhp.console.model.dto;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,8 +25,6 @@ import java.util.List;
  */
 @Data
 public class DevicesExecutionResult {
-    private String id;
-    private LocalDateTime createTime;
     private List<ExecutionResult> deviceExecutionResults;
 
     private Long startTime = 0L;

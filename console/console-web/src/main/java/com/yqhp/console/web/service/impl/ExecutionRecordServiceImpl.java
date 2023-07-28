@@ -177,9 +177,11 @@ public class ExecutionRecordServiceImpl
         ExecutionRecord executionRecord = getExecutionRecordById(id);
 
         ExecutionReport report = new ExecutionReport();
+        report.setId(executionRecord.getId());
         report.setProject(projectService.getProjectById(executionRecord.getProjectId()));
         report.setPlan(executionRecord.getPlan());
         report.setCreator(userRpc.getVOById(executionRecord.getCreateBy()).getNickname());
+        report.setCreateTime(executionRecord.getCreateTime());
 
         if (planService.isDeviceMode(executionRecord.getPlan())) {
             DevicesExecutionResult result = statDevicesExecutionResult(executionRecord);
@@ -231,10 +233,9 @@ public class ExecutionRecordServiceImpl
                     result.setDeviceId(deviceId);
                     return result;
                 }).collect(Collectors.toList());
+
         // 汇总每个设备执行结果
         DevicesExecutionResult result = new DevicesExecutionResult();
-        result.setId(record.getId());
-        result.setCreateTime(record.getCreateTime());
         result.setDeviceExecutionResults(deviceExecutionResults);
 
         long minStartTime = deviceExecutionResults.stream()
