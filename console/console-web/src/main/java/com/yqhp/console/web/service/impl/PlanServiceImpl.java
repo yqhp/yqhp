@@ -230,7 +230,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         }
     }
 
-    private boolean isDeviceMode(Plan plan) {
+    @Override
+    public boolean isDeviceMode(Plan plan) {
         return !RunMode.NO_DEVICE.equals(plan.getRunMode());
     }
 

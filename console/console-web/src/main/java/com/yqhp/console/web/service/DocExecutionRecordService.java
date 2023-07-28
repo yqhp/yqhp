@@ -16,7 +16,7 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yqhp.console.model.dto.DeviceDocExecutionResult;
+import com.yqhp.console.model.dto.DocExecutionResult;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 
 import java.util.List;
@@ -31,5 +31,5 @@ public interface DocExecutionRecordService extends IService<DocExecutionRecord> 
 
     void deleteByExecutionRecordIdAndDeviceId(String executionRecordId, String deviceId);
 
-    DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records);
+    DocExecutionResult statDocExecutionResult(List<DocExecutionRecord> records);
 }

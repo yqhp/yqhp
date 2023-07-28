@@ -13,27 +13,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.console.web.service.impl;
+package com.yqhp.console.model.dto;
 
-import com.yqhp.auth.model.vo.UserVO;
-import com.yqhp.auth.rpc.UserRpc;
-import com.yqhp.console.web.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import com.yqhp.console.repository.enums.ExecutionStatus;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author jiangyitao
  */
-@Service
-public class UserServiceImpl implements UserService {
+@Data
+public class DevicesExecutionResult {
+    private String id;
+    private LocalDateTime createTime;
+    private List<ExecutionResult> deviceExecutionResults;
 
-    @Autowired
-    private UserRpc userRpc;
+    private Long startTime = 0L;
+    private Long endTime = 0L;
+    private boolean isFinished;
+    private ExecutionStatus status;
 
-    @Override
-    public UserVO getVOById(String id) {
-        Assert.hasText(id, "id must has text");
-        return userRpc.getVOById(id);
-    }
+    // for action
+    private Long passCount = 0L;
+    private Long failureCount = 0L;
+    private int totalCount = 0;
+    private String passRate;
 }

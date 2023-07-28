@@ -25,7 +25,7 @@ import java.util.List;
  * @author jiangyitao
  */
 @Data
-public class DeviceDocExecutionResult {
+public class DocExecutionResult {
     // for action
     private Long passCount = 0L;
     private Long failureCount = 0L;

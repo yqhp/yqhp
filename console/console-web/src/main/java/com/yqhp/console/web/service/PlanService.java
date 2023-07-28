@@ -41,4 +41,6 @@ public interface PlanService extends IService<Plan> {
     List<Plan> listByProjectId(String projectId);
 
     void exec(String id, String submitBy);
+
+    boolean isDeviceMode(Plan plan);
 }

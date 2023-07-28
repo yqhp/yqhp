@@ -17,6 +17,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yqhp.console.model.dto.DevicesExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
 import com.yqhp.console.model.vo.ExecutionReport;
@@ -51,4 +52,6 @@ public interface ExecutionRecordService extends IService<ExecutionRecord> {
     ExecutionReport getReportById(String id);
 
     ExecutionResult statExecutionResult(ExecutionRecord record);
+
+    DevicesExecutionResult statDevicesExecutionResult(ExecutionRecord record);
 }

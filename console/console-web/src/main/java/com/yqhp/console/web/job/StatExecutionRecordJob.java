@@ -15,11 +15,14 @@
  */
 package com.yqhp.console.web.job;
 
+import com.yqhp.console.model.dto.DevicesExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.repository.entity.ExecutionRecord;
+import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.web.kafka.MessageProducer;
 import com.yqhp.console.web.service.ExecutionRecordService;
+import com.yqhp.console.web.service.PlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -43,9 +46,11 @@ public class StatExecutionRecordJob {
     @Autowired
     private ExecutionRecordService executionRecordService;
     @Autowired
+    private PlanService planService;
+    @Autowired
     private MessageProducer producer;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     public void statExecutionRecord() {
         RLock lock = redissonClient.getLock(LOCK_NAME);
         if (!lock.tryLock()) {
@@ -55,18 +60,35 @@ public class StatExecutionRecordJob {
             LocalDateTime since = LocalDateTime.now().minusDays(3);
             List<ExecutionRecord> executionRecords = executionRecordService.listUnfinished(since);
             for (ExecutionRecord record : executionRecords) {
-                ExecutionResult result = executionRecordService.statExecutionResult(record);
+                ExecutionStatus status;
+                Long startTime;
+                Long endTime;
+                boolean isFinished;
+                boolean isDeviceMode = planService.isDeviceMode(record.getPlan());
+                if (isDeviceMode) {
+                    DevicesExecutionResult result = executionRecordService.statDevicesExecutionResult(record);
+                    status = result.getStatus();
+                    startTime = result.getStartTime();
+                    endTime = result.getEndTime();
+                    isFinished = result.isFinished();
+                } else {
+                    ExecutionResult result = executionRecordService.statExecutionResult(record);
+                    status = result.getStatus();
+                    startTime = result.getStartTime();
+                    endTime = result.getEndTime();
+                    isFinished = result.isFinished();
+                }
                 // 状态发生变化才更新db，避免频繁更新db
-                if (!result.getStatus().equals(record.getStatus())) {
+                if (!status.equals(record.getStatus())) {
                     ExecutionRecord toUpdate = new ExecutionRecord();
                     toUpdate.setId(record.getId());
-                    toUpdate.setStatus(result.getStatus());
-                    toUpdate.setStartTime(result.getStartTime());
-                    toUpdate.setEndTime(result.getEndTime());
+                    toUpdate.setStatus(status);
+                    toUpdate.setStartTime(startTime);
+                    toUpdate.setEndTime(endTime);
                     executionRecordService.updateById(toUpdate);
                 }
                 // 执行完成，发送报告到kafka
-                if (result.isFinished()) {
+                if (isFinished) {
                     ExecutionReport report = executionRecordService.getReportById(record.getId());
                     producer.sendExecutionReport(report);
                 }

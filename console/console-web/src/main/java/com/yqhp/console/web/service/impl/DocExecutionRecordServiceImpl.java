@@ -17,7 +17,7 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yqhp.console.model.dto.DeviceDocExecutionResult;
+import com.yqhp.console.model.dto.DocExecutionResult;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.ExecutionStatus;
@@ -73,8 +73,8 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
     }
 
     @Override
-    public DeviceDocExecutionResult statDeviceDocExecutionResult(List<DocExecutionRecord> records) {
-        DeviceDocExecutionResult result = new DeviceDocExecutionResult();
+    public DocExecutionResult statDocExecutionResult(List<DocExecutionRecord> records) {
+        DocExecutionResult result = new DocExecutionResult();
         result.setRecords(records);
         if (CollectionUtils.isEmpty(records)) {
             result.setFinished(true);

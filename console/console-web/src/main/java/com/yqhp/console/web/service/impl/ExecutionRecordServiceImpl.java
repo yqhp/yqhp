@@ -19,11 +19,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.auth.rpc.UserRpc;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.dto.DeviceDocExecutionResult;
-import com.yqhp.console.model.dto.DeviceExecutionResult;
-import com.yqhp.console.model.dto.DevicePluginExecutionResult;
+import com.yqhp.console.model.dto.DevicesExecutionResult;
+import com.yqhp.console.model.dto.DocExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
+import com.yqhp.console.model.dto.PluginExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
 import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.model.vo.Task;
@@ -76,9 +77,11 @@ public class ExecutionRecordServiceImpl
     @Autowired
     private ProjectService projectService;
     @Autowired
-    private UserService userService;
-    @Autowired
     private DeviceService deviceService;
+    @Autowired
+    private PlanService planService;
+    @Autowired
+    private UserRpc userRpc;
 
     @Override
     public void push(String deviceId, String executionRecordId) {
@@ -176,53 +179,75 @@ public class ExecutionRecordServiceImpl
         ExecutionReport report = new ExecutionReport();
         report.setProject(projectService.getProjectById(executionRecord.getProjectId()));
         report.setPlan(executionRecord.getPlan());
-        report.setCreator(userService.getVOById(executionRecord.getCreateBy()).getNickname());
+        report.setCreator(userRpc.getVOById(executionRecord.getCreateBy()).getNickname());
 
-        ExecutionResult result = statExecutionResult(executionRecord);
-        report.setResult(result);
+        if (planService.isDeviceMode(executionRecord.getPlan())) {
+            DevicesExecutionResult result = statDevicesExecutionResult(executionRecord);
+            report.setDevicesResult(result);
+            Set<String> deviceIds = result.getDeviceExecutionResults().stream()
+                    .map(ExecutionResult::getDeviceId)
+                    .collect(Collectors.toSet());
+            Map<String, Device> devices = deviceService.getMapByIds(deviceIds);
+            report.setDevices(devices);
+        } else {
+            ExecutionResult result = statExecutionResult(executionRecord);
+            report.setResult(result);
+        }
 
-        Set<String> deviceIds = result.getDeviceExecutionResults().stream()
-                .map(DeviceExecutionResult::getDeviceId)
-                .collect(Collectors.toSet());
-        Map<String, Device> devices = deviceService.getMapByIds(deviceIds);
-        report.setDevices(devices);
         return report;
     }
 
+    /**
+     * 统计执行结果(非设备模式)
+     */
     @Override
     public ExecutionResult statExecutionResult(ExecutionRecord record) {
-        // deviceId -> List<PluginExecutionRecord>
+        List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordService
+                .listByExecutionRecordId(record.getId());
+        List<DocExecutionRecord> docExecutionRecords = docExecutionRecordService
+                .listByExecutionRecordId(record.getId());
+        return statExecutionResult(pluginExecutionRecords, docExecutionRecords);
+    }
+
+    /**
+     * 统计设备执行结果
+     */
+    @Override
+    public DevicesExecutionResult statDevicesExecutionResult(ExecutionRecord record) {
+        // 按deviceId分组 deviceId -> List<PluginExecutionRecord>
         Map<String, List<PluginExecutionRecord>> pluginExecutionRecordsMap = pluginExecutionRecordService
                 .listByExecutionRecordId(record.getId()).stream()
                 .collect(Collectors.groupingBy(PluginExecutionRecord::getDeviceId));
-        // deviceId -> List<DocExecutionRecord>
+        // 按deviceId分组 deviceId -> List<DocExecutionRecord>
         Map<String, List<DocExecutionRecord>> docExecutionRecordsMap = docExecutionRecordService
                 .listByExecutionRecordId(record.getId()).stream()
                 .collect(Collectors.groupingBy(DocExecutionRecord::getDeviceId));
         // 统计每个设备执行结果
-        List<DeviceExecutionResult> deviceExecutionResults = docExecutionRecordsMap.keySet().stream()
+        List<ExecutionResult> deviceExecutionResults = docExecutionRecordsMap.keySet().stream()
                 .map(deviceId -> {
                     List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordsMap.get(deviceId);
                     List<DocExecutionRecord> docExecutionRecords = docExecutionRecordsMap.get(deviceId);
-                    return statDeviceExecutionResult(deviceId, pluginExecutionRecords, docExecutionRecords);
+                    ExecutionResult result = statExecutionResult(pluginExecutionRecords, docExecutionRecords);
+                    result.setDeviceId(deviceId);
+                    return result;
                 }).collect(Collectors.toList());
-
-        ExecutionResult result = new ExecutionResult();
+        // 汇总每个设备执行结果
+        DevicesExecutionResult result = new DevicesExecutionResult();
         result.setId(record.getId());
         result.setCreateTime(record.getCreateTime());
         result.setDeviceExecutionResults(deviceExecutionResults);
 
         long minStartTime = deviceExecutionResults.stream()
-                .mapToLong(DeviceExecutionResult::getStartTime)
+                .mapToLong(ExecutionResult::getStartTime)
                 .filter(value -> value > 0)
                 .min().orElse(0);
         result.setStartTime(minStartTime);
 
-        boolean allFinished = deviceExecutionResults.stream().allMatch(DeviceExecutionResult::isFinished);
+        boolean allFinished = deviceExecutionResults.stream().allMatch(ExecutionResult::isFinished);
         result.setFinished(allFinished);
         if (allFinished) {
             long maxEndTime = deviceExecutionResults.stream()
-                    .mapToLong(DeviceExecutionResult::getEndTime)
+                    .mapToLong(ExecutionResult::getEndTime)
                     .max().orElse(0);
             result.setEndTime(maxEndTime);
 
@@ -242,8 +267,8 @@ public class ExecutionRecordServiceImpl
         long passCount = 0;
         long failureCount = 0;
         int totalCount = 0;
-        for (DeviceExecutionResult deviceExecutionResult : deviceExecutionResults) {
-            DeviceDocExecutionResult docResult = deviceExecutionResult.getDocExecutionResult();
+        for (ExecutionResult executionResult : deviceExecutionResults) {
+            DocExecutionResult docResult = executionResult.getDocExecutionResult();
             passCount += docResult.getPassCount();
             failureCount += docResult.getFailureCount();
             totalCount += docResult.getTotalCount();
@@ -262,18 +287,17 @@ public class ExecutionRecordServiceImpl
         return result;
     }
 
-    private DeviceExecutionResult statDeviceExecutionResult(String deviceId,
-                                                            List<PluginExecutionRecord> pluginExecutionRecords,
-                                                            List<DocExecutionRecord> docExecutionRecords) {
-        DeviceExecutionResult result = new DeviceExecutionResult();
-        result.setDeviceId(deviceId);
-        DevicePluginExecutionResult pluginResult = pluginExecutionRecordService
-                .statDevicePluginExecutionResult(pluginExecutionRecords);
+    private ExecutionResult statExecutionResult(List<PluginExecutionRecord> pluginExecutionRecords,
+                                                List<DocExecutionRecord> docExecutionRecords) {
+        ExecutionResult result = new ExecutionResult();
+        PluginExecutionResult pluginResult = pluginExecutionRecordService
+                .statPluginExecutionResult(pluginExecutionRecords);
         result.setPluginExecutionResult(pluginResult);
-        DeviceDocExecutionResult docResult = docExecutionRecordService
-                .statDeviceDocExecutionResult(docExecutionRecords);
+        DocExecutionResult docResult = docExecutionRecordService
+                .statDocExecutionResult(docExecutionRecords);
         result.setDocExecutionResult(docResult);
 
+        // 汇总pluginResult与docResult
         long startTime;
         if (pluginResult.getStartTime() != 0) {
             startTime = pluginResult.getStartTime();

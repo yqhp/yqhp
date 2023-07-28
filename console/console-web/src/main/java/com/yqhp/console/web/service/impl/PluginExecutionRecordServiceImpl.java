@@ -17,7 +17,7 @@ package com.yqhp.console.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yqhp.console.model.dto.DevicePluginExecutionResult;
+import com.yqhp.console.model.dto.PluginExecutionResult;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.PluginExecutionRecordMapper;
@@ -65,8 +65,8 @@ public class PluginExecutionRecordServiceImpl
     }
 
     @Override
-    public DevicePluginExecutionResult statDevicePluginExecutionResult(List<PluginExecutionRecord> records) {
-        DevicePluginExecutionResult result = new DevicePluginExecutionResult();
+    public PluginExecutionResult statPluginExecutionResult(List<PluginExecutionRecord> records) {
+        PluginExecutionResult result = new PluginExecutionResult();
         result.setRecords(records);
         if (CollectionUtils.isEmpty(records)) {
             result.setFinished(true);

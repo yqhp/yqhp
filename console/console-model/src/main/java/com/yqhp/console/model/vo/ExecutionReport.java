@@ -15,6 +15,8 @@
  */
 package com.yqhp.console.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.yqhp.console.model.dto.DevicesExecutionResult;
 import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.repository.entity.Device;
 import com.yqhp.console.repository.entity.Plan;
@@ -27,10 +29,16 @@ import java.util.Map;
  * @author jiangyitao
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionReport {
     private Project project;
     private Plan plan;
     private String creator;
+
+    // 设备
     private Map<String, Device> devices;
+    private DevicesExecutionResult devicesResult;
+
+    // 非设备
     private ExecutionResult result;
 }
