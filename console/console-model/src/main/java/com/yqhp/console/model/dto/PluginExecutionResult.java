@@ -26,9 +26,10 @@ import java.util.List;
  */
 @Data
 public class PluginExecutionResult {
+    private List<PluginExecutionRecord> records;
+
     private Long startTime = 0L;
     private Long endTime = 0L;
     private boolean isFinished;
     private ExecutionStatus status;
-    private List<PluginExecutionRecord> records;
 }

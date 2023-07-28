@@ -274,7 +274,6 @@ public class ExecutionRecordServiceImpl
             failureCount += docResult.getFailureCount();
             totalCount += docResult.getTotalCount();
         }
-
         result.setPassCount(passCount);
         result.setFailureCount(failureCount);
         result.setTotalCount(totalCount);

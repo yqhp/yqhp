@@ -15,6 +15,7 @@
  */
 package com.yqhp.console.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import lombok.Data;
 
@@ -22,6 +23,7 @@ import lombok.Data;
  * @author jiangyitao
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionResult {
     private String deviceId;
     private Long startTime = 0L;

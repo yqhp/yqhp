@@ -35,6 +35,6 @@ public class DevicesExecutionResult {
     // for action
     private Long passCount = 0L;
     private Long failureCount = 0L;
-    private int totalCount = 0;
+    private Integer totalCount = 0;
     private String passRate;
 }

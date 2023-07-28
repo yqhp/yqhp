@@ -113,14 +113,20 @@ public class DeviceServiceImpl implements DeviceService {
             return;
         }
 
-        zkDeviceManager.create(zkDevice);
-        DEVICE_DRIVERS.put(device.getId(), deviceDriver);
+        try {
+            zkDeviceManager.create(zkDevice);
+        } finally {
+            DEVICE_DRIVERS.put(device.getId(), deviceDriver);
+        }
     }
 
     @Override
     public void offline(String deviceId) {
-        zkDeviceManager.delete(location, deviceId);
-        DEVICE_DRIVERS.remove(deviceId);
+        try {
+            zkDeviceManager.delete(location, deviceId);
+        } finally {
+            DEVICE_DRIVERS.remove(deviceId);
+        }
     }
 
     @Override
@@ -156,16 +162,21 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void unlockDevice(String token) {
-        DeviceDriver deviceDriver = getDeviceDriverByToken(token);
-        deviceDriver.release();
-        ZkDevice zkDevice = zkDeviceManager.get(location, deviceDriver.getDeviceId());
-        if (zkDevice != null) {
-            zkDevice.setLocked(false);
-            zkDevice.setUnlockTime(LocalDateTime.now());
-            zkDeviceManager.update(zkDevice);
+        try {
+            DeviceDriver deviceDriver = getDeviceDriverByToken(token);
+            deviceDriver.release();
+            ZkDevice zkDevice = zkDeviceManager.get(location, deviceDriver.getDeviceId());
+            if (zkDevice != null) {
+                zkDevice.setLocked(false);
+                zkDevice.setUnlockTime(LocalDateTime.now());
+                zkDeviceManager.update(zkDevice);
+            }
+        } finally {
+            DeviceDriver deviceDriver = LOCKED_DEVICE_DRIVERS.remove(token);
+            if (deviceDriver != null) {
+                log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
+            }
         }
-        LOCKED_DEVICE_DRIVERS.remove(token);
-        log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
     }
 
     @Override
