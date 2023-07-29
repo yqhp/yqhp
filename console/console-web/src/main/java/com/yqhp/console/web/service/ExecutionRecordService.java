@@ -22,9 +22,7 @@ import com.yqhp.console.model.dto.ExecutionResult;
 import com.yqhp.console.model.param.query.ExecutionRecordPageQuery;
 import com.yqhp.console.model.vo.ExecutionReport;
 import com.yqhp.console.model.vo.Task;
-import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.ExecutionRecord;
-import com.yqhp.console.repository.entity.PluginExecutionRecord;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,13 +31,11 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface ExecutionRecordService extends IService<ExecutionRecord> {
-    void push(String deviceId, String executionRecordId);
+    void push(String executionRecordId);
 
-    void push(ExecutionRecord executionRecord, List<PluginExecutionRecord> pluginExecutionRecords, List<DocExecutionRecord> docExecutionRecords);
+    void pushForDevice(String deviceId, String executionRecordId);
 
-    boolean removePushed(String deviceId, String executionRecordId);
-
-    Task receiveDeviceTask(String deviceId);
+    Task receiveTask(String deviceId);
 
     ExecutionRecord getExecutionRecordById(String id);
 

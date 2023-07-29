@@ -11,7 +11,7 @@
 
     <artifactId>gateway</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.4</version>
+    <version>0.2.0</version>
 
     <dependencies>
         <dependency>

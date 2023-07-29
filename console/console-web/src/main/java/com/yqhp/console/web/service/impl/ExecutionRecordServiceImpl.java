@@ -35,7 +35,6 @@ import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.ExecutionRecordMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
-import com.yqhp.console.web.kafka.MessageProducer;
 import com.yqhp.console.web.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -69,8 +69,6 @@ public class ExecutionRecordServiceImpl
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
-    private MessageProducer producer;
-    @Autowired
     private PluginExecutionRecordService pluginExecutionRecordService;
     @Autowired
     private DocExecutionRecordService docExecutionRecordService;
@@ -84,23 +82,16 @@ public class ExecutionRecordServiceImpl
     private UserRpc userRpc;
 
     @Override
-    public void push(String deviceId, String executionRecordId) {
+    public void push(String executionRecordId) {
+        redisTemplate.opsForList().leftPush(getRedisKey(), executionRecordId);
+    }
+
+    @Override
+    public void pushForDevice(String deviceId, String executionRecordId) {
         redisTemplate.opsForList().leftPush(getDeviceRedisKey(deviceId), executionRecordId);
     }
 
-    @Override
-    public void push(ExecutionRecord executionRecord,
-                     List<PluginExecutionRecord> pluginExecutionRecords,
-                     List<DocExecutionRecord> docExecutionRecords) {
-        Task task = new Task();
-        task.setExecutionRecord(executionRecord);
-        task.setPluginExecutionRecords(pluginExecutionRecords);
-        task.setDocExecutionRecords(docExecutionRecords);
-        producer.sendTask(task);
-    }
-
-    @Override
-    public boolean removePushed(String deviceId, String executionRecordId) {
+    private boolean removePushedForDevice(String deviceId, String executionRecordId) {
         // 第2个参数count
         // count > 0: Remove elements equal to element moving from head to tail.
         // count < 0: Remove elements equal to element moving from tail to head.
@@ -110,25 +101,34 @@ public class ExecutionRecordServiceImpl
     }
 
     @Override
-    public Task receiveDeviceTask(String deviceId) {
-        String executionRecordId = redisTemplate.opsForList().rightPop(getDeviceRedisKey(deviceId));
+    public Task receiveTask(String deviceId) {
+        boolean isFromDevice = StringUtils.hasText(deviceId);
+
+        String redisKey = isFromDevice ? getDeviceRedisKey(deviceId) : getRedisKey();
+        String executionRecordId = redisTemplate.opsForList().rightPop(redisKey);
         if (executionRecordId == null) {
             return null;
         }
-
-        log.info("deviceId={} receive executionRecordId={}", deviceId, executionRecordId);
+        if (isFromDevice) {
+            log.info("deviceId={} receive executionRecordId={}", deviceId, executionRecordId);
+        } else {
+            log.info("receive executionRecordId={}", executionRecordId);
+        }
         ExecutionRecord executionRecord = getById(executionRecordId);
         if (executionRecord == null) {
             return null;
         }
 
+        List<PluginExecutionRecord> pluginExecutionRecords = isFromDevice
+                ? pluginExecutionRecordService.listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId)
+                : pluginExecutionRecordService.listByExecutionRecordId(executionRecordId);
+        List<DocExecutionRecord> docExecutionRecords = isFromDevice
+                ? docExecutionRecordService.listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId)
+                : docExecutionRecordService.listByExecutionRecordId(executionRecordId);
+
         Task task = new Task();
         task.setExecutionRecord(executionRecord);
-        List<PluginExecutionRecord> pluginExecutionRecords = pluginExecutionRecordService
-                .listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId);
         task.setPluginExecutionRecords(pluginExecutionRecords);
-        List<DocExecutionRecord> docExecutionRecords = docExecutionRecordService
-                .listByExecutionRecordIdAndDeviceId(executionRecordId, deviceId);
         task.setDocExecutionRecords(docExecutionRecords);
         return task;
     }
@@ -164,7 +164,7 @@ public class ExecutionRecordServiceImpl
     @Transactional
     @Override
     public void deleteDeviceExecutionRecord(String id, String deviceId) {
-        boolean removed = removePushed(deviceId, id);
+        boolean removed = removePushedForDevice(deviceId, id);
         if (!removed) {
             throw new ServiceException(ResponseCodeEnum.DEVICE_TASK_HAS_BEEN_RECEIVED);
         }
@@ -336,6 +336,10 @@ public class ExecutionRecordServiceImpl
 
     private String getDeviceRedisKey(String deviceId) {
         return "executionRecord:" + deviceId;
+    }
+
+    private String getRedisKey() {
+        return "executionRecord";
     }
 
 }

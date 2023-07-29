@@ -26,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author jiangyitao
@@ -45,8 +44,8 @@ public class ExecutionRecordController {
     }
 
     @GetMapping("/receive")
-    public Task receive(@NotBlank(message = "设备id不能为空") String deviceId) {
-        return executionRecordService.receiveDeviceTask(deviceId);
+    public Task receiveTask(String deviceId) {
+        return executionRecordService.receiveTask(deviceId);
     }
 
     @GetMapping("/{id}/report")

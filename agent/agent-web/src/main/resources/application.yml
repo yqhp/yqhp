@@ -22,10 +22,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: agent
-      enable-auto-commit: true
-      max-poll-records: 20
 
   servlet:
     multipart:
@@ -37,7 +33,7 @@ zk:
 
 agent:
   version: @project.version@
-  description: ${AGENT_DESC}
+  description: ${AGENT_DESC:}
   download-dir: download
   android:
     enabled: true

@@ -27,6 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface ExecutionRecordRpc {
 
     @GetMapping("/receive")
-    Task receiveDeviceTask(@RequestParam("deviceId") String deviceId);
+    Task receiveTask(@RequestParam("deviceId") String deviceId);
 
 }

@@ -225,10 +225,10 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
 
         if (isDeviceMode(plan)) {
             for (String deviceId : finalDeviceIds) {
-                executionRecordService.push(deviceId, executionRecord.getId());
+                executionRecordService.pushForDevice(deviceId, executionRecord.getId());
             }
         } else {
-            executionRecordService.push(executionRecord, pluginExecutionRecords, docExecutionRecords);
+            executionRecordService.push(executionRecord.getId());
         }
     }
 
