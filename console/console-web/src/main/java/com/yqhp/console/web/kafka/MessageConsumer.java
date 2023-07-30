@@ -41,13 +41,21 @@ public class MessageConsumer {
 
     @KafkaListener(topics = Topics.DOC_EXECUTION_RECORD, concurrency = "2")
     public void consumeDocExecutionRecordMessage(ConsumerRecord<?, String> record) {
-        DocExecutionRecordMessage message = JacksonUtils.readValue(record.value(), DocExecutionRecordMessage.class);
-        docExecutionRecordService.updateById(message.convertTo());
+        try {
+            DocExecutionRecordMessage message = JacksonUtils.readValue(record.value(), DocExecutionRecordMessage.class);
+            docExecutionRecordService.updateById(message.convertTo());
+        } catch (Throwable cause) {
+            log.error("consumeDocExecutionRecordMessage failed, message={}", record.value(), cause);
+        }
     }
 
     @KafkaListener(topics = Topics.PLUGIN_EXECUTION_RECORD, concurrency = "2")
     public void consumePluginExecutionRecordMessage(ConsumerRecord<?, String> record) {
-        PluginExecutionRecordMessage message = JacksonUtils.readValue(record.value(), PluginExecutionRecordMessage.class);
-        pluginExecutionRecordService.updateById(message.convertTo());
+        try {
+            PluginExecutionRecordMessage message = JacksonUtils.readValue(record.value(), PluginExecutionRecordMessage.class);
+            pluginExecutionRecordService.updateById(message.convertTo());
+        } catch (Throwable cause) {
+            log.error("consumePluginExecutionRecordMessage failed, message={}", record.value(), cause);
+        }
     }
 }

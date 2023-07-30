@@ -65,6 +65,14 @@ public class PluginExecutionRecordServiceImpl
     }
 
     @Override
+    public void deleteByExecutionRecordId(String executionRecordId) {
+        Assert.hasText(executionRecordId, "executionRecordId must has text");
+        LambdaQueryWrapper<PluginExecutionRecord> query = new LambdaQueryWrapper<>();
+        query.eq(PluginExecutionRecord::getExecutionRecordId, executionRecordId);
+        remove(query);
+    }
+
+    @Override
     public PluginExecutionResult statPluginExecutionResult(List<PluginExecutionRecord> records) {
         PluginExecutionResult result = new PluginExecutionResult();
         result.setRecords(records);

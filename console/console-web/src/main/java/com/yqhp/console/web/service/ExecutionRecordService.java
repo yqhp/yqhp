@@ -45,6 +45,8 @@ public interface ExecutionRecordService extends IService<ExecutionRecord> {
 
     void deleteDeviceExecutionRecord(String id, String deviceId);
 
+    void deleteById(String id);
+
     ExecutionReport getReportById(String id);
 
     ExecutionResult statExecutionResult(ExecutionRecord record);

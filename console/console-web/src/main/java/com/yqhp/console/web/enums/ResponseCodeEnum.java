@@ -107,6 +107,7 @@ public enum ResponseCodeEnum implements ResponseCode {
 
     EXECUTION_RECORD_NOT_FOUND(3901, "执行记录不存在"),
     DEVICE_TASK_HAS_BEEN_RECEIVED(3902, "设备任务已领取，无法删除"),
+    TASK_HAS_BEEN_RECEIVED(3903, "任务已领取，无法删除")
     ;
 
 

@@ -73,6 +73,14 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
     }
 
     @Override
+    public void deleteByExecutionRecordId(String executionRecordId) {
+        Assert.hasText(executionRecordId, "executionRecordId must has text");
+        LambdaQueryWrapper<DocExecutionRecord> query = new LambdaQueryWrapper<>();
+        query.eq(DocExecutionRecord::getExecutionRecordId, executionRecordId);
+        remove(query);
+    }
+
+    @Override
     public DocExecutionResult statDocExecutionResult(List<DocExecutionRecord> records) {
         DocExecutionResult result = new DocExecutionResult();
         result.setRecords(records);

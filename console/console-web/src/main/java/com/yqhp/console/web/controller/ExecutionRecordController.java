@@ -57,4 +57,9 @@ public class ExecutionRecordController {
     public void deleteDeviceExecutionRecord(@PathVariable String id, @PathVariable String deviceId) {
         executionRecordService.deleteDeviceExecutionRecord(id, deviceId);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable String id) {
+        executionRecordService.deleteById(id);
+    }
 }

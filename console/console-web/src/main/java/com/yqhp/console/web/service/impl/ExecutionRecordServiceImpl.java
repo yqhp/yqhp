@@ -49,10 +49,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -84,6 +81,15 @@ public class ExecutionRecordServiceImpl
     @Override
     public void push(String executionRecordId) {
         redisTemplate.opsForList().leftPush(getRedisKey(), executionRecordId);
+    }
+
+    private boolean removePushed(String executionRecordId) {
+        // 第2个参数count
+        // count > 0: Remove elements equal to element moving from head to tail.
+        // count < 0: Remove elements equal to element moving from tail to head.
+        // count = 0: Remove all elements equal to element.
+        Long result = redisTemplate.opsForList().remove(getRedisKey(), -1, executionRecordId);
+        return result != null && result > 0;
     }
 
     @Override
@@ -170,6 +176,46 @@ public class ExecutionRecordServiceImpl
         }
         pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
         docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(String id) {
+        ExecutionRecord executionRecord = getExecutionRecordById(id);
+        if (planService.isDeviceMode(executionRecord.getPlan())) {
+            Set<String> deviceIds = docExecutionRecordService.listByExecutionRecordId(id).stream()
+                    .map(DocExecutionRecord::getDeviceId)
+                    .collect(Collectors.toSet());
+            if (CollectionUtils.isEmpty(deviceIds)) {
+                // 每个设备都已经删了，直接删除执行记录
+                removeById(id);
+            }
+
+            List<String> unRemovedDevices = new ArrayList<>();
+            for (String deviceId : deviceIds) {
+                boolean removed = removePushedForDevice(deviceId, id);
+                if (removed) {
+                    pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
+                    docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
+                } else {
+                    unRemovedDevices.add(deviceId);
+                }
+            }
+            if (unRemovedDevices.isEmpty()) {
+                removeById(id);
+            } else {
+                // 不做处理，有设备已经领取了任务
+            }
+        } else {
+            // 非设备模式
+            boolean removed = removePushed(id);
+            if (!removed) {
+                throw new ServiceException(ResponseCodeEnum.TASK_HAS_BEEN_RECEIVED);
+            }
+            pluginExecutionRecordService.deleteByExecutionRecordId(id);
+            docExecutionRecordService.deleteByExecutionRecordId(id);
+            removeById(id);
+        }
     }
 
     @Override
