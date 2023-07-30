@@ -30,11 +30,16 @@ public class AgentProperties {
     private String version;
     private String description;
     private String downloadDir;
-
+    private Opencv opencv = new Opencv();
     private Android android = new Android();
     private IOS iOS = new IOS();
     private Appium appium = new Appium();
     private Plugin plugin = new Plugin();
+
+    @Data
+    public class Opencv {
+        private boolean enabled = false;
+    }
 
     @Data
     public class Android {

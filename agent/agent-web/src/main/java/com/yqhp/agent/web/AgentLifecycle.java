@@ -115,9 +115,11 @@ public class AgentLifecycle implements SmartLifecycle {
             });
         }
 
-        log.info("opencv loading...");
-        OpenCV.loadShared();
-        log.info("opencv loaded");
+        if (agentProperties.getOpencv().isEnabled()) {
+            log.info("opencv loading...");
+            OpenCV.loadShared();
+            log.info("opencv loaded");
+        }
     }
 
     @Override

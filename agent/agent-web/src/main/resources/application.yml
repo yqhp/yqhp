@@ -35,6 +35,8 @@ agent:
   version: @project.version@
   description: ${AGENT_DESC:}
   download-dir: download
+  opencv:
+    enabled: true
   android:
     enabled: true
     adb-path:
