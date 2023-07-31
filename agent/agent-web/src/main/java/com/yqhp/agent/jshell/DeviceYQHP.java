@@ -47,6 +47,13 @@ public class DeviceYQHP extends YQHP {
     }
 
     /**
+     * @since 0.2.2
+     */
+    public String getId() {
+        return deviceDriver().getDeviceId();
+    }
+
+    /**
      * @since 0.0.1
      */
     public AppiumDriver appiumDriver() {
