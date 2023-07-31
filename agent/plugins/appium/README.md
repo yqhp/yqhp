@@ -39,7 +39,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param appId  android: package name | ios: bundle id
      */
     void startApp(String appId) {
-        ((InteractsWithApps) driver()).activateApp(appId);
+        ((InteractsWithApps) driver).activateApp(appId);
     }
 
     /**
@@ -48,7 +48,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param appId  android: package name | ios: bundle id
      */
     boolean stopApp(String appId) {
-        return ((InteractsWithApps) driver()).terminateApp(appId);
+        return ((InteractsWithApps) driver).terminateApp(appId);
     }
     
     /**
@@ -66,7 +66,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param appId android: package name | ios: bundle id
      */
     boolean isAppInstalled(String appId) {
-        return ((InteractsWithApps) driver()).isAppInstalled(appId);
+        return ((InteractsWithApps) driver).isAppInstalled(appId);
     }
 
     /**
@@ -75,7 +75,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
      * @param appId android: package name | ios: bundle id
      */
     boolean uninstallApp(String appId) {
-        return ((InteractsWithApps) driver()).removeApp(appId);
+        return ((InteractsWithApps) driver).removeApp(appId);
     }
 
     /**

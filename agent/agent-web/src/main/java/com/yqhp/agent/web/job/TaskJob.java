@@ -17,6 +17,7 @@ package com.yqhp.agent.web.job;
 
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.service.TaskService;
 import com.yqhp.console.model.vo.Task;
@@ -53,6 +54,8 @@ public class TaskJob {
     @Autowired
     private DeviceService deviceService;
     @Autowired
+    private AgentService agentService;
+    @Autowired
     private TaskService taskService;
 
     @Scheduled(fixedDelay = 10_000)
@@ -81,7 +84,7 @@ public class TaskJob {
                     log.info("[{}]task started, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
                     taskService.execute(driver, task);
                 } catch (Throwable cause) {
-                    log.error("[{}]unexpected error", driver.getDeviceId(), cause);
+                    log.error("[{}]unexpected error, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId(), cause);
                 } finally {
                     log.info("[{}]task finished, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
                     deviceService.unlockDevice(token);
@@ -104,13 +107,17 @@ public class TaskJob {
 
         // 当线程池所有线程都在执行任务，submit将会阻塞，直到有空闲线程
         NO_DEVICE_THREAD_POOL.submit(() -> {
-            Driver driver = new Driver();
+            String planName = task.getExecutionRecord().getPlan().getName();
+            String token = agentService.register(planName);
+            Driver driver = agentService.getDriverByToken(token);
             try {
                 log.info("task started, executionId={}", task.getExecutionRecord().getId());
                 taskService.execute(driver, task);
+            } catch (Throwable cause) {
+                log.error("unexpected error, executionId={}", task.getExecutionRecord().getId(), cause);
             } finally {
                 log.info("task finished, executionId={}", task.getExecutionRecord().getId());
-                driver.release();
+                agentService.unregister(token);
             }
         });
     }
