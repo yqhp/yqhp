@@ -8,7 +8,8 @@
         <result column="project_id" property="projectId" />
         <result column="pkg_id" property="pkgId" />
         <result column="weight" property="weight" />
-        <result column="type" property="type" />
+        <result column="kind" property="kind" />
+        <result column="flow" property="flow" />
         <result column="name" property="name" />
         <result column="description" property="description" />
         <result column="content" property="content" />
