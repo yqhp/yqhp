@@ -17,6 +17,7 @@ package com.yqhp.console.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.DocStatus;
 import lombok.Data;
@@ -49,6 +50,8 @@ public class Doc implements Serializable {
     private Integer weight;
 
     private DocKind kind;
+
+    private DocFlow flow;
 
     private String name;
 

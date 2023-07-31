@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.console.model.dto.DocExecutionResult;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
+import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.DocExecutionRecordMapper;
@@ -112,12 +113,14 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
         DocExecutionRecord firstRecord = records.get(0);
         result.setStartTime(firstRecord.getStartTime());
 
-        boolean initFailed = records.stream()
-                .filter(record -> DocKind.JSH_INIT.equals(record.getDocKind()))
-                .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
-        if (initFailed) {
+        boolean stopRunning = records.stream()
+                .anyMatch(record ->
+                        ExecutionStatus.FAILED.equals(record.getStatus())
+                                && DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())
+                );
+        if (stopRunning) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(true, records));
+            result.setEndTime(getEndTime(false, records));
             result.setStatus(ExecutionStatus.FAILED);
             return result;
         }
@@ -125,7 +128,7 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
         boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
         if (allFinished) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(false, records));
+            result.setEndTime(getEndTime(true, records));
             boolean anyFailed = records.stream()
                     .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
             result.setStatus(anyFailed ? ExecutionStatus.FAILED : ExecutionStatus.SUCCESSFUL);
@@ -134,20 +137,20 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
 
         result.setFinished(false);
         if (ExecutionStatus.TODO.equals(firstRecord.getStatus())) {
-            result.setStatus(firstRecord.getStatus());
+            result.setStatus(ExecutionStatus.TODO);
         } else {
             result.setStatus(ExecutionStatus.STARTED);
         }
         return result;
     }
 
-    private long getEndTime(boolean initFailed, List<DocExecutionRecord> records) {
-        if (initFailed) {
-            return records.stream()
-                    .mapToLong(DocExecutionRecord::getEndTime)
-                    .max().orElse(0);
+    private long getEndTime(boolean allFinished, List<DocExecutionRecord> records) {
+        if (allFinished) {
+            DocExecutionRecord lastRecord = records.get(records.size() - 1);
+            return lastRecord.getEndTime();
         }
-        DocExecutionRecord lastRecord = records.get(records.size() - 1);
-        return lastRecord.getEndTime();
+        return records.stream()
+                .mapToLong(DocExecutionRecord::getEndTime)
+                .max().orElse(0);
     }
 }

@@ -105,7 +105,7 @@ public class PluginExecutionRecordServiceImpl
 
         result.setFinished(false);
         if (ExecutionStatus.TODO.equals(firstRecord.getStatus())) {
-            result.setStatus(firstRecord.getStatus());
+            result.setStatus(ExecutionStatus.TODO);
         } else {
             result.setStatus(ExecutionStatus.STARTED);
         }

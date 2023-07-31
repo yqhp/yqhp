@@ -24,7 +24,7 @@ import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
 import com.yqhp.console.model.vo.Task;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
-import com.yqhp.console.repository.enums.DocKind;
+import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,8 +53,7 @@ public class TaskServiceImpl implements TaskService {
         // 执行doc
         for (DocExecutionRecord record : task.getDocExecutionRecords()) {
             boolean ok = evalDocQuietly(driver, record);
-            if (!ok && DocKind.JSH_INIT.equals(record.getDocKind())) {
-                // 初始化执行失败，停止运行
+            if (!ok && DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())) {
                 return;
             }
         }
