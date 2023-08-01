@@ -31,9 +31,9 @@ import java.io.File;
  * @author jiangyitao
  */
 @Slf4j
-public class DeviceYQHP extends YQHP {
+public class Device extends Agent {
 
-    public DeviceYQHP(DeviceDriver deviceDriver) {
+    public Device(DeviceDriver deviceDriver) {
         super(deviceDriver);
     }
 
@@ -70,7 +70,7 @@ public class DeviceYQHP extends YQHP {
     /**
      * @since 0.0.1
      */
-    public DeviceYQHP cap(String key, Object value) {
+    public Device cap(String key, Object value) {
         deviceDriver().setCapability(key, value);
         return this;
     }

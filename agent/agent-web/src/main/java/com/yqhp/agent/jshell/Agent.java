@@ -31,18 +31,18 @@ import java.io.File;
  * @author jiangyitao
  */
 @Slf4j
-public class YQHP implements JShellVar {
+public class Agent implements JShellVar {
 
     protected final Driver driver;
 
-    public YQHP(Driver driver) {
+    public Agent(Driver driver) {
         Assert.notNull(driver, "driver cannot be null");
         this.driver = driver;
     }
 
     @Override
     public String getName() {
-        return "yqhp";
+        return "agent";
     }
 
     /**

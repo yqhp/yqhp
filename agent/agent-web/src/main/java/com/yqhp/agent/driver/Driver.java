@@ -15,7 +15,7 @@
  */
 package com.yqhp.agent.driver;
 
-import com.yqhp.agent.jshell.YQHP;
+import com.yqhp.agent.jshell.Agent;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.jshell.CompletionItem;
 import com.yqhp.common.jshell.JShellContext;
@@ -67,7 +67,7 @@ public class Driver {
     }
 
     public void injectVar(JShellContext context) {
-        context.injectVar(new YQHP(this));
+        context.injectVar(new Agent(this));
     }
 
     public JShellEvalResult jshellEval(String input) {
