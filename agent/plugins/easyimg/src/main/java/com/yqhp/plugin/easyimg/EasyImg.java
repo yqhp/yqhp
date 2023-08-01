@@ -15,13 +15,9 @@
  */
 package com.yqhp.plugin.easyimg;
 
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.RawImage;
-import com.yqhp.agent.androidtools.AndroidUtils;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.opencv.MatchTemplateResult;
 import com.yqhp.common.opencv.OpencvEngine;
-import io.appium.java_client.AppiumDriver;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -31,9 +27,11 @@ import org.opencv.features2d.SIFT;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -45,21 +43,15 @@ import java.util.List;
 @Slf4j
 public class EasyImg {
 
-    private final IDevice iDevice;
-
     private File imgDir;
-    private AppiumDriver appiumDriver;
+    private final RemoteWebDriver driver;
 
-    public EasyImg(IDevice iDevice) {
-        this.iDevice = iDevice;
+    public EasyImg(RemoteWebDriver driver) {
+        this.driver = driver;
     }
 
     public void setImgDir(String dir) {
         imgDir = new File(dir);
-    }
-
-    public void setAppiumDriver(AppiumDriver driver) {
-        appiumDriver = driver;
     }
 
     /**
@@ -101,9 +93,15 @@ public class EasyImg {
      *
      * @since 0.0.2
      */
+    @SneakyThrows
     public RectX findColors(List<Color> colors) {
-        RawImage rawImage = AndroidUtils.screenshotAsRawImage(iDevice);
-        return findColors(rawImage, colors);
+        File img = screenshot();
+        try {
+            return findColors(ImageIO.read(img), colors);
+        } finally {
+            // 删除截图
+            if (img != null) img.delete();
+        }
     }
 
     /**
@@ -111,8 +109,8 @@ public class EasyImg {
      *
      * @since 0.0.2
      */
-    private RectX findColors(RawImage image, List<Color> colors) {
-        Validate.notNull(image);
+    private RectX findColors(BufferedImage img, List<Color> colors) {
+        Validate.notNull(img);
         Validate.notEmpty(colors);
 
         int minX = Integer.MAX_VALUE;
@@ -120,7 +118,7 @@ public class EasyImg {
         int minY = Integer.MAX_VALUE;
         int maxY = Integer.MIN_VALUE;
         for (Color color : colors) {
-            if (color.argb != getARGB(image, color.x, color.y)) {
+            if (color.argb != img.getRGB(color.x, color.y)) {
                 return null;
             }
             minX = Math.min(minX, color.x);
@@ -214,16 +212,7 @@ public class EasyImg {
         return rect != null ? new RectX(rect) : null;
     }
 
-    private int getARGB(RawImage img, int x, int y) {
-        return img.getARGB((x + y * img.width) * (img.bpp / 8));
-    }
-
-    private File screenshot() throws IOException {
-        if (appiumDriver == null) {
-            // 速度慢
-            return AndroidUtils.screenshot(iDevice);
-        } else {
-            return appiumDriver.getScreenshotAs(OutputType.FILE);
-        }
+    private File screenshot() {
+        return driver.getScreenshotAs(OutputType.FILE);
     }
 }

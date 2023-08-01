@@ -3,8 +3,7 @@
 ```groovy
 import com.yqhp.plugin.easyimg.*;
 
-EasyImg img = new EasyImg(device.getIDevice());
-img.setAppiumDriver(device.appiumDriver()); // 可以不设置，但截图速度比较慢
+EasyImg img = new EasyImg(device.appiumDriver());
 img.setImgDir("download"); // 远程图片存放路径
 ```
 
