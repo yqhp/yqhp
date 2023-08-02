@@ -112,6 +112,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
+    @Override
     public WebElement text(String text) {
         return uia(uiSelectorText(text));
     }
@@ -121,6 +122,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
+    @Override
     public WebElement _text(String text) {
         return _uia(uiSelectorText(text));
     }
@@ -130,6 +132,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
+    @Override
     public WebElement text(String text, Duration timeout) {
         return uia(uiSelectorText(text), timeout);
     }
@@ -139,6 +142,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
+    @Override
     public WebElement _text(String text, Duration timeout) {
         return _uia(uiSelectorText(text), timeout);
     }

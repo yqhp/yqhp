@@ -99,6 +99,185 @@ public class RemoteWebDriverWrapper {
         return _find(By.id(id), timeout);
     }
 
+    /**
+     * 通过linkText查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement linkText(String linkText) {
+        return find(By.linkText(linkText));
+    }
+
+    /**
+     * 通过linkText查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _linkText(String linkText) {
+        return _find(By.linkText(linkText));
+    }
+
+    /**
+     * 通过linkText查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement linkText(String linkText, Duration timeout) {
+        return find(By.linkText(linkText), timeout);
+    }
+
+    /**
+     * 通过linkText查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _linkText(String linkText, Duration timeout) {
+        return _find(By.linkText(linkText), timeout);
+    }
+
+    /**
+     * 通过partialLinkText查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement partialLinkText(String partialLinkText) {
+        return find(By.partialLinkText(partialLinkText));
+    }
+
+    /**
+     * 通过partialLinkText查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _partialLinkText(String partialLinkText) {
+        return _find(By.partialLinkText(partialLinkText));
+    }
+
+    /**
+     * 通过partialLinkText查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement partialLinkText(String partialLinkText, Duration timeout) {
+        return find(By.partialLinkText(partialLinkText), timeout);
+    }
+
+    /**
+     * 通过partialLinkText查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _partialLinkText(String partialLinkText, Duration timeout) {
+        return _find(By.partialLinkText(partialLinkText), timeout);
+    }
+
+    /**
+     * 通过name查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement name(String name) {
+        return find(By.name(name));
+    }
+
+    /**
+     * 通过name查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _name(String name) {
+        return _find(By.name(name));
+    }
+
+    /**
+     * 通过name查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement name(String name, Duration timeout) {
+        return find(By.name(name), timeout);
+    }
+
+    /**
+     * 通过name查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _name(String name, Duration timeout) {
+        return _find(By.name(name), timeout);
+    }
+
+    /**
+     * 通过tagName查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement tagName(String tagName) {
+        return find(By.tagName(tagName));
+    }
+
+    /**
+     * 通过tagName查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _tagName(String tagName) {
+        return _find(By.tagName(tagName));
+    }
+
+    /**
+     * 通过tagName查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement tagName(String tagName, Duration timeout) {
+        return find(By.tagName(tagName), timeout);
+    }
+
+    /**
+     * 通过tagName查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _tagName(String tagName, Duration timeout) {
+        return _find(By.tagName(tagName), timeout);
+    }
+
+    /**
+     * 通过xpath text()查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement text(String text) {
+        return xpath("//*[text()='" + text + "']");
+    }
+
+    /**
+     * 通过xpath text()查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _text(String text) {
+        return _xpath("//*[text()='" + text + "']");
+    }
+
+    /**
+     * 通过xpath text()查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement text(String text, Duration timeout) {
+        return xpath("//*[text()='" + text + "']", timeout);
+    }
+
+    /**
+     * 通过xpath text()查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _text(String text, Duration timeout) {
+        return _xpath("//*[text()='" + text + "']", timeout);
+    }
 
     /**
      * 通过xpath查找元素(找不到则抛出异常)
@@ -134,6 +313,78 @@ public class RemoteWebDriverWrapper {
      */
     public WebElement _xpath(String xpath, Duration timeout) {
         return _find(By.xpath(xpath), timeout);
+    }
+
+    /**
+     * 通过className查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement className(String className) {
+        return find(By.className(className));
+    }
+
+    /**
+     * 通过className查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _className(String className) {
+        return _find(By.className(className));
+    }
+
+    /**
+     * 通过className查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement className(String className, Duration timeout) {
+        return find(By.className(className), timeout);
+    }
+
+    /**
+     * 通过className查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _className(String className, Duration timeout) {
+        return _find(By.className(className), timeout);
+    }
+
+    /**
+     * 通过cssSelector查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement cssSelector(String cssSelector) {
+        return find(By.cssSelector(cssSelector));
+    }
+
+    /**
+     * 通过cssSelector查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _cssSelector(String cssSelector) {
+        return _find(By.cssSelector(cssSelector));
+    }
+
+    /**
+     * 通过cssSelector查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.3
+     */
+    public WebElement cssSelector(String cssSelector, Duration timeout) {
+        return find(By.cssSelector(cssSelector), timeout);
+    }
+
+    /**
+     * 通过cssSelector查找元素(找不到则返回null)
+     *
+     * @since 0.0.3
+     */
+    public WebElement _cssSelector(String cssSelector, Duration timeout) {
+        return _find(By.cssSelector(cssSelector), timeout);
     }
 
     /**
