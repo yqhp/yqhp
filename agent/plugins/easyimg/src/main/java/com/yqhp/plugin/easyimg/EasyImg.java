@@ -67,14 +67,14 @@ public class EasyImg {
     /**
      * 查找颜色，找不到返回null
      *
-     * @param timeout 查找超时时间
-     * @param sleep   每次查找间隔时间
+     * @param timeout  查找超时时间
+     * @param interval 查找间隔时间
      * @since 0.0.2
      */
     @SneakyThrows
-    public RectX findColors(List<Color> colors, Duration timeout, Duration sleep) {
+    public RectX findColors(List<Color> colors, Duration timeout, Duration interval) {
         long endTime = System.currentTimeMillis() + timeout.toMillis();
-        long sleepMs = sleep.toMillis();
+        long intervalMs = interval.toMillis();
         for (; ; ) {
             RectX rect = findColors(colors);
             if (rect != null) {
@@ -84,7 +84,7 @@ public class EasyImg {
                 // 超时
                 return null;
             }
-            Thread.sleep(sleepMs);
+            Thread.sleep(intervalMs);
         }
     }
 
@@ -162,14 +162,14 @@ public class EasyImg {
      *
      * @param template  模版图片
      * @param timeout   查找超时时间
-     * @param sleep     每次查找间隔时间
+     * @param interval  查找间隔时间
      * @param threshold 相似度
      * @since 0.0.2
      */
     @SneakyThrows
-    private RectX findImage(File template, Duration timeout, Duration sleep, double threshold) {
+    private RectX findImage(File template, Duration timeout, Duration interval, double threshold) {
         long endTime = System.currentTimeMillis() + timeout.toMillis();
-        long sleepMs = sleep.toMillis();
+        long intervalMs = interval.toMillis();
         for (; ; ) {
             RectX rect = findImage(template, threshold);
             if (rect != null) {
@@ -179,7 +179,7 @@ public class EasyImg {
                 // 超时
                 return null;
             }
-            Thread.sleep(sleepMs);
+            Thread.sleep(intervalMs);
         }
     }
 

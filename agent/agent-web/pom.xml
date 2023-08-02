@@ -11,11 +11,11 @@
 
     <artifactId>agent-web</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.4</version>
+    <version>0.2.5</version>
 
     <properties>
         <!-- 注意: dependencies发生变化，需要更新这个版本号  -->
-        <lib.version>v23</lib.version>
+        <lib.version>v25</lib.version>
     </properties>
 
     <dependencies>
