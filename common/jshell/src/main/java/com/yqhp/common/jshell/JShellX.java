@@ -19,6 +19,7 @@ import jdk.jshell.*;
 import jdk.jshell.execution.LocalExecutionControlProvider;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -57,6 +58,38 @@ public class JShellX implements Closeable {
         // 如: jshell执行了一个死循环代码，如果不调用stop，死循环会一直执行
         jShell.stop();
         jShell.close();
+    }
+
+    public List<CompletionItem> getSuggestions(TriggerSuggestRequest request) {
+        String input = request.getInput();
+        if (StringUtils.isBlank(input)) {
+            return new ArrayList<>();
+        }
+        int cursor = request.getCursor() == null ? input.length() : request.getCursor();
+
+        List<String> suggestions = codeAnalysis
+                .completionSuggestions(input, cursor, new int[]{-1}).stream()
+                .filter(Suggestion::matchesType)
+                .map(Suggestion::continuation)
+                .distinct()
+                .collect(toList());
+        if (suggestions.size() == 0) {
+            List<Documentation> docs = codeAnalysis.documentation(input, cursor, false);
+            return docs.stream().map(doc -> {
+                CompletionItem item = new CompletionItem();
+                item.setLabel(doc.signature());
+                item.setInsertText("");
+                return item;
+            }).collect(toList());
+        } else if (suggestions.size() < 200) {
+            return suggestions.stream().map(suggestion -> {
+                CompletionItem item = new CompletionItem();
+                item.setLabel(suggestion);
+                item.setInsertText(suggestion);
+                return item;
+            }).collect(toList());
+        }
+        return new ArrayList<>();
     }
 
     public List<JShellEvalResult> analysisAndEval(String input) {
@@ -135,15 +168,19 @@ public class JShellX implements Closeable {
                 snippetRecord.setFailed(true);
             } else if (snippetEvent.exception() != null) {
                 snippetRecord.setFailed(true);
+
                 JShellException exception = snippetEvent.exception();
-                String exceptionText = exception.getMessage();
+                String exceptionMessage = exception.getMessage();
                 if (exception instanceof EvalException) {
                     EvalException evalException = (EvalException) exception;
-                    exceptionText = StringUtils.isBlank(exceptionText)
+                    exceptionMessage = StringUtils.isBlank(exceptionMessage)
                             ? evalException.getExceptionClassName()
-                            : evalException.getExceptionClassName() + ": " + exceptionText;
+                            : evalException.getExceptionClassName() + ": " + exceptionMessage;
                 }
-                snippetRecord.setException(exceptionText == null ? "" : exceptionText);
+                snippetRecord.setExceptionMessage(exceptionMessage);
+
+                String stackTrace = ExceptionUtils.getStackTrace(exception);
+                snippetRecord.setExceptionStackTrace(stackTrace);
             }
         }
 
@@ -152,10 +189,10 @@ public class JShellX implements Closeable {
         }
     }
 
-    // copy from jdk.internal.jshell.tool.JShellTool
+    // 以下代码主要来自jdk.internal.jshell.tool.JShellTool
+
     private static final Pattern LINEBREAK = Pattern.compile("\\R");
 
-    // copy from jdk.internal.jshell.tool.JShellTool
     private void displayableDiagnostic(String source, Diag diag, List<String> toDisplay) {
         for (String line : diag.getMessage(null).split("\\r?\\n")) { // TODO: Internationalize
             if (!line.trim().startsWith("location:")) {
@@ -204,37 +241,5 @@ public class JShellX implements Closeable {
             }
         }
         toDisplay.add(sb.toString());
-    }
-
-    public List<CompletionItem> getSuggestions(TriggerSuggestRequest request) {
-        String input = request.getInput();
-        if (StringUtils.isBlank(input)) {
-            return new ArrayList<>();
-        }
-        int cursor = request.getCursor() == null ? input.length() : request.getCursor();
-
-        List<String> suggestions = codeAnalysis
-                .completionSuggestions(input, cursor, new int[]{-1}).stream()
-                .filter(Suggestion::matchesType)
-                .map(Suggestion::continuation)
-                .distinct()
-                .collect(toList());
-        if (suggestions.size() == 0) {
-            List<Documentation> docs = codeAnalysis.documentation(input, cursor, false);
-            return docs.stream().map(doc -> {
-                CompletionItem item = new CompletionItem();
-                item.setLabel(doc.signature());
-                item.setInsertText("");
-                return item;
-            }).collect(toList());
-        } else if (suggestions.size() < 200) {
-            return suggestions.stream().map(suggestion -> {
-                CompletionItem item = new CompletionItem();
-                item.setLabel(suggestion);
-                item.setInsertText(suggestion);
-                return item;
-            }).collect(toList());
-        }
-        return new ArrayList<>();
     }
 }

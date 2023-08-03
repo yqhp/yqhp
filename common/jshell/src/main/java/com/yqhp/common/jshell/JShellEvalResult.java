@@ -38,7 +38,8 @@ public class JShellEvalResult {
         private String value;
         private String status;
         private boolean failed;
-        private String exception;
+        private String exceptionMessage;
+        private String exceptionStackTrace;
         private List<String> diagnostics = new ArrayList<>();
     }
 }
