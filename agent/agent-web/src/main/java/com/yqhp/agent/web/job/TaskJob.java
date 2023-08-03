@@ -24,6 +24,7 @@ import com.yqhp.console.model.vo.Task;
 import com.yqhp.console.rpc.ExecutionRecordRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.*;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "agent.schedule.receive-task-enabled", havingValue = "true")
 public class TaskJob {
 
     /**

@@ -35,10 +35,12 @@ agent:
   version: @project.version@
   description: ${AGENT_DESC:}
   download-dir: download
+  schedule:
+    receive-task-enabled: false # 是否领取任务。为了防止本地调试的agent领取到提交的任务，默认关闭。
   opencv:
-    enabled: true
+    enabled: false
   android:
-    enabled: true
+    enabled: false
     adb-path:
     scrcpy-version: 1.25
     scrcpy-server-path: vendor/scrcpy/scrcpy-server-v1.25
