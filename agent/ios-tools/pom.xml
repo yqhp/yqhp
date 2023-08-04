@@ -9,8 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>usbmuxd</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>ios-tools</artifactId>
 
     <dependencies>
         <dependency>

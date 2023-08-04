@@ -15,10 +15,10 @@
     <modules>
         <module>device-discovery</module>
         <module>agent-web</module>
-        <module>usbmuxd</module>
         <module>android-tools</module>
         <module>scrcpy</module>
         <module>plugins</module>
+        <module>ios-tools</module>
     </modules>
 
 </project>

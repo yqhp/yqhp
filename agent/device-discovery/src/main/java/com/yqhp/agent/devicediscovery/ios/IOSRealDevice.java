@@ -15,7 +15,7 @@
  */
 package com.yqhp.agent.devicediscovery.ios;
 
-import com.yqhp.agent.usbmuxd.IDevice;
+import com.yqhp.agent.iostools.usbmuxd.IDevice;
 import lombok.Getter;
 
 /**

@@ -16,7 +16,7 @@
 package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
-import com.yqhp.agent.jshell.Device;
+import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
@@ -50,7 +50,7 @@ import java.util.function.Consumer;
 public abstract class DeviceDriver extends Driver {
 
     @Getter
-    protected final com.yqhp.agent.devicediscovery.Device device;
+    protected final Device device;
 
     @Setter
     private DesiredCapabilities capabilities;
@@ -59,7 +59,7 @@ public abstract class DeviceDriver extends Driver {
     private AppiumDriverLocalService appiumService;
     private OutputStream appiumLogOutput;
 
-    public DeviceDriver(com.yqhp.agent.devicediscovery.Device device) {
+    public DeviceDriver(Device device) {
         this.device = device;
     }
 
@@ -69,7 +69,7 @@ public abstract class DeviceDriver extends Driver {
 
     @Override
     public void injectVar(JShellContext context) {
-        context.injectVar(new Device(this));
+        context.injectVar(new com.yqhp.agent.jshell.Device(this));
     }
 
     public void installApp(String uri) throws IOException {

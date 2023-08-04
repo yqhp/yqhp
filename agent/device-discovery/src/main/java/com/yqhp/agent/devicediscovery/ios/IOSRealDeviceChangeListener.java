@@ -16,8 +16,8 @@
 package com.yqhp.agent.devicediscovery.ios;
 
 import com.yqhp.agent.devicediscovery.DeviceChangeListener;
-import com.yqhp.agent.usbmuxd.IDevice;
-import com.yqhp.agent.usbmuxd.IDeviceChangeListener;
+import com.yqhp.agent.iostools.usbmuxd.IDevice;
+import com.yqhp.agent.iostools.usbmuxd.IDeviceChangeListener;
 import lombok.extern.slf4j.Slf4j;
 
 /**

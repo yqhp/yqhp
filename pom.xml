@@ -103,12 +103,12 @@
             </dependency>
             <dependency>
                 <groupId>com.yqhp</groupId>
-                <artifactId>usbmuxd</artifactId>
+                <artifactId>android-tools</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.yqhp</groupId>
-                <artifactId>android-tools</artifactId>
+                <artifactId>ios-tools</artifactId>
                 <version>${revision}</version>
             </dependency>
             <!--agent above-->

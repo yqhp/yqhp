@@ -17,8 +17,8 @@ package com.yqhp.agent.devicediscovery.ios;
 
 import com.yqhp.agent.devicediscovery.DeviceChangeListener;
 import com.yqhp.agent.devicediscovery.DeviceDiscovery;
-import com.yqhp.agent.usbmuxd.IDeviceChangeListener;
-import com.yqhp.agent.usbmuxd.Usbmuxd;
+import com.yqhp.agent.iostools.usbmuxd.IDeviceChangeListener;
+import com.yqhp.agent.iostools.usbmuxd.Usbmuxd;
 
 /**
  * @author jiangyitao

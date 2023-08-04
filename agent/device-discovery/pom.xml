@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>com.yqhp</groupId>
-            <artifactId>usbmuxd</artifactId>
+            <artifactId>ios-tools</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

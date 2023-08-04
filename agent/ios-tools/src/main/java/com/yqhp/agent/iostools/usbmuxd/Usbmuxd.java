@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.usbmuxd;
+package com.yqhp.agent.iostools.usbmuxd;
 
 import com.dd.plist.*;
 import lombok.extern.slf4j.Slf4j;
