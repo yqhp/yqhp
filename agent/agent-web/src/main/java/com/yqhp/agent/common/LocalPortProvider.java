@@ -26,7 +26,7 @@ public class LocalPortProvider {
     private static final int[] SCRCPY_PORTS = {20000, 20999, 20000};
     private static final int[] APPIUM_SERVICE_PORTS = {21000, 21999, 21000};
     private static final int[] APPIUM_ANDROID_SYSTEM_PORTS = {22000, 22999, 22000};
-    private static final int[] APPIUM_IOS_WDA_PORTS = {30000, 30999, 30000};
+    private static final int[] WDA_PORTS = {30000, 30999, 30000};
 
     public static int getScrcpyAvailablePort() {
         synchronized (SCRCPY_PORTS) {
@@ -46,9 +46,9 @@ public class LocalPortProvider {
         }
     }
 
-    public static int getAppiumIOSWdaAvailablePort() {
-        synchronized (APPIUM_IOS_WDA_PORTS) {
-            return getAvailablePort(APPIUM_IOS_WDA_PORTS);
+    public static int getWdaAvailablePort() {
+        synchronized (WDA_PORTS) {
+            return getAvailablePort(WDA_PORTS);
         }
     }
 

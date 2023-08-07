@@ -18,17 +18,13 @@ package com.yqhp.agent.androidtools.browser;
 import com.android.ddmlib.IDevice;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.agent.androidtools.AndroidUtils;
+import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.common.commons.util.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.SocketUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -57,12 +53,12 @@ public class ChromeDevtools {
     }
 
     public static Version getVersion(int localPort) throws IOException {
-        String responseBody = httpGet("http://localhost:" + localPort + "/json/version");
+        String responseBody = HttpUtils.get("http://localhost:" + localPort + "/json/version");
         return StringUtils.isBlank(responseBody) ? null : JacksonUtils.readValue(responseBody, Version.class);
     }
 
     public static List<Page> listPage(int localPort) throws IOException {
-        String responseBody = httpGet("http://localhost:" + localPort + "/json");
+        String responseBody = HttpUtils.get("http://localhost:" + localPort + "/json");
         return StringUtils.isBlank(responseBody) ? new ArrayList<>() : JacksonUtils.readValue(responseBody, new TypeReference<>() {
         });
     }
@@ -102,27 +98,5 @@ public class ChromeDevtools {
                 .map(socketName -> getBrowser(iDevice, socketName))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 由于java.net.http.HttpClient无法关闭请求连接，如果不关闭连接，会导致cat /proc/net/unix出现大量连接
-     * 使用HttpURLConnection代替
-     */
-    private static String httpGet(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("GET");
-
-        InputStream is = conn.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        try (is; isr; BufferedReader br = new BufferedReader(isr)) {
-            StringBuilder responseBody = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                responseBody.append(line);
-            }
-            return responseBody.toString();
-        } finally {
-            conn.disconnect();
-        }
     }
 }

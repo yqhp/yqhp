@@ -45,6 +45,7 @@ agent:
     scrcpy-version: 1.25
     scrcpy-server-path: vendor/scrcpy/scrcpy-server-v1.25
   iOS:
+    wda-bundle-id: ${WDA_BUNDLE_ID:}
     realDevice:
       enabled: false
     emulator:

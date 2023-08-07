@@ -17,21 +17,36 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.ios.IOSDevice;
+import com.yqhp.agent.iostools.IOSUtils;
+import com.yqhp.agent.web.config.Properties;
+import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.util.StringUtils;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
  * @author jiangyitao
  */
+@Slf4j
 public abstract class IOSDeviceDriver extends DeviceDriver {
+
+    private static final int WDA_REMOTE_PORT = 8100;
+
+    private String wdaUrl;
+    private ShutdownHookProcessDestroyer wdaDestroyer;
+    private ShutdownHookProcessDestroyer wdaForwardDestroyer;
 
     public IOSDeviceDriver(IOSDevice iosDevice) {
         super(iosDevice);
@@ -59,16 +74,61 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     @Override
     protected IOSDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities) {
+        // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
+        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
+        capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
+        capabilities.setCapability("skipLogCapture", true);
+        return new IOSDriver(appiumServiceURL, capabilities);
+    }
 
-        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
-            // 默认XCuiTest
-            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
-            // 本地端口 -> 设备wda服务端口
-            capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, LocalPortProvider.getAppiumIOSWdaAvailablePort());
+    public synchronized String runWdaIfNeeded() {
+        if (wdaIsRunning()) {
+            return wdaUrl;
         }
 
-        return new IOSDriver(appiumServiceURL, capabilities);
+        try {
+            log.info("[ios][{}]run wda, bundleId={}", device.getId(), Properties.getWdaBundleId());
+            wdaDestroyer = IOSUtils.runWda(device.getId(), Properties.getWdaBundleId());
+
+            int wdaLocalPort = LocalPortProvider.getWdaAvailablePort();
+            log.info("[ios][{}]forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
+            wdaForwardDestroyer = IOSUtils.forward(device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
+
+            String wdaLocalUrl = "http://localhost:" + wdaLocalPort;
+            String checkUrl = wdaLocalUrl + "/status";
+            log.info("[ios][{}]check wda status, checkUrl={}", device.getId(), checkUrl);
+            new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(checkUrl));
+            log.info("[ios][{}]wda is running", device.getId());
+            wdaUrl = wdaLocalUrl;
+            return wdaUrl;
+        } catch (Exception e) {
+            throw new IllegalStateException("run wda failed. device=" + device.getId(), e);
+        }
+    }
+
+    private boolean wdaIsRunning() {
+        return StringUtils.hasText(wdaUrl) && HttpUtils.isUrlAvailable(wdaUrl + "/status");
+    }
+
+    public synchronized void stopWda() {
+        if (wdaDestroyer != null) {
+            log.info("[ios][{}]destroy wda", device.getId());
+            wdaDestroyer.run();
+            wdaDestroyer = null;
+        }
+        if (wdaForwardDestroyer != null) {
+            log.info("[ios][{}]destroy wda forward", device.getId());
+            wdaForwardDestroyer.run();
+            wdaForwardDestroyer = null;
+        }
+        wdaUrl = null;
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        stopWda();
     }
 }

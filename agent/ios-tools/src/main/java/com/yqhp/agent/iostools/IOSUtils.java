@@ -15,12 +15,16 @@
  */
 package com.yqhp.agent.iostools;
 
+import com.yqhp.common.commons.system.OS;
 import com.yqhp.common.commons.system.Terminal;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,5 +60,47 @@ public class IOSUtils {
         }
 
         return new HashSet<>();
+    }
+
+    // https://github.com/danielpaulus/go-ios
+    private static String GO_IOS_PATH = null;
+
+    public static void setGoIOSPath(String path) {
+        if (StringUtils.isNotBlank(path)) {
+            GO_IOS_PATH = path;
+        }
+    }
+
+    private static String getGoIOSPath() {
+        return GO_IOS_PATH == null
+                ? OS.isWindows() ? "ios.exe" : "ios"
+                : GO_IOS_PATH;
+    }
+
+    public static ShutdownHookProcessDestroyer forward(String udid, int localPort, int remotePort) throws IOException {
+        // https://github.com/danielpaulus/go-ios
+        String cmd = new StringJoiner(" ")
+                .add(getGoIOSPath())
+                .add("forward")
+                .add("--udid=" + udid)
+                .add(localPort + "")
+                .add(remotePort + "").toString();
+        log.info("[iOS][{}]{}", udid, cmd);
+        // ios forward是阻塞式运行的，需要异步运行
+        return Terminal.executeAsync(cmd);
+    }
+
+    public static ShutdownHookProcessDestroyer runWda(String udid, String bundleId) throws IOException {
+        // https://github.com/danielpaulus/go-ios
+        String cmd = new StringJoiner(" ")
+                .add(getGoIOSPath())
+                .add("runwda")
+                .add("--udid=" + udid)
+                .add("--bundleid=" + bundleId + ".xctrunner")
+                .add("--testrunnerbundleid=" + bundleId + ".xctrunner")
+                .add("--xctestconfig=WebDriverAgentRunner.xctest").toString();
+        log.info("[iOS][{}]{}", udid, cmd);
+        // ios runwda是阻塞式运行的，需要异步运行
+        return Terminal.executeAsync(cmd);
     }
 }

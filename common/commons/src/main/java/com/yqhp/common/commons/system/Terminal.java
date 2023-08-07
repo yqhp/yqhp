@@ -36,57 +36,50 @@ public class Terminal {
         Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
 
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
+        // ByteArrayOutputStream无需close
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out, error);
+        executor.setStreamHandler(streamHandler);
 
-            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
-            executor.setStreamHandler(pumpStreamHandler);
-
-            int exitValue = executor.execute(createCommandLine(command));
-            String result = outputStream + errorStream.toString();
-
-            if (log.isDebugEnabled())
-                log.debug("[Terminal]{} -> {} exitValue={}", command, result, exitValue);
-
-            if (StringUtils.isNotEmpty(result)) {
-                if (result.endsWith("\r\n")) {
-                    result = result.substring(0, result.length() - 2);
-                } else if (result.endsWith("\n")) {
-                    result = result.substring(0, result.length() - 1);
-                }
+        int exitValue = executor.execute(createCommandLine(command));
+        String result = out + error.toString();
+        if (log.isDebugEnabled())
+            log.debug("[Terminal]{} -> {} exitValue={}", command, result, exitValue);
+        if (StringUtils.isNotEmpty(result)) {
+            if (result.endsWith("\r\n")) {
+                result = result.substring(0, result.length() - 2);
+            } else if (result.endsWith("\n")) {
+                result = result.substring(0, result.length() - 1);
             }
-
-            return result;
         }
+
+        return result;
     }
 
     public static ShutdownHookProcessDestroyer executeAsync(String command) throws IOException {
         return executeAsync(command, null, null);
     }
 
-    public static ShutdownHookProcessDestroyer executeAsync(String command, ExecuteStreamHandler executeStreamHandler,
-                                                            ExecuteResultHandler executeResultHandler) throws IOException {
+    public static ShutdownHookProcessDestroyer executeAsync(String command,
+                                                            ExecuteStreamHandler streamHandler,
+                                                            ExecuteResultHandler resultHandler) throws IOException {
         Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
-
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
         executor.setProcessDestroyer(processDestroyer);
-
-        if (executeStreamHandler != null) {
-            executor.setStreamHandler(executeStreamHandler);
+        if (streamHandler != null) {
+            executor.setStreamHandler(streamHandler);
         }
-
-        if (executeResultHandler == null) {
-            executeResultHandler = new DefaultExecuteResultHandler();
+        if (resultHandler == null) {
+            resultHandler = new DefaultExecuteResultHandler();
         }
-
-        executor.execute(createCommandLine(command), executeResultHandler);
+        executor.execute(createCommandLine(command), resultHandler);
         return processDestroyer;
     }
 
     private static CommandLine createCommandLine(String command) {
         Validate.notBlank(command);
-
         CommandLine commandLine;
         if (OS.isWindows()) {
             commandLine = new CommandLine(CMD_EXE);
@@ -95,7 +88,6 @@ public class Terminal {
             commandLine = new CommandLine(BASH);
             commandLine.addArgument("-c");
         }
-
         commandLine.addArgument(command, false);
         return commandLine;
     }

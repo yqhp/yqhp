@@ -52,6 +52,7 @@ public class AgentProperties {
     @Data
     public class IOS {
 
+        private String wdaBundleId;
         private RealDevice realDevice = new RealDevice();
         private Emulator emulator = new Emulator();
 

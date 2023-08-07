@@ -40,4 +40,8 @@ public class Properties {
     public static String getAppiumJsPath() {
         return ApplicationContextUtils.getProperty("agent.appium.js-path");
     }
+
+    public static String getWdaBundleId() {
+        return ApplicationContextUtils.getProperty("agent.iOS.wda-bundle-id");
+    }
 }
