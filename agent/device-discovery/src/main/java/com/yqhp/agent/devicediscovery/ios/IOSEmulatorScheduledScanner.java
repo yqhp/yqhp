@@ -16,9 +16,9 @@
 package com.yqhp.agent.devicediscovery.ios;
 
 import com.yqhp.agent.devicediscovery.DeviceChangeListener;
-import com.yqhp.common.commons.system.Terminal;
+import com.yqhp.agent.iostools.IOSUtils;
+import com.yqhp.agent.iostools.Simulator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -26,8 +26,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author jiangyitao
@@ -39,8 +37,8 @@ class IOSEmulatorScheduledScanner {
 
     private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
 
-    private Set<IOSEmulator> lastEmulators = new HashSet<>();
-    private Set<IOSEmulator> currEmulators;
+    private Set<Simulator> lastSimulators = new HashSet<>();
+    private Set<Simulator> currSimulators;
 
     private volatile boolean running = false;
 
@@ -59,16 +57,16 @@ class IOSEmulatorScheduledScanner {
         long scanPeriodMs = scanPeriod.toMillis();
 
         scheduledService.scheduleAtFixedRate(() -> {
-            currEmulators = getEmulatorsQuietly();
+            currSimulators = IOSUtils.listBootedSimulator();
 
-            currEmulators.stream()
-                    .filter(emulator -> !lastEmulators.contains(emulator))
-                    .forEach(listener::online);
-            lastEmulators.stream()
-                    .filter(emulator -> !currEmulators.contains(emulator))
-                    .forEach(listener::offline);
+            currSimulators.stream()
+                    .filter(currSimulator -> !lastSimulators.contains(currSimulator))
+                    .forEach(currSimulator -> listener.online(new IOSEmulator(currSimulator.getModel(), currSimulator.getId())));
+            lastSimulators.stream()
+                    .filter(lastSimulator -> !currSimulators.contains(lastSimulator))
+                    .forEach(lastSimulator -> listener.offline(new IOSEmulator(lastSimulator.getModel(), lastSimulator.getId())));
 
-            lastEmulators = currEmulators;
+            lastSimulators = currSimulators;
         }, 0, scanPeriodMs, TimeUnit.MILLISECONDS);
 
         running = true;
@@ -79,27 +77,5 @@ class IOSEmulatorScheduledScanner {
             scheduledService.shutdown();
             running = false;
         }
-    }
-
-    private Set<IOSEmulator> getEmulatorsQuietly() {
-        String cmd = "xcrun simctl list devices |grep Booted";
-        try {
-            String res = Terminal.execute(cmd);
-            if (StringUtils.isNotEmpty(res)) {
-                String[] rows = res.split("\\r?\\n");
-                return Stream.of(rows).map(row -> {
-                    row = row.trim(); // iPhone 11 (9CC9EA0E-86E9-4B08-9E0A-32290F96EC5F) (Booted)
-                    int l = row.indexOf('(');
-                    int r = row.indexOf(')');
-                    String model = row.substring(0, l - 1);
-                    String udid = row.substring(l + 1, r);
-                    return new IOSEmulator(model, udid);
-                }).collect(Collectors.toSet());
-            }
-        } catch (Exception e) {
-            log.error("execute '{}' err", cmd, e);
-        }
-
-        return new HashSet<>();
     }
 }
