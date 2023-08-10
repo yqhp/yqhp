@@ -85,7 +85,7 @@ public class IOSUtils {
                 .add("--udid=" + udid)
                 .add(localPort + "")
                 .add(remotePort + "").toString();
-        log.info("[iOS][{}]{}", udid, cmd);
+        log.info("[ios][{}]{}", udid, cmd);
         // ios forward是阻塞式运行的，需要异步运行
         return Terminal.executeAsync(cmd);
     }
@@ -99,7 +99,7 @@ public class IOSUtils {
                 .add("--bundleid=" + bundleId + ".xctrunner")
                 .add("--testrunnerbundleid=" + bundleId + ".xctrunner")
                 .add("--xctestconfig=WebDriverAgentRunner.xctest").toString();
-        log.info("[iOS][{}]{}", udid, cmd);
+        log.info("[ios][{}]{}", udid, cmd);
         // ios runwda是阻塞式运行的，需要异步运行
         return Terminal.executeAsync(cmd);
     }

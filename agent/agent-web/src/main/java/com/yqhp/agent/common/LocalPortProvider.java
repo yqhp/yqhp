@@ -23,10 +23,12 @@ import org.springframework.util.Assert;
  */
 public class LocalPortProvider {
 
+    // port: { rangeBegin, rangeEnd, current }
     private static final int[] SCRCPY_PORTS = {20000, 20999, 20000};
     private static final int[] APPIUM_SERVICE_PORTS = {21000, 21999, 21000};
     private static final int[] APPIUM_ANDROID_SYSTEM_PORTS = {22000, 22999, 22000};
     private static final int[] WDA_PORTS = {30000, 30999, 30000};
+    private static final int[] WDA_MJPEG_PORTS = {31000, 31999, 31000};
 
     public static int getScrcpyAvailablePort() {
         synchronized (SCRCPY_PORTS) {
@@ -49,6 +51,12 @@ public class LocalPortProvider {
     public static int getWdaAvailablePort() {
         synchronized (WDA_PORTS) {
             return getAvailablePort(WDA_PORTS);
+        }
+    }
+
+    public static int getWdaMjpegAvailablePort() {
+        synchronized (WDA_MJPEG_PORTS) {
+            return getAvailablePort(WDA_MJPEG_PORTS);
         }
     }
 

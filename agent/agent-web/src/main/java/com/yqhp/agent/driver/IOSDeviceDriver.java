@@ -21,11 +21,13 @@ import com.yqhp.agent.iostools.IOSUtils;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.console.repository.enums.ViewType;
+import io.appium.java_client.Setting;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.net.UrlChecker;
@@ -43,10 +45,13 @@ import java.util.function.Consumer;
 public abstract class IOSDeviceDriver extends DeviceDriver {
 
     private static final int WDA_REMOTE_PORT = 8100;
+    private static final int WDA_REMOTE_MJPEG_PORT = 9100;
 
+    @Getter
     private String wdaUrl;
     private ShutdownHookProcessDestroyer wdaDestroyer;
     private ShutdownHookProcessDestroyer wdaForwardDestroyer;
+    private ShutdownHookProcessDestroyer wdaMjpegForwardDestroyer;
 
     public IOSDeviceDriver(IOSDevice iosDevice) {
         super(iosDevice);
@@ -79,8 +84,14 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
-        capabilities.setCapability("skipLogCapture", true);
-        return new IOSDriver(appiumServiceURL, capabilities);
+
+        if (capabilities.getCapability("skipLogCapture") == null) {
+            capabilities.setCapability("skipLogCapture", true);
+        }
+
+        IOSDriver iosDriver = new IOSDriver(appiumServiceURL, capabilities);
+        iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
+        return iosDriver;
     }
 
     public synchronized String runWdaIfNeeded() {
@@ -99,12 +110,23 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             String wdaLocalUrl = "http://localhost:" + wdaLocalPort;
             String checkUrl = wdaLocalUrl + "/status";
             log.info("[ios][{}]check wda status, checkUrl={}", device.getId(), checkUrl);
-            new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(checkUrl));
+            new UrlChecker().waitUntilAvailable(30, TimeUnit.SECONDS, new URL(checkUrl));
             log.info("[ios][{}]wda is running", device.getId());
             wdaUrl = wdaLocalUrl;
             return wdaUrl;
         } catch (Exception e) {
-            throw new IllegalStateException("run wda failed. device=" + device.getId(), e);
+            throw new RuntimeException("run wda failed. device=" + device.getId(), e);
+        }
+    }
+
+    public String getWdaMjpegUrl() {
+        try {
+            int mjpegLocalPort = LocalPortProvider.getWdaMjpegAvailablePort();
+            log.info("[ios][{}]forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
+            wdaMjpegForwardDestroyer = IOSUtils.forward(device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
+            return "http://localhost:" + mjpegLocalPort;
+        } catch (Exception e) {
+            throw new RuntimeException("get wda mjpeg url failed. device=" + device.getId(), e);
         }
     }
 
@@ -112,7 +134,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         return StringUtils.hasText(wdaUrl) && HttpUtils.isUrlAvailable(wdaUrl + "/status");
     }
 
-    public synchronized void stopWda() {
+    public synchronized void releaseWda() {
         if (wdaDestroyer != null) {
             log.info("[ios][{}]destroy wda", device.getId());
             wdaDestroyer.run();
@@ -123,12 +145,17 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             wdaForwardDestroyer.run();
             wdaForwardDestroyer = null;
         }
+        if (wdaMjpegForwardDestroyer != null) {
+            log.info("[ios][{}]destroy wda mjpeg forward", device.getId());
+            wdaMjpegForwardDestroyer.run();
+            wdaMjpegForwardDestroyer = null;
+        }
         wdaUrl = null;
     }
 
     @Override
     public void release() {
         super.release();
-        stopWda();
+        releaseWda();
     }
 }
