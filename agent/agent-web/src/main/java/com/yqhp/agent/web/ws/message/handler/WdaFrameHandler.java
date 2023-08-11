@@ -79,7 +79,7 @@ public class WdaFrameHandler extends InputHandler {
                 break;
             } catch (Exception e) {
                 log.info("[ios][{}]connect to wda mjpeg url failed, reason={}", driver.getDeviceId(), e.getMessage());
-                if (connectCount == 3) {
+                if (connectCount == 5) {
                     throw new IllegalStateException("cannot connect to wda mjpeg url " + wdaMjpegUrl);
                 }
                 Thread.sleep(200);
