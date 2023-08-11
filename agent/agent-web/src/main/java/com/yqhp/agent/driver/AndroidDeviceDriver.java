@@ -130,7 +130,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
             throw new IllegalStateException("receiving");
         }
 
-        log.info("[{}]receive device log", device.getId());
+        log.info("[{}]receive deviceLog", device.getId());
         this.logcatListener = messages -> {
             for (LogCatMessage message : messages) {
                 consumer.accept(message.toString());
@@ -144,7 +144,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
     @Override
     public synchronized void stopReceiveDeviceLog() {
         if (logcatReceiverTask != null) {
-            log.info("[{}]stop receive device log", device.getId());
+            log.info("[{}]stop receive deviceLog", device.getId());
             logcatReceiverTask.removeLogCatListener(logcatListener);
             logcatListener = null;
             logcatReceiverTask.stop();

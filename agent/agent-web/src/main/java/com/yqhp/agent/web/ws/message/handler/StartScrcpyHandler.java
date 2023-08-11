@@ -63,7 +63,7 @@ public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
     protected void handle(Input<ScrcpyOptions> input) {
         String uid = input.getUid();
 
-        os.info(uid, "starting scrcpy...");
+        os.info(uid, "start scrcpy...");
         Scrcpy scrcpy = driver.getScrcpy();
         scrcpy.start(
                 Properties.getScrcpyServerPath(),
@@ -73,7 +73,7 @@ public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
                 Duration.ofSeconds(30), // start timeout
                 START_SCRCPY_THREAD_POOL
         );
-        os.info(uid, "starting scrcpy success");
+        os.info(uid, "scrcpy started");
 
         ScrcpyFrameClient scrcpyFrameClient = scrcpy.getScrcpyFrameClient();
         os.info(uid, scrcpyFrameClient.getScreenSize());

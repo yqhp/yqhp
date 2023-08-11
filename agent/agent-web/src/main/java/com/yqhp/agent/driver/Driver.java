@@ -52,14 +52,14 @@ public class Driver {
         if (jshellContext == null) {
             synchronized (this) {
                 if (jshellContext == null) {
-                    log.info("init jshell context...");
+                    log.info("init jshellContext...");
                     jshellContext = new JShellContext();
                     for (String toEval : DEFAULT_JSHELL_TO_EVAL) {
                         log.info("jshell eval: {}", toEval);
                         jshellContext.getJShellX().eval(toEval);
                     }
                     injectVar(jshellContext);
-                    log.info("init jshell context completed");
+                    log.info("jshellContext inited");
                 }
             }
         }
@@ -114,7 +114,7 @@ public class Driver {
 
     public synchronized void closeJShellContext() {
         if (jshellContext != null) {
-            log.info("close jshell context");
+            log.info("close jshellContext");
             jshellContext.close();
             jshellContext = null;
         }
@@ -123,9 +123,9 @@ public class Driver {
     public synchronized ThreadGroup getOrCreateThreadGroup() {
         if (threadGroup == null) {
             String threadGroupName = "driver-" + THREAD_GROUP_ID.getAndIncrement();
-            log.info("init thread group, name={}", threadGroupName);
+            log.info("init threadGroup, name={}", threadGroupName);
             threadGroup = new ThreadGroup(threadGroupName);
-            log.info("init thread group completed, name={}", threadGroupName);
+            log.info("threadGroup inited, name={}", threadGroupName);
         }
         return threadGroup;
     }
@@ -140,7 +140,7 @@ public class Driver {
 
     public synchronized void stopThreadGroup() {
         if (threadGroup != null) {
-            log.info("stop thread group, name={}", threadGroup.getName());
+            log.info("stop threadGroup, name={}", threadGroup.getName());
             threadGroup.stop();
             threadGroup = null;
         }

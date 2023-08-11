@@ -35,6 +35,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.StringUtils;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -64,7 +65,16 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     @Override
     public DeviceInfo getDeviceInfo() {
-        throw new UnsupportedOperationException();
+        DeviceInfo info = new DeviceInfo();
+        info.setBrand("Apple");
+        info.setManufacturer("Apple");
+
+        Map fullInfo = IOSUtils.getDeviceInfo(device.getId());
+        if (fullInfo != null) {
+            info.setModel((String) fullInfo.get("ProductType"));
+            info.setSystemVersion((String) fullInfo.get("ProductVersion"));
+        }
+        return info;
     }
 
     @Override
@@ -92,6 +102,15 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         IOSDriver iosDriver = new IOSDriver(appiumServiceURL, capabilities);
         iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
         return iosDriver;
+    }
+
+    /**
+     * 远程真机操作不依赖于Appium IOSDriver, 提供单独创建wda session方法
+     */
+    public String createWdaSession() {
+        String sessionId = IOSUtils.createWdaSession(wdaUrl);
+        setSessionId(sessionId);
+        return sessionId;
     }
 
     public synchronized String runWdaIfNeeded() {

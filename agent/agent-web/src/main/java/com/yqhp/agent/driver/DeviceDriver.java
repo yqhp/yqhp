@@ -56,6 +56,9 @@ public abstract class DeviceDriver extends Driver {
     private DesiredCapabilities capabilities;
     @Getter
     private AppiumDriver appiumDriver;
+    @Getter
+    @Setter
+    private String sessionId;
     private AppiumDriverLocalService appiumService;
     private OutputStream appiumLogOutput;
 
@@ -130,18 +133,18 @@ public abstract class DeviceDriver extends Driver {
             builder.withAppiumJS(new File(appiumJsPath));
         }
         appiumService = AppiumDriverLocalService.buildService(builder);
-        log.info("[{}]starting appium service: {}", device.getId(), appiumService.getUrl());
+        log.info("[{}]start appiumService: {}", device.getId(), appiumService.getUrl());
         appiumService.start();
-        log.info("[{}]start appium service completed", device.getId());
+        log.info("[{}]appiumService started", device.getId());
         return appiumService;
     }
 
     public synchronized void stopAppiumService() {
         if (appiumServiceIsRunning()) {
-            log.info("[{}]stop appium service...1", device.getId());
+            log.info("[{}]stop appiumService...1", device.getId());
             appiumService.stop();
             if (appiumServiceIsRunning()) {
-                log.info("[{}]stop appium service...2", device.getId());
+                log.info("[{}]stop appiumService...2", device.getId());
                 appiumService.stop();
             }
             appiumService = null;
@@ -157,7 +160,7 @@ public abstract class DeviceDriver extends Driver {
             throw new IllegalStateException("receiving");
         }
 
-        log.info("[{}]receive appium log", device.getId());
+        log.info("[{}]receive appiumLog", device.getId());
         appiumLogOutput = new OutputStream() {
 
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -176,7 +179,7 @@ public abstract class DeviceDriver extends Driver {
 
     public synchronized void stopReceiveAppiumLog() {
         if (appiumLogOutput != null) {
-            log.info("[{}]stop receive appium log", device.getId());
+            log.info("[{}]stop receive appiumLog", device.getId());
             if (appiumService != null) {
                 appiumService.removeOutPutStream(appiumLogOutput);
             }
@@ -212,19 +215,20 @@ public abstract class DeviceDriver extends Driver {
             capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
         }
 
-        log.info("[{}]creating appium driver, capabilities: {}", device.getId(), capabilities);
+        log.info("[{}]create appiumDriver, capabilities: {}", device.getId(), capabilities);
         appiumDriver = newAppiumDriver(getOrStartAppiumService().getUrl(), capabilities);
-        log.info("[{}]create appium driver completed, capabilities: {}", device.getId(), capabilities);
+        sessionId = appiumDriver.getSessionId().toString();
+        log.info("[{}]appiumDriver created, sessionId: {}, capabilities: {}", device.getId(), sessionId, capabilities);
         return appiumDriver;
     }
 
     public synchronized void quitAppiumDriver() {
         if (appiumDriver != null) {
             try {
-                log.info("[{}]quit appium driver", device.getId());
+                log.info("[{}]quit appiumDriver", device.getId());
                 appiumDriver.quit();
             } catch (Exception e) {
-                log.warn("[{}]quit appium driver err", device.getId(), e);
+                log.warn("[{}]quit appiumDriver err", device.getId(), e);
             }
             appiumDriver = null;
         }

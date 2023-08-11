@@ -64,6 +64,11 @@ public class WdaFrameHandler extends InputHandler {
         driver.runWdaIfNeeded();
         os.info(uid, "run wda successfully");
 
+        // mjpeg读取frame不依赖于session。提前创建，方便远程真机操作，如点击滑动
+        log.info("[ios][{}]create wdaSession", driver.getDeviceId());
+        String sessionId = driver.createWdaSession();
+        log.info("[ios][{}]wdaSession created, sessionId={}", driver.getDeviceId(), sessionId);
+
         String wdaMjpegUrl = driver.getWdaMjpegUrl();
         HttpURLConnection conn = (HttpURLConnection) new URL(wdaMjpegUrl).openConnection();
         conn.setConnectTimeout(1000); // ms
@@ -72,15 +77,15 @@ public class WdaFrameHandler extends InputHandler {
         for (; ; ) {
             try {
                 connectCount++;
-                log.info("[ios][{}]connect to wda mjpeg url {} ..{}", driver.getDeviceId(), wdaMjpegUrl, connectCount);
+                log.info("[ios][{}]connect to wdaMjpegUrl {} ..{}", driver.getDeviceId(), wdaMjpegUrl, connectCount);
                 conn.connect();
-                log.info("[ios][{}]connect to wda mjpeg url successful", driver.getDeviceId());
-                os.info(uid, "connect to wda mjpeg url successful");
+                log.info("[ios][{}]wdaMjpegUrl connected", driver.getDeviceId());
+                os.info(uid, "wdaMjpegUrl connected");
                 break;
             } catch (Exception e) {
-                log.info("[ios][{}]connect to wda mjpeg url failed, reason={}", driver.getDeviceId(), e.getMessage());
+                log.info("[ios][{}]connect to wdaMjpegUrl failed, reason={}", driver.getDeviceId(), e.getMessage());
                 if (connectCount == 5) {
-                    throw new IllegalStateException("cannot connect to wda mjpeg url " + wdaMjpegUrl);
+                    throw new IllegalStateException("cannot connect to wdaMjpegUrl " + wdaMjpegUrl);
                 }
                 Thread.sleep(200);
             }

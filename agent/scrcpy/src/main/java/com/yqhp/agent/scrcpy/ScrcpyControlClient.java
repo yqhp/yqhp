@@ -53,17 +53,17 @@ public class ScrcpyControlClient {
 
     void connect(int localPort) throws IOException {
         socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
-        log.info("[{}]connect control socket channel success", iDevice.getSerialNumber());
+        log.info("[{}]controlSocketChannel connected", iDevice.getSerialNumber());
     }
 
     void disconnect() {
         if (socketChannel != null) {
             try {
-                log.info("[{}]close control socket channel", iDevice.getSerialNumber());
+                log.info("[{}]close controlSocketChannel", iDevice.getSerialNumber());
                 socketChannel.close();
                 socketChannel = null;
             } catch (IOException e) {
-                log.warn("[{}]close control socket channel io err", iDevice.getSerialNumber(), e);
+                log.warn("[{}]close controlSocketChannel io err", iDevice.getSerialNumber(), e);
             }
         }
     }

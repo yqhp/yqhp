@@ -106,7 +106,7 @@ public class Scrcpy {
             throw new ScrcpyException(e);
         }
 
-        log.info("[{}]start scrcpy success", iDevice.getSerialNumber());
+        log.info("[{}]scrcpy started", iDevice.getSerialNumber());
     }
 
     public synchronized void stop() {

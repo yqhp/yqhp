@@ -70,7 +70,7 @@ public class PluginServiceImpl implements PluginService {
                     if (!tmpFile.renameTo(file)) {
                         throw new IOException(tmpFile + " renameTo " + file + " fail");
                     }
-                    log.info("[plugin][{}][{}]download complete -> {}", plugin.getName(), fileInfo.getName(), file);
+                    log.info("[plugin][{}][{}]downloaded -> {}", plugin.getName(), fileInfo.getName(), file);
                 }
                 files.add(file);
             }

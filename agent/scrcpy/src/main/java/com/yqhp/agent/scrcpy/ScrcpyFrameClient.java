@@ -81,17 +81,17 @@ public class ScrcpyFrameClient {
             socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
         }
 
-        log.info("[{}]connect frame socket success", iDevice.getSerialNumber());
+        log.info("[{}]frameSocketChannel connected", iDevice.getSerialNumber());
     }
 
     void disconnect() {
         if (socketChannel != null) {
             try {
-                log.info("[{}]close frame socket channel", iDevice.getSerialNumber());
+                log.info("[{}]close frameSocketChannel", iDevice.getSerialNumber());
                 socketChannel.close();
                 socketChannel = null;
             } catch (IOException e) {
-                log.warn("[{}]close frame socket channel io err", iDevice.getSerialNumber(), e);
+                log.warn("[{}]close frameSocketChannel io err", iDevice.getSerialNumber(), e);
             }
         }
         if (localPort > 0) {

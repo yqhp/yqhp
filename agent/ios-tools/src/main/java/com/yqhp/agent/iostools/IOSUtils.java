@@ -17,12 +17,15 @@ package com.yqhp.agent.iostools;
 
 import com.yqhp.common.commons.system.OS;
 import com.yqhp.common.commons.system.Terminal;
+import com.yqhp.common.commons.util.HttpUtils;
+import com.yqhp.common.commons.util.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -63,6 +66,8 @@ public class IOSUtils {
     }
 
     // https://github.com/danielpaulus/go-ios
+    // -----------------------以下go-ios--------------------
+
     private static String GO_IOS_PATH = null;
 
     public static void setGoIOSPath(String path) {
@@ -77,8 +82,21 @@ public class IOSUtils {
                 : GO_IOS_PATH;
     }
 
+    public static Map getDeviceInfo(String udid) {
+        String cmd = new StringJoiner(" ")
+                .add(getGoIOSPath())
+                .add("info")
+                .add("--udid=" + udid).toString();
+        log.info("[ios][{}]{}", udid, cmd);
+        try {
+            return JacksonUtils.readValue(Terminal.execute(cmd), Map.class);
+        } catch (IOException e) {
+            log.error("[ios][{}]io err", udid, e);
+            return null;
+        }
+    }
+
     public static ShutdownHookProcessDestroyer forward(String udid, int localPort, int remotePort) throws IOException {
-        // https://github.com/danielpaulus/go-ios
         String cmd = new StringJoiner(" ")
                 .add(getGoIOSPath())
                 .add("forward")
@@ -91,7 +109,6 @@ public class IOSUtils {
     }
 
     public static ShutdownHookProcessDestroyer runWda(String udid, String bundleId) throws IOException {
-        // https://github.com/danielpaulus/go-ios
         String cmd = new StringJoiner(" ")
                 .add(getGoIOSPath())
                 .add("runwda")
@@ -102,5 +119,16 @@ public class IOSUtils {
         log.info("[ios][{}]{}", udid, cmd);
         // ios runwda是阻塞式运行的，需要异步运行
         return Terminal.executeAsync(cmd);
+    }
+
+    // -----------------------以上go-ios--------------------
+
+    public static String createWdaSession(String wdaUrl) {
+        Map resp = HttpUtils.postJSON(
+                wdaUrl + "/session",
+                Map.of("capabilities", Map.of()),
+                Map.class
+        );
+        return (String) resp.get("sessionId");
     }
 }
