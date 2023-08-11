@@ -69,12 +69,12 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     @Override
     public void receiveDeviceLog(Consumer<String> consumer) {
-        throw new UnsupportedOperationException();
+        // TODO
     }
 
     @Override
     public void stopReceiveDeviceLog() {
-        throw new UnsupportedOperationException();
+        // TODO
     }
 
     @Override
