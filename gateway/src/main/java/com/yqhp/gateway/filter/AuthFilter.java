@@ -50,6 +50,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/console/executionRecord/*/report",
             "/agent/device/devtools/**",
             "/agent/device/scrcpy/**",
+            "/agent/device/wda/**",
             "/agent/device/jshellExecution/**",
             "/agent/device/jshellSuggestions/**",
             "/agent/device/appiumLog/**",
