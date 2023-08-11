@@ -15,12 +15,20 @@
  */
 package com.yqhp.common.commons.util;
 
+import com.yqhp.common.commons.exception.HttpException;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 /**
  * @author jiangyitao
@@ -28,25 +36,32 @@ import java.net.URL;
 public class HttpUtils {
 
     /**
-     * 发送请求获取响应后关闭连接
+     * 发送GET请求，最终关闭连接
      */
-    public static String get(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("GET");
-        try (InputStream is = conn.getInputStream();
-             InputStreamReader isr = new InputStreamReader(is);
-             BufferedReader br = new BufferedReader(isr)) {
-            StringBuilder responseBody = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                responseBody.append(line);
+    public static String getAndClose(String url) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setRequestMethod("GET");
+            try (InputStream is = conn.getInputStream();
+                 InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader br = new BufferedReader(isr)) {
+                StringBuilder responseBody = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    responseBody.append(line);
+                }
+                return responseBody.toString();
+            } finally {
+                conn.disconnect();
             }
-            return responseBody.toString();
-        } finally {
-            conn.disconnect();
+        } catch (IOException e) {
+            throw new HttpException(e);
         }
     }
 
+    /**
+     * http状态码返回200 为可用
+     */
     public static boolean isUrlAvailable(String url) {
         HttpURLConnection conn = null;
         try {
@@ -61,6 +76,37 @@ public class HttpUtils {
             if (conn != null) {
                 conn.disconnect();
             }
+        }
+    }
+
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+
+    public static <T> T postJSON(String url, Object body, Class<T> responseBodyType, String... headers) {
+        String responseBody = postJSON(url, body, headers);
+        return StringUtils.isBlank(responseBody)
+                ? null
+                : JacksonUtils.readValue(responseBody, responseBodyType);
+    }
+
+    public static String postJSON(String url, Object body, String... headers) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json");
+        if (!ArrayUtils.isEmpty(headers)) {
+            builder.headers(headers);
+        }
+        if (body != null) {
+            String bodyString = body instanceof String ? (String) body : JacksonUtils.writeValueAsString(body);
+            builder.POST(HttpRequest.BodyPublishers.ofString(bodyString));
+        } else {
+            builder.POST(HttpRequest.BodyPublishers.noBody());
+        }
+        HttpRequest request = builder.build();
+
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        } catch (IOException | InterruptedException e) {
+            throw new HttpException(e);
         }
     }
 }

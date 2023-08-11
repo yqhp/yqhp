@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.SocketUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,13 +51,13 @@ public class ChromeDevtools {
         log.info("LIST_SOCKET_COMMAND: {}", LIST_SOCKET_COMMAND);
     }
 
-    public static Version getVersion(int localPort) throws IOException {
-        String responseBody = HttpUtils.get("http://localhost:" + localPort + "/json/version");
+    public static Version getVersion(int localPort) {
+        String responseBody = HttpUtils.getAndClose("http://localhost:" + localPort + "/json/version");
         return StringUtils.isBlank(responseBody) ? null : JacksonUtils.readValue(responseBody, Version.class);
     }
 
-    public static List<Page> listPage(int localPort) throws IOException {
-        String responseBody = HttpUtils.get("http://localhost:" + localPort + "/json");
+    public static List<Page> listPage(int localPort) {
+        String responseBody = HttpUtils.getAndClose("http://localhost:" + localPort + "/json");
         return StringUtils.isBlank(responseBody) ? new ArrayList<>() : JacksonUtils.readValue(responseBody, new TypeReference<>() {
         });
     }
