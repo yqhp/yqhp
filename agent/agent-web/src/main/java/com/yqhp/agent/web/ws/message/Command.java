@@ -24,6 +24,7 @@ public enum Command {
     SCRCPY_KEY,
     SCRCPY_TEXT,
     SCRCPY_SCROLL,
+    WDA_FRAME,
     JSHELL_LOAD_PLUGIN,
     JSHELL_EVAL,
     JSHELL_SUGGESTIONS,
