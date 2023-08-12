@@ -13,20 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.web.ws.message;
+package com.yqhp.agent.appium;
+
+import lombok.Data;
 
 /**
  * @author jiangyitao
  */
-public enum Command {
-    START_SCRCPY,
-    SCRCPY_TOUCH,
-    SCRCPY_KEY,
-    SCRCPY_TEXT,
-    SCRCPY_SCROLL,
-    WDA_FRAME,
-    WDA_TOUCH,
-    JSHELL_LOAD_PLUGIN,
-    JSHELL_EVAL,
-    JSHELL_SUGGESTIONS,
+@Data
+public class WdaTouchEvent {
+
+    // 与scrcpy保持一致
+    public static final int DOWN = 0;
+    public static final int UP = 1;
+    public static final int MOVE = 2;
+
+    private int action;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
 }

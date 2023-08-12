@@ -70,8 +70,8 @@ public class WdaFrameHandler extends InputHandler {
         driver.createWdaSession();
         log.info("[ios][{}]wdaSession created", driver.getDeviceId());
 
-        // 获取逻辑分辨率，后续坐标相关操作，基于该分辨率
-        String url = driver.getWdaUrl() + "/session/" + driver.getSessionId() + "/window/size";
+        // 获取逻辑分辨率传给前端，后续坐标相关操作，基于该分辨率
+        String url = driver.getWdaUrl() + "/session/" + driver.getWdaSessionId() + "/window/size";
         // {"value":{"width":414,"height":736},"sessionId":"2D125BD1-2A7C-4040-AD1A-6A5EDA523836"}
         Object windowSize = HttpUtils.get(url, Map.class).get("value");
         log.info("[ios][{}]window size: {}", driver.getDeviceId(), windowSize);

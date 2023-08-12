@@ -17,6 +17,7 @@ package com.yqhp.agent.web.ws.device;
 
 import com.yqhp.agent.driver.IOSDeviceDriver;
 import com.yqhp.agent.web.ws.message.handler.WdaFrameHandler;
+import com.yqhp.agent.web.ws.message.handler.WdaTouchHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
@@ -35,7 +36,8 @@ public class DeviceWdaWebsocket extends DeviceWebsocket {
     protected void onOpened(Session session) {
         IOSDeviceDriver driver = (IOSDeviceDriver) deviceDriver;
         messageHandler
-                .register(new WdaFrameHandler(session, driver));
+                .register(new WdaFrameHandler(session, driver))
+                .register(new WdaTouchHandler(driver));
     }
 
     @Override

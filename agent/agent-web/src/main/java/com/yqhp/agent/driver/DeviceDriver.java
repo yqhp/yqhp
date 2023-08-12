@@ -56,9 +56,6 @@ public abstract class DeviceDriver extends Driver {
     private DesiredCapabilities capabilities;
     @Getter
     private AppiumDriver appiumDriver;
-    @Getter
-    @Setter
-    private String sessionId;
     private AppiumDriverLocalService appiumService;
     private OutputStream appiumLogOutput;
 
@@ -217,8 +214,7 @@ public abstract class DeviceDriver extends Driver {
 
         log.info("[{}]create appiumDriver, capabilities: {}", device.getId(), capabilities);
         appiumDriver = newAppiumDriver(getOrStartAppiumService().getUrl(), capabilities);
-        sessionId = appiumDriver.getSessionId().toString();
-        log.info("[{}]appiumDriver created, sessionId: {}, capabilities: {}", device.getId(), sessionId, capabilities);
+        log.info("[{}]appiumDriver created, capabilities: {}", device.getId(), capabilities);
         return appiumDriver;
     }
 

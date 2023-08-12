@@ -50,6 +50,11 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     @Getter
     private String wdaUrl;
+    /**
+     * 用于直接向wda发送请求，而不经过appiumServer转发
+     */
+    @Getter
+    private String wdaSessionId;
     private ShutdownHookProcessDestroyer wdaDestroyer;
     private ShutdownHookProcessDestroyer wdaForwardDestroyer;
     private ShutdownHookProcessDestroyer wdaMjpegForwardDestroyer;
@@ -100,13 +105,18 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         }
 
         IOSDriver iosDriver = new IOSDriver(appiumServiceURL, capabilities);
+        // wdaSessionId 与 driver.getSessionId() 不一样
+        Map resp = HttpUtils.get(wdaUrl + "/status", Map.class);
+        wdaSessionId = (String) resp.get("sessionId");
+
         iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
+        iosDriver.setSetting("animationCoolOffTimeout", 0);
         return iosDriver;
     }
 
     /**
-     * 远程真机操作不依赖于Appium IOSDriver, 在此提供单独创建wda session方法
-     * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session, 可以通过getSessionId获取最新的sessionId
+     * 远程真机操作不走appiumServer(不用appiumDriver)，而是直接发送请求到wda，在此提供创建wda session方法
+     * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session，所以在new IOSDriver后需要重新赋值wdaSessionId
      */
     public void createWdaSession() {
         Map resp = HttpUtils.postJSON(
@@ -114,8 +124,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
                 Map.of("capabilities", Map.of()),
                 Map.class
         );
-        String sessionId = (String) resp.get("sessionId");
-        setSessionId(sessionId);
+        wdaSessionId = (String) resp.get("sessionId");
     }
 
     public synchronized String runWdaIfNeeded() {
