@@ -105,12 +105,14 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     }
 
     /**
-     * 远程真机操作不依赖于Appium IOSDriver, 提供单独创建wda session方法
+     * 远程真机操作不依赖于Appium IOSDriver, 在此提供单独创建wda session方法
+     * <p>
+     * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session
+     * 所以我们不返回sessionId，可以通过getSessionId获取最新的sessionId
      */
-    public String createWdaSession() {
+    public void createWdaSession() {
         String sessionId = IOSUtils.createWdaSession(wdaUrl);
         setSessionId(sessionId);
-        return sessionId;
     }
 
     public synchronized String runWdaIfNeeded() {

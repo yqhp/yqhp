@@ -66,8 +66,8 @@ public class WdaFrameHandler extends InputHandler {
 
         // mjpeg读取frame不依赖于session。提前创建，方便远程真机操作，如点击滑动
         log.info("[ios][{}]create wdaSession", driver.getDeviceId());
-        String sessionId = driver.createWdaSession();
-        log.info("[ios][{}]wdaSession created, sessionId={}", driver.getDeviceId(), sessionId);
+        driver.createWdaSession();
+        log.info("[ios][{}]wdaSession created", driver.getDeviceId());
 
         String wdaMjpegUrl = driver.getWdaMjpegUrl();
         HttpURLConnection conn = (HttpURLConnection) new URL(wdaMjpegUrl).openConnection();
