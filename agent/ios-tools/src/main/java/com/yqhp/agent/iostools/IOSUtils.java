@@ -17,7 +17,6 @@ package com.yqhp.agent.iostools;
 
 import com.yqhp.common.commons.system.OS;
 import com.yqhp.common.commons.system.Terminal;
-import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.common.commons.util.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
@@ -122,13 +121,4 @@ public class IOSUtils {
     }
 
     // -----------------------以上go-ios--------------------
-
-    public static String createWdaSession(String wdaUrl) {
-        Map resp = HttpUtils.postJSON(
-                wdaUrl + "/session",
-                Map.of("capabilities", Map.of()),
-                Map.class
-        );
-        return (String) resp.get("sessionId");
-    }
 }

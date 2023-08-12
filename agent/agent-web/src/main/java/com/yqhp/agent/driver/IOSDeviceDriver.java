@@ -106,12 +106,15 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     /**
      * 远程真机操作不依赖于Appium IOSDriver, 在此提供单独创建wda session方法
-     * <p>
-     * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session
-     * 所以我们不返回sessionId，可以通过getSessionId获取最新的sessionId
+     * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session, 可以通过getSessionId获取最新的sessionId
      */
     public void createWdaSession() {
-        String sessionId = IOSUtils.createWdaSession(wdaUrl);
+        Map resp = HttpUtils.postJSON(
+                wdaUrl + "/session",
+                Map.of("capabilities", Map.of()),
+                Map.class
+        );
+        String sessionId = (String) resp.get("sessionId");
         setSessionId(sessionId);
     }
 
@@ -125,7 +128,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             wdaDestroyer = IOSUtils.runWda(device.getId(), Properties.getWdaBundleId());
 
             int wdaLocalPort = LocalPortProvider.getWdaAvailablePort();
-            log.info("[ios][{}]forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
+            log.info("[ios][{}]wda forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
             wdaForwardDestroyer = IOSUtils.forward(device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
 
             String wdaLocalUrl = "http://localhost:" + wdaLocalPort;
@@ -143,11 +146,11 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     public String getWdaMjpegUrl() {
         try {
             int mjpegLocalPort = LocalPortProvider.getWdaMjpegAvailablePort();
-            log.info("[ios][{}]forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
+            log.info("[ios][{}]wdaMjpeg forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
             wdaMjpegForwardDestroyer = IOSUtils.forward(device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
             return "http://localhost:" + mjpegLocalPort;
         } catch (Exception e) {
-            throw new RuntimeException("get wda mjpeg url failed. device=" + device.getId(), e);
+            throw new RuntimeException("get wdaMjpegUrl failed. device=" + device.getId(), e);
         }
     }
 
@@ -167,7 +170,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             wdaForwardDestroyer = null;
         }
         if (wdaMjpegForwardDestroyer != null) {
-            log.info("[ios][{}]destroy wda mjpeg forward", device.getId());
+            log.info("[ios][{}]destroy wdaMjpeg forward", device.getId());
             wdaMjpegForwardDestroyer.run();
             wdaMjpegForwardDestroyer = null;
         }

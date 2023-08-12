@@ -81,6 +81,29 @@ public class HttpUtils {
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
+    public static <T> T get(String url, Class<T> responseBodyType, String... headers) {
+        String responseBody = get(url, headers);
+        return StringUtils.isBlank(responseBody)
+                ? null
+                : JacksonUtils.readValue(responseBody, responseBodyType);
+    }
+
+    public static String get(String url, String... headers) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET();
+        if (!ArrayUtils.isEmpty(headers)) {
+            builder.headers(headers);
+        }
+        HttpRequest request = builder.build();
+
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        } catch (IOException | InterruptedException e) {
+            throw new HttpException(e);
+        }
+    }
+
     public static <T> T postJSON(String url, Object body, Class<T> responseBodyType, String... headers) {
         String responseBody = postJSON(url, body, headers);
         return StringUtils.isBlank(responseBody)

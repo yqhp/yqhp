@@ -539,7 +539,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     private Sequence createTapSeq(PointerInput finger, int x, int y, Duration pause) {
-        return new Sequence(finger, 1)
+        return new Sequence(finger, 0)
                 .addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, y)) // 移动到x,y
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg())) // 鼠标左按下
                 .addAction(new Pause(finger, pause)) // 暂停
@@ -627,7 +627,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     private Sequence createScrollSeq(PointerInput finger, int startX, int startY, int endX, int endY, Duration duration) {
-        return new Sequence(finger, 1)
+        return new Sequence(finger, 0)
                 .addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY))
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
                 .addAction(finger.createPointerMove(duration, PointerInput.Origin.viewport(), endX, endY))
