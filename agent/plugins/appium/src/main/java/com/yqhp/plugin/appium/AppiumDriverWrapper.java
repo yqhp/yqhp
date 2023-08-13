@@ -70,6 +70,41 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
         return (IOSDriver) driver;
     }
 
+    /**
+     * 通过accessibilityId查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.4
+     */
+    public WebElement accessibilityId(String accessibilityId) {
+        return find(AppiumBy.accessibilityId(accessibilityId));
+    }
+
+    /**
+     * 通过accessibilityId查找元素(找不到则返回null)
+     *
+     * @since 0.0.4
+     */
+    public WebElement _accessibilityId(String accessibilityId) {
+        return _find(AppiumBy.accessibilityId(accessibilityId));
+    }
+
+    /**
+     * 通过accessibilityId查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.4
+     */
+    public WebElement accessibilityId(String accessibilityId, Duration timeout) {
+        return find(AppiumBy.accessibilityId(accessibilityId), timeout);
+    }
+
+    /**
+     * 通过accessibilityId查找元素(找不到则返回null)
+     *
+     * @since 0.0.4
+     */
+    public WebElement _accessibilityId(String accessibilityId, Duration timeout) {
+        return _find(AppiumBy.accessibilityId(accessibilityId), timeout);
+    }
 
     /**
      * 通过content-desc查找元素(找不到则抛出异常)

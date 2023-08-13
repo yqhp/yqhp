@@ -18,6 +18,7 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.ios.IOSDevice;
 import com.yqhp.agent.iostools.IOSUtils;
+import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.console.repository.enums.ViewType;
@@ -32,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -126,22 +126,17 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
      * 由于wda不支持多session，如new IOSDriver，将会覆盖此处创建的session，所以在new IOSDriver后需要重新赋值wdaSessionId
      */
     public void createWdaSession() {
-        Map resp = HttpUtils.postJSON(
-                wdaUrl + "/session",
-                Map.of("capabilities", Map.of()),
-                Map.class
-        );
-        wdaSessionId = (String) resp.get("sessionId");
+        wdaSessionId = WdaUtils.createSession(wdaUrl, Map.of());
     }
 
     public synchronized String runWdaIfNeeded() {
-        if (wdaIsRunning()) {
+        if (WdaUtils.isRunning(wdaUrl)) {
             return wdaUrl;
         }
 
         try {
             log.info("[ios][{}]run wda, bundleId={}", device.getId(), Properties.getWdaBundleId());
-            wdaDestroyer = IOSUtils.runWda(device.getId(), Properties.getWdaBundleId());
+            wdaDestroyer = WdaUtils.run(device.getId(), Properties.getWdaBundleId());
 
             int wdaLocalPort = LocalPortProvider.getWdaAvailablePort();
             log.info("[ios][{}]wda forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
@@ -170,10 +165,6 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         }
     }
 
-    private boolean wdaIsRunning() {
-        return StringUtils.hasText(wdaUrl) && HttpUtils.isUrlAvailable(wdaUrl + "/status");
-    }
-
     public synchronized void releaseWda() {
         if (wdaDestroyer != null) {
             log.info("[ios][{}]destroy wda", device.getId());
@@ -191,6 +182,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             wdaMjpegForwardDestroyer = null;
         }
         wdaUrl = null;
+        wdaSessionId = null;
     }
 
     @Override

@@ -16,10 +16,11 @@
 package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.driver.IOSDeviceDriver;
+import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.agent.web.ws.message.OutputSender;
-import com.yqhp.common.commons.util.HttpUtils;
+import com.yqhp.common.commons.model.Size;
 import com.yqhp.common.commons.util.MjpegInputStream;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,11 +71,9 @@ public class WdaFrameHandler extends InputHandler {
         log.info("[ios][{}]wdaSession created", driver.getDeviceId());
 
         // 获取逻辑分辨率传给前端，后续坐标相关操作，基于该分辨率
-        String url = driver.getWdaUrl() + "/session/" + driver.getWdaSessionId() + "/window/size";
-        // {"value":{"width":414,"height":736},"sessionId":"2D125BD1-2A7C-4040-AD1A-6A5EDA523836"}
-        Object windowSize = HttpUtils.get(url, Map.class).get("value");
-        log.info("[ios][{}]window size: {}", driver.getDeviceId(), windowSize);
-        os.info(uid, windowSize);
+        Size size = WdaUtils.getLogicalScreenSize(driver.getWdaUrl(), driver.getWdaSessionId());
+        log.info("[ios][{}]logical screen size: {}", driver.getDeviceId(), size);
+        os.info(uid, size);
 
         String wdaMjpegUrl = driver.getWdaMjpegUrl();
         HttpURLConnection conn = (HttpURLConnection) new URL(wdaMjpegUrl).openConnection();

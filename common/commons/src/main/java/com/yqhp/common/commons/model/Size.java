@@ -15,9 +15,12 @@
  */
 package com.yqhp.common.commons.model;
 
+import lombok.Data;
+
 /**
  * @author jiangyitao
  */
+@Data
 public class Size {
 
     public int width;

@@ -17,16 +17,15 @@ package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.appium.WdaTouchEvent;
 import com.yqhp.agent.driver.IOSDeviceDriver;
+import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
-import com.yqhp.common.commons.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author jiangyitao
@@ -72,17 +71,7 @@ public class WdaTouchHandler extends InputHandler<WdaTouchEvent> {
             seq.addAction(finger.createPointerMove(duration, VIEW, touch.getX(), touch.getY()));
             seq.addAction(finger.createPointerUp(MOUSE_LEFT));
             touchDownTime = 0;
-            wdaPerform();
+            WdaUtils.performActions(driver.getWdaUrl(), driver.getWdaSessionId(), List.of(seq.encode()));
         }
     }
-
-    /**
-     * 不走appiumServer，直接发送到wda执行
-     */
-    private void wdaPerform() {
-        String url = driver.getWdaUrl() + "/session/" + driver.getWdaSessionId() + "/actions";
-        Map<String, Object> body = Map.of("actions", List.of(seq.encode()));
-        HttpUtils.postJSON(url, body);
-    }
-
 }

@@ -16,11 +16,9 @@
 package com.yqhp.agent.web.ws.message.handler;
 
 import com.yqhp.agent.driver.IOSDeviceDriver;
+import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
-import com.yqhp.common.commons.util.HttpUtils;
-
-import java.util.Map;
 
 /**
  * @author jiangyitao
@@ -41,10 +39,16 @@ public class WdaPressButtonHandler extends InputHandler<String> {
     @Override
     protected void handle(Input<String> input) {
         // 不走appiumServer，直接发送到wda执行
-        // https://appium.github.io/appium-xcuitest-driver/4.33/execute-methods/
-        String url = driver.getWdaUrl() + "/session/" + driver.getWdaSessionId() + "/wda/pressButton";
-        Map<String, Object> body = Map.of("name", input.getData());
-        HttpUtils.postJSON(url, body);
+        if ("power".equals(input.getData())) {
+            boolean isLocked = WdaUtils.isDeviceLocked(driver.getWdaUrl(), driver.getWdaSessionId());
+            if (isLocked) {
+                WdaUtils.unlockDevice(driver.getWdaUrl(), driver.getWdaSessionId());
+            } else {
+                WdaUtils.lockDevice(driver.getWdaUrl(), driver.getWdaSessionId());
+            }
+        } else {
+            WdaUtils.pressButton(driver.getWdaUrl(), driver.getWdaSessionId(), input.getData());
+        }
     }
 
 }

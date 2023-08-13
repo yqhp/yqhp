@@ -108,16 +108,19 @@ public class IOSUtils {
         return Terminal.executeAsync(cmd);
     }
 
-    public static ShutdownHookProcessDestroyer runWda(String udid, String bundleId) throws IOException {
+    public static ShutdownHookProcessDestroyer runTest(String udid,
+                                                       String bundleId,
+                                                       String testRunnerBundleId,
+                                                       String xctestConfig) throws IOException {
         String cmd = new StringJoiner(" ")
                 .add(getGoIOSPath())
-                .add("runwda")
+                .add("runtest")
                 .add("--udid=" + udid)
-                .add("--bundleid=" + bundleId + ".xctrunner")
-                .add("--testrunnerbundleid=" + bundleId + ".xctrunner")
-                .add("--xctestconfig=WebDriverAgentRunner.xctest").toString();
+                .add("--bundle-id=" + bundleId)
+                .add("--test-runner-bundle-id=" + testRunnerBundleId)
+                .add("--xctest-config=" + xctestConfig).toString();
         log.info("[ios][{}]{}", udid, cmd);
-        // ios runwda是阻塞式运行的，需要异步运行
+        // ios runTest是阻塞式运行的，需要异步运行
         return Terminal.executeAsync(cmd);
     }
 
