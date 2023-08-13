@@ -121,14 +121,23 @@ public class IOSUtils {
         return Terminal.executeAsync(cmd);
     }
 
-    public static void installApp(String udid, File app) throws IOException {
+    public static void installApp(String udid, File app) {
         String cmd = new StringJoiner(" ")
                 .add(getGoIOSPath())
                 .add("install")
                 .add("--udid=" + udid)
                 .add("--path=" + app.getAbsolutePath()).toString();
         log.info("[ios][{}]{}", udid, cmd);
-        Terminal.execute(cmd);
+        String result;
+        try {
+            result = Terminal.execute(cmd);
+        } catch (Exception e) {
+            throw new InstallAppException(e);
+        }
+        // {"level":"info","msg":"installation successful","time":"2023-08-13T11:05:05+08:00"}
+        if (StringUtils.isBlank(result) || !result.contains("installation successful")) {
+            throw new InstallAppException(result);
+        }
     }
 
     // -----------------------以上go-ios--------------------
