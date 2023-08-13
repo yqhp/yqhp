@@ -109,6 +109,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         Map resp = HttpUtils.get(wdaUrl + "/status", Map.class);
         wdaSessionId = (String) resp.get("sessionId");
 
+        // https://appium.github.io/appium-xcuitest-driver/4.33/settings/
         iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
         iosDriver.setSetting("animationCoolOffTimeout", 0);
         return iosDriver;
