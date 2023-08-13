@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -118,6 +119,16 @@ public class IOSUtils {
         log.info("[ios][{}]{}", udid, cmd);
         // ios runwda是阻塞式运行的，需要异步运行
         return Terminal.executeAsync(cmd);
+    }
+
+    public static void installApp(String udid, File app) throws IOException {
+        String cmd = new StringJoiner(" ")
+                .add(getGoIOSPath())
+                .add("install")
+                .add("--udid=" + udid)
+                .add("--path=" + app.getAbsolutePath()).toString();
+        log.info("[ios][{}]{}", udid, cmd);
+        Terminal.execute(cmd);
     }
 
     // -----------------------以上go-ios--------------------

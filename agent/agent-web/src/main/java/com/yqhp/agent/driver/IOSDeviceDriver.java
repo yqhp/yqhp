@@ -15,6 +15,7 @@
  */
 package com.yqhp.agent.driver;
 
+import com.yqhp.agent.androidtools.InstallAppException;
 import com.yqhp.agent.common.LocalPortProvider;
 import com.yqhp.agent.devicediscovery.ios.IOSDevice;
 import com.yqhp.agent.iostools.IOSUtils;
@@ -34,6 +35,8 @@ import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +64,16 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
     public IOSDeviceDriver(IOSDevice iosDevice) {
         super(iosDevice);
+    }
+
+    @Override
+    public void installApp(File app) {
+        try {
+            IOSUtils.installApp(device.getId(), app);
+        } catch (IOException e) {
+            // 借用android-tools里的异常
+            throw new InstallAppException(e);
+        }
     }
 
     @Override
