@@ -51,6 +51,11 @@ public class WdaUtils {
         return (String) resp.get("sessionId");
     }
 
+    public static String getSessionId(String wdaUrl) {
+        Map resp = HttpUtils.get(wdaUrl + "/status", Map.class);
+        return (String) resp.get("sessionId");
+    }
+
     /**
      * 获取屏幕逻辑分辨率
      */

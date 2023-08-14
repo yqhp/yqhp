@@ -20,7 +20,6 @@ import com.yqhp.agent.devicediscovery.ios.IOSDevice;
 import com.yqhp.agent.iostools.IOSUtils;
 import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.config.Properties;
-import com.yqhp.common.commons.util.HttpUtils;
 import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.Setting;
 import io.appium.java_client.ios.IOSDriver;
@@ -112,8 +111,8 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
 
         IOSDriver iosDriver = new IOSDriver(appiumServiceURL, capabilities);
         // wdaSessionId 与 driver.getSessionId() 不一样
-        Map resp = HttpUtils.get(wdaUrl + "/status", Map.class);
-        wdaSessionId = (String) resp.get("sessionId");
+        wdaSessionId = WdaUtils.getSessionId(wdaUrl);
+        log.info("[ios][{}]iosDriver wdaSessionId={}", device.getId(), wdaSessionId);
 
         // https://appium.github.io/appium-xcuitest-driver/4.33/settings/
         iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
@@ -127,6 +126,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
      */
     public void createWdaSession() {
         wdaSessionId = WdaUtils.createSession(wdaUrl, Map.of());
+        log.info("[ios][{}]manual wdaSessionId={}", device.getId(), wdaSessionId);
     }
 
     public synchronized String runWdaIfNeeded() {
