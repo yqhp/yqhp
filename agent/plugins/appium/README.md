@@ -26,7 +26,11 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
     }
 
     void pressHome() {
-        pressAndroidKey(AndroidKey.HOME);
+        if (isAndroid()) {
+            pressAndroidKey(AndroidKey.HOME);
+        } else {
+            driver.executeScript("mobile: pressButton", Map.of("name", "home"));
+        }
     }
 
     void pressBack() {
@@ -36,7 +40,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
     /**
      * 启动app
      *
-     * @param appId  android: package name | ios: bundle id
+     * @param appId android: package name | ios: bundle id
      */
     void startApp(String appId) {
         ((InteractsWithApps) driver).activateApp(appId);
@@ -44,16 +48,16 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
 
     /**
      * 停止app
-     * 
-     * @param appId  android: package name | ios: bundle id
+     *
+     * @param appId android: package name | ios: bundle id
      */
     boolean stopApp(String appId) {
         return ((InteractsWithApps) driver).terminateApp(appId);
     }
-    
+
     /**
      * 安装app
-     * 
+     *
      * @param appUri app url or filePath
      */
     void installApp(String appUri) {
@@ -62,7 +66,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
 
     /**
      * app是否已安装
-     * 
+     *
      * @param appId android: package name | ios: bundle id
      */
     boolean isAppInstalled(String appId) {
@@ -81,7 +85,7 @@ class CustomAppiumDriver extends AppiumDriverWrapper {
     /**
      * 清除apk数据, 相当于重新安装了app
      *
-     * @param pkg  package name
+     * @param pkg package name
      */
     void clearApkData(String pkg) {
         device.androidShell("pm clear " + pkg);

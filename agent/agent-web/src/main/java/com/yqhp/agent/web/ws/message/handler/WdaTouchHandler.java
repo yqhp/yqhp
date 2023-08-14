@@ -15,11 +15,11 @@
  */
 package com.yqhp.agent.web.ws.message.handler;
 
-import com.yqhp.agent.appium.WdaTouchEvent;
 import com.yqhp.agent.driver.IOSDeviceDriver;
 import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
@@ -31,7 +31,7 @@ import java.util.List;
  * @author jiangyitao
  */
 @Slf4j
-public class WdaTouchHandler extends InputHandler<WdaTouchEvent> {
+public class WdaTouchHandler extends InputHandler<WdaTouchHandler.WdaTouchEvent> {
 
     private static final PointerInput.Origin VIEW = PointerInput.Origin.viewport();
     private static final int MOUSE_LEFT = PointerInput.MouseButton.LEFT.asArg();
@@ -73,5 +73,19 @@ public class WdaTouchHandler extends InputHandler<WdaTouchEvent> {
             touchDownTime = 0;
             WdaUtils.performActions(driver.getWdaUrl(), driver.getWdaSessionId(), List.of(seq.encode()));
         }
+    }
+
+    @Data
+    static class WdaTouchEvent {
+        // 与scrcpy保持一致
+        public static final int DOWN = 0;
+        public static final int UP = 1;
+        public static final int MOVE = 2;
+
+        private int action;
+        private int x;
+        private int y;
+        private int width;
+        private int height;
     }
 }

@@ -39,7 +39,7 @@ import java.util.concurrent.SynchronousQueue;
  * @author jiangyitao
  */
 @Slf4j
-public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
+public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
 
     private static final ExecutorService START_SCRCPY_THREAD_POOL = Executors.newCachedThreadPool();
     private static final ExecutorService READ_SCRCPY_FRAME_THREAD_POOL = Executors.newCachedThreadPool();
@@ -48,7 +48,7 @@ public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
     private final OutputSender os;
     private final AndroidDeviceDriver driver;
 
-    public StartScrcpyHandler(Session session, AndroidDeviceDriver driver) {
+    public ScrcpyFrameHandler(Session session, AndroidDeviceDriver driver) {
         this.session = session;
         os = new OutputSender(session, command());
         this.driver = driver;
@@ -56,7 +56,7 @@ public class StartScrcpyHandler extends InputHandler<ScrcpyOptions> {
 
     @Override
     protected Command command() {
-        return Command.START_SCRCPY;
+        return Command.SCRCPY_FRAME;
     }
 
     @Override

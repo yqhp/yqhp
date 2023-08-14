@@ -35,7 +35,7 @@ public class DeviceScrcpyWebsocket extends DeviceWebsocket {
     protected void onOpened(Session session) {
         AndroidDeviceDriver driver = (AndroidDeviceDriver) deviceDriver;
         messageHandler
-                .register(new StartScrcpyHandler(session, driver))
+                .register(new ScrcpyFrameHandler(session, driver))
                 .register(new ScrcpyKeyHandler(driver))
                 .register(new ScrcpyTextHandler(driver))
                 .register(new ScrcpyTouchHandler(driver))

@@ -19,7 +19,7 @@ package com.yqhp.agent.web.ws.message;
  * @author jiangyitao
  */
 public enum Command {
-    START_SCRCPY,
+    SCRCPY_FRAME,
     SCRCPY_TOUCH,
     SCRCPY_KEY,
     SCRCPY_TEXT,
