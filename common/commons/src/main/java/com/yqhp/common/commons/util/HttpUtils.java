@@ -79,7 +79,7 @@ public class HttpUtils {
         }
     }
 
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
     public static <T> T get(String url, Class<T> responseBodyType, String... headers) {
         String responseBody = get(url, headers);
@@ -98,7 +98,7 @@ public class HttpUtils {
         HttpRequest request = builder.build();
 
         try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
             throw new HttpException(e);
         }
@@ -127,7 +127,7 @@ public class HttpUtils {
         HttpRequest request = builder.build();
 
         try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
             throw new HttpException(e);
         }

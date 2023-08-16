@@ -71,12 +71,19 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
     }
 
     /**
+     * @since 0.0.5
+     */
+    public IOSDriver iosDriver() {
+        return iOSDriver();
+    }
+
+    /**
      * 通过accessibilityId查找元素(找不到则抛出异常)
      *
      * @since 0.0.4
      */
     public WebElement accessibilityId(String accessibilityId) {
-        return find(AppiumBy.accessibilityId(accessibilityId));
+        return findElement(AppiumBy.accessibilityId(accessibilityId));
     }
 
     /**
@@ -85,7 +92,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.4
      */
     public WebElement _accessibilityId(String accessibilityId) {
-        return _find(AppiumBy.accessibilityId(accessibilityId));
+        return _findElement(AppiumBy.accessibilityId(accessibilityId));
     }
 
     /**
@@ -94,7 +101,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.4
      */
     public WebElement accessibilityId(String accessibilityId, Duration timeout) {
-        return find(AppiumBy.accessibilityId(accessibilityId), timeout);
+        return findElement(AppiumBy.accessibilityId(accessibilityId), timeout);
     }
 
     /**
@@ -103,7 +110,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.4
      */
     public WebElement _accessibilityId(String accessibilityId, Duration timeout) {
-        return _find(AppiumBy.accessibilityId(accessibilityId), timeout);
+        return _findElement(AppiumBy.accessibilityId(accessibilityId), timeout);
     }
 
     /**
@@ -112,7 +119,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement desc(String desc) {
-        return find(AppiumBy.accessibilityId(desc));
+        return findElement(AppiumBy.accessibilityId(desc));
     }
 
     /**
@@ -121,7 +128,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _desc(String desc) {
-        return _find(AppiumBy.accessibilityId(desc));
+        return _findElement(AppiumBy.accessibilityId(desc));
     }
 
     /**
@@ -130,7 +137,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement desc(String desc, Duration timeout) {
-        return find(AppiumBy.accessibilityId(desc), timeout);
+        return findElement(AppiumBy.accessibilityId(desc), timeout);
     }
 
     /**
@@ -139,7 +146,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _desc(String desc, Duration timeout) {
-        return _find(AppiumBy.accessibilityId(desc), timeout);
+        return _findElement(AppiumBy.accessibilityId(desc), timeout);
     }
 
     /**
@@ -193,7 +200,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement uia(String uiautomatorText) {
-        return find(AppiumBy.androidUIAutomator(uiautomatorText));
+        return findElement(AppiumBy.androidUIAutomator(uiautomatorText));
     }
 
     /**
@@ -202,7 +209,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _uia(String uiautomatorText) {
-        return _find(AppiumBy.androidUIAutomator(uiautomatorText));
+        return _findElement(AppiumBy.androidUIAutomator(uiautomatorText));
     }
 
     /**
@@ -211,7 +218,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement uia(String uiautomatorText, Duration timeout) {
-        return find(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
+        return findElement(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
     }
 
     /**
@@ -220,7 +227,7 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _uia(String uiautomatorText, Duration timeout) {
-        return _find(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
+        return _findElement(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
     }
 
 }

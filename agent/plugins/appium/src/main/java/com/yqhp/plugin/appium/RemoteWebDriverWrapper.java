@@ -69,7 +69,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement id(String id) {
-        return find(By.id(id));
+        return findElement(By.id(id));
     }
 
     /**
@@ -78,7 +78,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _id(String id) {
-        return _find(By.id(id));
+        return _findElement(By.id(id));
     }
 
     /**
@@ -87,7 +87,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement id(String id, Duration timeout) {
-        return find(By.id(id), timeout);
+        return findElement(By.id(id), timeout);
     }
 
     /**
@@ -96,7 +96,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _id(String id, Duration timeout) {
-        return _find(By.id(id), timeout);
+        return _findElement(By.id(id), timeout);
     }
 
     /**
@@ -105,7 +105,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement linkText(String linkText) {
-        return find(By.linkText(linkText));
+        return findElement(By.linkText(linkText));
     }
 
     /**
@@ -114,7 +114,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _linkText(String linkText) {
-        return _find(By.linkText(linkText));
+        return _findElement(By.linkText(linkText));
     }
 
     /**
@@ -123,7 +123,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement linkText(String linkText, Duration timeout) {
-        return find(By.linkText(linkText), timeout);
+        return findElement(By.linkText(linkText), timeout);
     }
 
     /**
@@ -132,7 +132,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _linkText(String linkText, Duration timeout) {
-        return _find(By.linkText(linkText), timeout);
+        return _findElement(By.linkText(linkText), timeout);
     }
 
     /**
@@ -141,7 +141,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement partialLinkText(String partialLinkText) {
-        return find(By.partialLinkText(partialLinkText));
+        return findElement(By.partialLinkText(partialLinkText));
     }
 
     /**
@@ -150,7 +150,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _partialLinkText(String partialLinkText) {
-        return _find(By.partialLinkText(partialLinkText));
+        return _findElement(By.partialLinkText(partialLinkText));
     }
 
     /**
@@ -159,7 +159,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement partialLinkText(String partialLinkText, Duration timeout) {
-        return find(By.partialLinkText(partialLinkText), timeout);
+        return findElement(By.partialLinkText(partialLinkText), timeout);
     }
 
     /**
@@ -168,7 +168,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _partialLinkText(String partialLinkText, Duration timeout) {
-        return _find(By.partialLinkText(partialLinkText), timeout);
+        return _findElement(By.partialLinkText(partialLinkText), timeout);
     }
 
     /**
@@ -177,7 +177,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement name(String name) {
-        return find(By.name(name));
+        return findElement(By.name(name));
     }
 
     /**
@@ -186,7 +186,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _name(String name) {
-        return _find(By.name(name));
+        return _findElement(By.name(name));
     }
 
     /**
@@ -195,7 +195,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement name(String name, Duration timeout) {
-        return find(By.name(name), timeout);
+        return findElement(By.name(name), timeout);
     }
 
     /**
@@ -204,7 +204,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _name(String name, Duration timeout) {
-        return _find(By.name(name), timeout);
+        return _findElement(By.name(name), timeout);
     }
 
     /**
@@ -213,7 +213,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement tagName(String tagName) {
-        return find(By.tagName(tagName));
+        return findElement(By.tagName(tagName));
     }
 
     /**
@@ -222,7 +222,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _tagName(String tagName) {
-        return _find(By.tagName(tagName));
+        return _findElement(By.tagName(tagName));
     }
 
     /**
@@ -231,7 +231,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement tagName(String tagName, Duration timeout) {
-        return find(By.tagName(tagName), timeout);
+        return findElement(By.tagName(tagName), timeout);
     }
 
     /**
@@ -240,7 +240,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _tagName(String tagName, Duration timeout) {
-        return _find(By.tagName(tagName), timeout);
+        return _findElement(By.tagName(tagName), timeout);
     }
 
     /**
@@ -285,7 +285,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement xpath(String xpath) {
-        return find(By.xpath(xpath));
+        return findElement(By.xpath(xpath));
     }
 
     /**
@@ -294,7 +294,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _xpath(String xpath) {
-        return _find(By.xpath(xpath));
+        return _findElement(By.xpath(xpath));
     }
 
     /**
@@ -303,7 +303,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement xpath(String xpath, Duration timeout) {
-        return find(By.xpath(xpath), timeout);
+        return findElement(By.xpath(xpath), timeout);
     }
 
     /**
@@ -312,7 +312,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.1
      */
     public WebElement _xpath(String xpath, Duration timeout) {
-        return _find(By.xpath(xpath), timeout);
+        return _findElement(By.xpath(xpath), timeout);
     }
 
     /**
@@ -321,7 +321,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement className(String className) {
-        return find(By.className(className));
+        return findElement(By.className(className));
     }
 
     /**
@@ -330,7 +330,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _className(String className) {
-        return _find(By.className(className));
+        return _findElement(By.className(className));
     }
 
     /**
@@ -339,7 +339,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement className(String className, Duration timeout) {
-        return find(By.className(className), timeout);
+        return findElement(By.className(className), timeout);
     }
 
     /**
@@ -348,7 +348,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _className(String className, Duration timeout) {
-        return _find(By.className(className), timeout);
+        return _findElement(By.className(className), timeout);
     }
 
     /**
@@ -357,7 +357,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement cssSelector(String cssSelector) {
-        return find(By.cssSelector(cssSelector));
+        return findElement(By.cssSelector(cssSelector));
     }
 
     /**
@@ -366,7 +366,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _cssSelector(String cssSelector) {
-        return _find(By.cssSelector(cssSelector));
+        return _findElement(By.cssSelector(cssSelector));
     }
 
     /**
@@ -375,7 +375,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement cssSelector(String cssSelector, Duration timeout) {
-        return find(By.cssSelector(cssSelector), timeout);
+        return findElement(By.cssSelector(cssSelector), timeout);
     }
 
     /**
@@ -384,7 +384,7 @@ public class RemoteWebDriverWrapper {
      * @since 0.0.3
      */
     public WebElement _cssSelector(String cssSelector, Duration timeout) {
-        return _find(By.cssSelector(cssSelector), timeout);
+        return _findElement(By.cssSelector(cssSelector), timeout);
     }
 
     /**
@@ -392,7 +392,7 @@ public class RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
-    public WebElement find(By by) {
+    public WebElement findElement(By by) {
         return driver.findElement(by);
     }
 
@@ -401,7 +401,7 @@ public class RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
-    public WebElement find(By by, Duration timeout) {
+    public WebElement findElement(By by, Duration timeout) {
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
@@ -411,9 +411,9 @@ public class RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
-    public WebElement _find(By by) {
+    public WebElement _findElement(By by) {
         try {
-            return find(by);
+            return findElement(by);
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             return null;
         }
@@ -424,9 +424,9 @@ public class RemoteWebDriverWrapper {
      *
      * @since 0.0.1
      */
-    public WebElement _find(By by, Duration timeout) {
+    public WebElement _findElement(By by, Duration timeout) {
         try {
-            return find(by, timeout);
+            return findElement(by, timeout);
         } catch (TimeoutException e) {
             return null;
         }
