@@ -29,11 +29,19 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 /**
  * @author jiangyitao
  */
 public class HttpUtils {
+
+    public static final Duration REQUEST_CONNECT_TIMEOUT = Duration.ofSeconds(1);
+    public static final Duration REQUEST_READ_TIMEOUT = Duration.ofSeconds(30);
+
+    public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(REQUEST_CONNECT_TIMEOUT)
+            .build();
 
     /**
      * 发送GET请求，最终关闭连接
@@ -41,6 +49,8 @@ public class HttpUtils {
     public static String getAndClose(String url) {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setConnectTimeout((int) REQUEST_CONNECT_TIMEOUT.toMillis());
+            conn.setReadTimeout((int) REQUEST_READ_TIMEOUT.toMillis());
             conn.setRequestMethod("GET");
             try (InputStream is = conn.getInputStream();
                  InputStreamReader isr = new InputStreamReader(is);
@@ -66,8 +76,8 @@ public class HttpUtils {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setConnectTimeout(500); // ms
-            conn.setReadTimeout(1000); // ms
+            conn.setConnectTimeout((int) REQUEST_CONNECT_TIMEOUT.toMillis());
+            conn.setReadTimeout((int) REQUEST_READ_TIMEOUT.toMillis());
             conn.connect();
             return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
         } catch (Exception e) {
@@ -79,8 +89,6 @@ public class HttpUtils {
         }
     }
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
-
     public static <T> T get(String url, Class<T> responseBodyType, String... headers) {
         String responseBody = get(url, headers);
         return StringUtils.isBlank(responseBody)
@@ -89,13 +97,14 @@ public class HttpUtils {
     }
 
     public static String get(String url, String... headers) {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
+        HttpRequest.Builder reqBuilder = HttpRequest.newBuilder()
+                .timeout(REQUEST_READ_TIMEOUT)
                 .uri(URI.create(url))
                 .GET();
         if (!ArrayUtils.isEmpty(headers)) {
-            builder.headers(headers);
+            reqBuilder.headers(headers);
         }
-        HttpRequest request = builder.build();
+        HttpRequest request = reqBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString()).body();
@@ -112,19 +121,20 @@ public class HttpUtils {
     }
 
     public static String postJSON(String url, Object body, String... headers) {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
+        HttpRequest.Builder reqBuilder = HttpRequest.newBuilder()
+                .timeout(REQUEST_READ_TIMEOUT)
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json");
         if (!ArrayUtils.isEmpty(headers)) {
-            builder.headers(headers);
+            reqBuilder.headers(headers);
         }
         if (body != null) {
             String bodyString = body instanceof String ? (String) body : JacksonUtils.writeValueAsString(body);
-            builder.POST(HttpRequest.BodyPublishers.ofString(bodyString));
+            reqBuilder.POST(HttpRequest.BodyPublishers.ofString(bodyString));
         } else {
-            builder.POST(HttpRequest.BodyPublishers.noBody());
+            reqBuilder.POST(HttpRequest.BodyPublishers.noBody());
         }
-        HttpRequest request = builder.build();
+        HttpRequest request = reqBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString()).body();
