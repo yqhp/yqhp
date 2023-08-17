@@ -81,51 +81,65 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void online(Device device) {
-        ZkDevice zkDevice;
-        DeviceDriver deviceDriver;
-        if (device instanceof AndroidDevice) {
-            zkDevice = new ZkDevice(
-                    device.getId(),
-                    DevicePlatform.Android,
-                    device.isEmulator() ? DeviceType.EMULATOR : DeviceType.REAL,
-                    location
-            );
-            deviceDriver = new AndroidDeviceDriver((AndroidDevice) device);
-        } else if (device instanceof IOSRealDevice) {
-            zkDevice = new ZkDevice(
-                    device.getId(),
-                    DevicePlatform.iOS,
-                    DeviceType.REAL,
-                    location
-            );
-            deviceDriver = new IOSRealDeviceDriver((IOSRealDevice) device);
-        } else if (device instanceof IOSEmulator) {
-            zkDevice = new ZkDevice(
-                    device.getId(),
-                    DevicePlatform.iOS,
-                    DeviceType.EMULATOR,
-                    location
-            );
-            zkDevice.setModel(((IOSEmulator) device).getModel());
-            deviceDriver = new IOSEmulatorDriver((IOSEmulator) device);
-        } else {
-            log.warn("unknown device={}", device);
-            return;
-        }
+        // 不同的deviceId可以并发online
+        synchronized (device.getId().intern()) {
+            if (DEVICE_DRIVERS.containsKey(device.getId())) {
+                return;
+            }
 
-        try {
-            zkDeviceManager.create(zkDevice);
-        } finally {
-            DEVICE_DRIVERS.put(device.getId(), deviceDriver);
+            ZkDevice zkDevice;
+            DeviceDriver deviceDriver;
+            if (device instanceof AndroidDevice) {
+                zkDevice = new ZkDevice(
+                        device.getId(),
+                        DevicePlatform.Android,
+                        device.isEmulator() ? DeviceType.EMULATOR : DeviceType.REAL,
+                        location
+                );
+                deviceDriver = new AndroidDeviceDriver((AndroidDevice) device);
+            } else if (device instanceof IOSRealDevice) {
+                zkDevice = new ZkDevice(
+                        device.getId(),
+                        DevicePlatform.iOS,
+                        DeviceType.REAL,
+                        location
+                );
+                deviceDriver = new IOSRealDeviceDriver((IOSRealDevice) device);
+            } else if (device instanceof IOSEmulator) {
+                zkDevice = new ZkDevice(
+                        device.getId(),
+                        DevicePlatform.iOS,
+                        DeviceType.EMULATOR,
+                        location
+                );
+                zkDevice.setModel(((IOSEmulator) device).getModel());
+                deviceDriver = new IOSEmulatorDriver((IOSEmulator) device);
+            } else {
+                log.warn("unknown device={}", device);
+                return;
+            }
+
+            try {
+                log.info("create zkDevice: {}", zkDevice);
+                zkDeviceManager.create(zkDevice);
+            } finally {
+                DEVICE_DRIVERS.put(device.getId(), deviceDriver);
+            }
         }
     }
 
     @Override
     public void offline(String deviceId) {
-        try {
-            zkDeviceManager.delete(location, deviceId);
-        } finally {
-            DEVICE_DRIVERS.remove(deviceId);
+        // 不同的deviceId可以并发offline
+        synchronized (deviceId.intern()) {
+            if (DEVICE_DRIVERS.containsKey(deviceId)) {
+                try {
+                    log.info("delete zkDevice: {}", deviceId);
+                    zkDeviceManager.delete(location, deviceId);
+                } finally {
+                    DEVICE_DRIVERS.remove(deviceId);
+                }
+            }
         }
     }
 
