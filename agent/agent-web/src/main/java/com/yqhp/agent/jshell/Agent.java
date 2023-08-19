@@ -78,7 +78,7 @@ public class Agent implements JShellVar {
     }
 
     /**
-     * 循环执行传入的supplier，超时将抛出异常
+     * 执行supplier，无异常则直接返回，有异常则休眠500ms再执行，超过timeout仍未执行成功将抛出TimeoutException
      *
      * @param timeout 执行超时时间
      * @since 0.2.5
@@ -88,7 +88,7 @@ public class Agent implements JShellVar {
     }
 
     /**
-     * 循环执行传入的supplier，超时将抛出异常
+     * 执行supplier，无异常则直接返回，有异常则休眠interval再执行，超过timeout仍未执行成功将抛出TimeoutException
      *
      * @param timeout  执行超时时间
      * @param interval 执行间隔时间
