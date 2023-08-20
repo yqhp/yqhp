@@ -68,8 +68,8 @@ public abstract class DeviceDriver extends Driver {
     }
 
     @Override
-    public void injectVar(JShellContext context) {
-        context.injectVar(new com.yqhp.agent.jshell.Device(this));
+    public void injectVar(JShellContext jshellCtx) {
+        jshellCtx.injectVar(new com.yqhp.agent.jshell.Device(this));
     }
 
     public void installApp(String uri) throws IOException {

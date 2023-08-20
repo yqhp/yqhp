@@ -39,10 +39,6 @@ import java.util.function.Consumer;
 @Slf4j
 public class Driver {
 
-    private static final List<String> DEFAULT_JSHELL_TO_EVAL = List.of(
-            "String print(Object o) { return String.valueOf(o); }"
-    );
-
     private static final AtomicInteger THREAD_GROUP_ID = new AtomicInteger();
 
     private volatile JShellContext jshellContext;
@@ -54,10 +50,6 @@ public class Driver {
                 if (jshellContext == null) {
                     log.info("init jshellContext...");
                     jshellContext = new JShellContext();
-                    for (String toEval : DEFAULT_JSHELL_TO_EVAL) {
-                        log.info("jshell eval: {}", toEval);
-                        jshellContext.getJShellX().eval(toEval);
-                    }
                     injectVar(jshellContext);
                     log.info("jshellContext inited");
                 }
@@ -66,8 +58,8 @@ public class Driver {
         return jshellContext;
     }
 
-    public void injectVar(JShellContext context) {
-        context.injectVar(new Agent(this));
+    public void injectVar(JShellContext jshellCtx) {
+        jshellCtx.injectVar(new Agent(this));
     }
 
     public JShellEvalResult jshellEval(String input) {

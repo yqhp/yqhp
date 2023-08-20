@@ -40,12 +40,13 @@ public class JShellX implements Closeable {
     @Getter
     private final JShell jShell;
     @Getter
-    private SourceCodeAnalysis codeAnalysis;
+    private final SourceCodeAnalysis codeAnalysis;
 
     public JShellX() {
-        this.jShell = JShell.builder()
-//                .out(os)
-//                .err(os)
+        jShell = JShell.builder()
+                // 使用LocalExecutionControlProvider时，这里的out与err不生效，导致System.out.print/System.err.print无法获取，可能是jshell的bug
+                // .out(os)
+                // .err(os)
                 .executionEngine(new LocalExecutionControlProvider(), new HashMap<>())
                 .build();
         codeAnalysis = jShell.sourceCodeAnalysis();
@@ -53,7 +54,6 @@ public class JShellX implements Closeable {
 
     @Override
     public void close() {
-        codeAnalysis = null;
         // LocalExecutionControl提供的stop方法，可以立即停止当前jshell实例正在执行的线程
         // 如: jshell执行了一个死循环代码，如果不调用stop，死循环会一直执行
         jShell.stop();
@@ -73,7 +73,7 @@ public class JShellX implements Closeable {
                 .map(Suggestion::continuation)
                 .distinct()
                 .collect(toList());
-        if (suggestions.size() == 0) {
+        if (suggestions.isEmpty()) {
             List<Documentation> docs = codeAnalysis.documentation(input, cursor, false);
             return docs.stream().map(doc -> {
                 CompletionItem item = new CompletionItem();
