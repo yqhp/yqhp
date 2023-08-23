@@ -16,6 +16,7 @@
 package com.yqhp.agent.driver;
 
 import com.yqhp.agent.jshell.Agent;
+import com.yqhp.agent.jshell.Logger;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.jshell.CompletionItem;
 import com.yqhp.common.jshell.JShellContext;
@@ -29,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -43,6 +45,7 @@ public class Driver {
 
     private volatile JShellContext jshellContext;
     private volatile ThreadGroup threadGroup;
+    private final List<Consumer<Logger.Log>> logConsumers = new ArrayList<>();
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
@@ -50,6 +53,7 @@ public class Driver {
                 if (jshellContext == null) {
                     log.info("init jshellContext...");
                     jshellContext = new JShellContext();
+                    jshellContext.injectVar(new Logger(this));
                     injectVar(jshellContext);
                     log.info("jshellContext inited");
                 }
@@ -138,8 +142,26 @@ public class Driver {
         }
     }
 
+    public void log(Logger.Log log) {
+        for (Consumer<Logger.Log> logConsumer : logConsumers) {
+            logConsumer.accept(log);
+        }
+    }
+
+    public void addLogConsumer(Consumer<Logger.Log> consumer) {
+        logConsumers.add(consumer);
+    }
+
+    public void clearLogConsumers() {
+        if (!logConsumers.isEmpty()) {
+            log.info("clear logConsumers");
+            logConsumers.clear();
+        }
+    }
+
     public void release() {
         closeJShellContext();
         stopThreadGroup();
+        clearLogConsumers();
     }
 }

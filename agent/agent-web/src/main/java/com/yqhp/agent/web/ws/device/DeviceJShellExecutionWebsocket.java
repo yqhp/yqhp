@@ -17,11 +17,14 @@ package com.yqhp.agent.web.ws.device;
 
 import com.yqhp.agent.web.ws.message.handler.JShellEvalHandler;
 import com.yqhp.agent.web.ws.message.handler.JShellLoadPluginHandler;
+import com.yqhp.common.commons.util.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
+import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
 
 /**
  * @author jiangyitao
@@ -36,6 +39,17 @@ public class DeviceJShellExecutionWebsocket extends DeviceWebsocket {
         messageHandler
                 .register(new JShellLoadPluginHandler(session, deviceDriver))
                 .register(new JShellEvalHandler(session, deviceDriver));
+
+        RemoteEndpoint.Basic remote = session.getBasicRemote();
+        deviceDriver.addLogConsumer(_log -> {
+            if (session.isOpen()) {
+                try {
+                    remote.sendText(JacksonUtils.writeValueAsString(_log));
+                } catch (IOException e) {
+                    log.warn("ws send error, log:{}, cause:{}", _log, e.getMessage());
+                }
+            }
+        });
     }
 
 }
