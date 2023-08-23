@@ -26,6 +26,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -429,6 +430,50 @@ public class RemoteWebDriverWrapper {
             return findElement(by, timeout);
         } catch (TimeoutException e) {
             return null;
+        }
+    }
+
+    /**
+     * 查找元素list(找不到则抛出异常)
+     *
+     * @since 0.0.6
+     */
+    public List<WebElement> findElements(By by) {
+        List<WebElement> elements = driver.findElements(by);
+        if (elements.isEmpty()) {
+            throw new NoSuchElementException("Elements not found, " + by);
+        }
+        return elements;
+    }
+
+    /**
+     * 查找元素list(找不到则返回[])
+     *
+     * @since 0.0.6
+     */
+    public List<WebElement> _findElements(By by) {
+        return driver.findElements(by);
+    }
+
+    /**
+     * 查找元素list(找不到则抛出异常)
+     *
+     * @since 0.0.6
+     */
+    public List<WebElement> findElements(By by, Duration timeout) {
+        return new WebDriverWait(driver, timeout).until(d -> findElements(by));
+    }
+
+    /**
+     * 查找元素list(找不到则返回[])
+     *
+     * @since 0.0.6
+     */
+    public List<WebElement> _findElements(By by, Duration timeout) {
+        try {
+            return findElements(by, timeout);
+        } catch (TimeoutException e) {
+            return new ArrayList<>();
         }
     }
 
