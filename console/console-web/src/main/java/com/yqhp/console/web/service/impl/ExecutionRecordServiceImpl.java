@@ -186,14 +186,10 @@ public class ExecutionRecordServiceImpl
             Set<String> deviceIds = docExecutionRecordService.listByExecutionRecordId(id).stream()
                     .map(DocExecutionRecord::getDeviceId)
                     .collect(Collectors.toSet());
-            if (CollectionUtils.isEmpty(deviceIds)) {
-                // 每个设备都已经删了，直接删除执行记录
-                removeById(id);
-            }
-
             List<String> unRemovedDevices = new ArrayList<>();
             for (String deviceId : deviceIds) {
                 boolean removed = removePushedForDevice(deviceId, id);
+                // 移除成功，设备则领取不到任务，可以删除该设备相关任务数据
                 if (removed) {
                     pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
                     docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
