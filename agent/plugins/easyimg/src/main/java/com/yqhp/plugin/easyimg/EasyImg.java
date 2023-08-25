@@ -32,6 +32,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -137,7 +138,20 @@ public class EasyImg {
      * @since 0.0.2
      */
     public RectX findImage(String templateUri) {
-        return findImage(templateUri, null);
+        return findImage(templateUri, 0.9);
+    }
+
+    /**
+     * 查找图片，找不到返回null
+     *
+     * @param templateUri 模版图片 httpUrl or filePath
+     * @param threshold   相似度 0-1
+     * @since 0.0.5
+     */
+    @SneakyThrows
+    public RectX findImage(String templateUri, double threshold) {
+        File templateFile = getFileByUri(templateUri);
+        return findImage(templateFile, threshold);
     }
 
     /**
@@ -147,14 +161,22 @@ public class EasyImg {
      * @param timeout     查找超时时间
      * @since 0.0.2
      */
-    @SneakyThrows
     public RectX findImage(String templateUri, Duration timeout) {
-        File templateFile = templateUri.startsWith("http")
-                ? FileUtils.downloadIfAbsent(templateUri, imgDir)
-                : new File(templateUri);
-        return timeout == null
-                ? findImage(templateFile, 0.9)
-                : findImage(templateFile, timeout, Duration.ofMillis(500), 0.9);
+        return findImage(templateUri, timeout, 0.9);
+    }
+
+    /**
+     * 查找图片，找不到返回null
+     *
+     * @param templateUri 模版图片 httpUrl or filePath
+     * @param timeout     查找超时时间
+     * @param threshold   相似度 0-1
+     * @since 0.0.5
+     */
+    @SneakyThrows
+    public RectX findImage(String templateUri, Duration timeout, double threshold) {
+        File templateFile = getFileByUri(templateUri);
+        return findImage(templateFile, timeout, Duration.ofMillis(500), threshold);
     }
 
     /**
@@ -163,7 +185,7 @@ public class EasyImg {
      * @param template  模版图片
      * @param timeout   查找超时时间
      * @param interval  查找间隔时间
-     * @param threshold 相似度
+     * @param threshold 相似度 0-1
      * @since 0.0.2
      */
     @SneakyThrows
@@ -210,6 +232,12 @@ public class EasyImg {
         // 特征匹配
         Rect rect = OpencvEngine.matchFeature(img, template, SIFT.create(), threshold);
         return rect != null ? new RectX(rect) : null;
+    }
+
+    private File getFileByUri(String uri) throws IOException {
+        return uri.startsWith("http")
+                ? FileUtils.downloadIfAbsent(uri, imgDir)
+                : new File(uri);
     }
 
     private File screenshot() {
