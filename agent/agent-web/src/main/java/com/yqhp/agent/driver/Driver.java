@@ -23,7 +23,9 @@ import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.jshell.TriggerSuggestRequest;
 import com.yqhp.common.web.util.ApplicationContextUtils;
+import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +33,8 @@ import org.springframework.util.CollectionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -45,7 +49,9 @@ public class Driver {
 
     private volatile JShellContext jshellContext;
     private volatile ThreadGroup threadGroup;
-    private final List<Consumer<Logger.Log>> logConsumers = new ArrayList<>();
+    @Getter
+    private final List<DocExecutionLog> logs = Collections.synchronizedList(new LinkedList<>());
+    private final List<Consumer<DocExecutionLog>> logConsumers = new ArrayList<>();
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
@@ -142,13 +148,21 @@ public class Driver {
         }
     }
 
-    public void log(Logger.Log log) {
-        for (Consumer<Logger.Log> logConsumer : logConsumers) {
+    public void log(DocExecutionLog log) {
+        for (Consumer<DocExecutionLog> logConsumer : logConsumers) {
             logConsumer.accept(log);
+        }
+        logs.add(log);
+    }
+
+    public void clearLogs() {
+        if (!logs.isEmpty()) {
+            log.info("clear Logs");
+            logs.clear();
         }
     }
 
-    public void addLogConsumer(Consumer<Logger.Log> consumer) {
+    public void addLogConsumer(Consumer<DocExecutionLog> consumer) {
         logConsumers.add(consumer);
     }
 
@@ -162,6 +176,7 @@ public class Driver {
     public void release() {
         closeJShellContext();
         stopThreadGroup();
+        clearLogs();
         clearLogConsumers();
     }
 }

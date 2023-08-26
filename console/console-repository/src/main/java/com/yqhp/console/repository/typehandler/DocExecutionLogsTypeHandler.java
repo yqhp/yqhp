@@ -13,28 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.common.kafka.message;
+package com.yqhp.console.repository.typehandler;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.yqhp.common.jshell.JShellEvalResult;
-import com.yqhp.common.web.model.InputConverter;
-import com.yqhp.console.repository.entity.DocExecutionRecord;
-import com.yqhp.console.repository.enums.ExecutionStatus;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.yqhp.common.mybatis.typehandler.JacksonTypeHandler;
 import com.yqhp.console.repository.jsonfield.DocExecutionLog;
-import lombok.Data;
 
 import java.util.List;
 
 /**
  * @author jiangyitao
  */
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class DocExecutionRecordMessage implements InputConverter<DocExecutionRecord> {
-    private String id;
-    private ExecutionStatus status;
-    private Long startTime;
-    private Long endTime;
-    private List<JShellEvalResult> results;
-    private List<DocExecutionLog> logs;
+public class DocExecutionLogsTypeHandler extends JacksonTypeHandler<List<DocExecutionLog>> {
+    @Override
+    protected TypeReference<List<DocExecutionLog>> typeReference() {
+        return new TypeReference<>() {
+        };
+    }
 }

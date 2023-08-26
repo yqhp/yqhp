@@ -26,6 +26,7 @@ import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.ExecutionStatus;
+import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -101,15 +102,17 @@ public class TaskServiceImpl implements TaskService {
             List<JShellEvalResult> results = driver.jshellAnalysisAndEval(record.getDoc().getContent());
             boolean failed = results.stream().anyMatch(JShellEvalResult::isFailed);
             if (failed) {
-                onEvalDocFailed(record, results, null);
+                onEvalDocFailed(record, results, driver.getLogs(), null);
                 return false;
             } else {
-                onEvalDocSuccessful(record, results);
+                onEvalDocSuccessful(record, results, driver.getLogs());
                 return true;
             }
         } catch (Throwable cause) {
-            onEvalDocFailed(record, null, cause);
+            onEvalDocFailed(record, null, driver.getLogs(), cause);
             return false;
+        } finally {
+            driver.clearLogs();
         }
     }
 
@@ -121,21 +124,23 @@ public class TaskServiceImpl implements TaskService {
         producer.sendDocExecutionRecordMessage(message);
     }
 
-    private void onEvalDocSuccessful(DocExecutionRecord record, List<JShellEvalResult> results) {
+    private void onEvalDocSuccessful(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs) {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
         message.setStatus(ExecutionStatus.SUCCESSFUL);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);
+        message.setLogs(logs);
         producer.sendDocExecutionRecordMessage(message);
     }
 
-    private void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, Throwable cause) {
+    private void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs, Throwable cause) {
         DocExecutionRecordMessage message = new DocExecutionRecordMessage();
         message.setId(record.getId());
         message.setStatus(ExecutionStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         message.setResults(results);
+        message.setLogs(logs);
         producer.sendDocExecutionRecordMessage(message);
     }
 

@@ -16,6 +16,7 @@
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />
         <result column="results" property="results" typeHandler="com.yqhp.console.repository.typehandler.JShellEvalResultsTypeHandler" />
+        <result column="logs" property="logs" typeHandler="com.yqhp.console.repository.typehandler.DocExecutionLogsTypeHandler" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />

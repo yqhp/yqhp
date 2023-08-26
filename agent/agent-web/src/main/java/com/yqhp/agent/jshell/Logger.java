@@ -17,6 +17,7 @@ package com.yqhp.agent.jshell;
 
 import com.yqhp.agent.driver.Driver;
 import com.yqhp.common.jshell.JShellVar;
+import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import org.springframework.util.Assert;
 
 /**
@@ -40,33 +41,29 @@ public class Logger implements JShellVar {
      * @since 0.3.2
      */
     public void info(Object obj) {
-        driver.log(new Log("info", obj));
+        driver.log(createLog("info", obj));
     }
 
     /**
      * @since 0.3.2
      */
     public void warn(Object obj) {
-        driver.log(new Log("warn", obj));
+        driver.log(createLog("warn", obj));
     }
 
     /**
      * @since 0.3.2
      */
     public void error(Object obj) {
-        driver.log(new Log("error", obj));
+        driver.log(createLog("error", obj));
     }
 
-    public static class Log {
-        public long timestamp;
-        public String tag;
-        public String value;
-
-        public Log(String tag, Object val) {
-            timestamp = System.currentTimeMillis();
-            this.tag = tag;
-            this.value = String.valueOf(val);
-        }
+    private DocExecutionLog createLog(String tag, Object obj) {
+        DocExecutionLog executionLog = new DocExecutionLog();
+        executionLog.setTimestamp(System.currentTimeMillis());
+        executionLog.setTag(tag);
+        executionLog.setValue(String.valueOf(obj));
+        return executionLog;
     }
 
 }
