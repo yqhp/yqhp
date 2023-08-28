@@ -29,7 +29,6 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.OutputType;
@@ -52,9 +51,7 @@ public abstract class DeviceDriver extends Driver {
     @Getter
     protected final Device device;
 
-    @Setter
-    private DesiredCapabilities capabilities;
-    @Getter
+    private DesiredCapabilities capabilities = new DesiredCapabilities();
     private AppiumDriver appiumDriver;
     private AppiumDriverLocalService appiumService;
     private OutputStream appiumLogOutput;
@@ -195,18 +192,12 @@ public abstract class DeviceDriver extends Driver {
     }
 
     public void setCapability(String key, Object value) {
-        if (capabilities == null) {
-            capabilities = new DesiredCapabilities();
-        }
         capabilities.setCapability(key, value);
     }
 
     public synchronized AppiumDriver getOrCreateAppiumDriver() {
         if (appiumDriver != null) {
             return appiumDriver;
-        }
-        if (capabilities == null) {
-            capabilities = new DesiredCapabilities();
         }
         if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
             capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
@@ -232,13 +223,17 @@ public abstract class DeviceDriver extends Driver {
 
     protected abstract AppiumDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities);
 
+    private void resetCapability() {
+        capabilities = new DesiredCapabilities();
+    }
+
     @Override
     public void release() {
         stopReceiveDeviceLog();
         stopReceiveAppiumLog();
         quitAppiumDriver();
         stopAppiumService();
-        capabilities = null;
+        resetCapability();
         super.release();
     }
 }
