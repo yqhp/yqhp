@@ -95,6 +95,9 @@ public class AndroidDeviceDriver extends DeviceDriver {
     protected RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities) {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
+        if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
+            capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
+        }
         if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
             // 默认uiautomator2
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);

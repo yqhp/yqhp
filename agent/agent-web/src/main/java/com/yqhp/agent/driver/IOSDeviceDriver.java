@@ -106,6 +106,9 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
+        if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
+            capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
+        }
         if (capabilities.getCapability("skipLogCapture") == null) {
             capabilities.setCapability("skipLogCapture", true);
         }
