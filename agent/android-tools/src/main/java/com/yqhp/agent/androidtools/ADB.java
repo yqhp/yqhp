@@ -36,13 +36,13 @@ public class ADB {
 
     public static synchronized void init(String adbPath, Duration timeout) {
         if (inited) {
-            throw new IllegalStateException("adb inited");
+            throw new IllegalStateException("Adb inited");
         }
 
         if (StringUtils.isEmpty(adbPath)) {
             String androidHome = System.getenv("ANDROID_HOME");
             if (StringUtils.isEmpty(androidHome)) {
-                throw new IllegalStateException("adbPath is empty && System env ANDROID_HOME is empty");
+                throw new IllegalStateException("AdbPath is empty && System env ANDROID_HOME is empty");
             }
             adbPath = androidHome + File.separator + "platform-tools" + File.separator
                     + (OS.isWindows() ? "adb.exe" : "adb");
@@ -71,14 +71,14 @@ public class ADB {
             }
         }
 
-        log.info("adb inited");
+        log.info("Adb inited");
         inited = true;
     }
 
     // 在init前调用
     public static synchronized void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
         if (inited) {
-            throw new IllegalStateException("adb inited");
+            throw new IllegalStateException("Adb inited");
         }
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
     }

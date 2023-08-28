@@ -63,7 +63,7 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
     protected void handle(Input<ScrcpyOptions> input) {
         String uid = input.getUid();
 
-        os.info(uid, "start scrcpy...");
+        os.info(uid, "Start scrcpy...");
         Scrcpy scrcpy = driver.getScrcpy();
         scrcpy.start(
                 Properties.getScrcpyServerPath(),
@@ -73,7 +73,7 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
                 Duration.ofSeconds(30), // start timeout
                 START_SCRCPY_THREAD_POOL
         );
-        os.info(uid, "scrcpy started");
+        os.info(uid, "Scrcpy started");
 
         ScrcpyFrameClient scrcpyFrameClient = scrcpy.getScrcpyFrameClient();
         os.info(uid, scrcpyFrameClient.getScreenSize());
@@ -82,15 +82,15 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
         Thread sendFrameThread = new Thread(() -> {
             RemoteEndpoint.Basic remote = session.getBasicRemote();
             try {
-                os.ok(uid, "start sending frames...");
-                log.info("[{}]start sending frames...", driver.getDeviceId());
+                os.ok(uid, "Start sending frames...");
+                log.info("[{}]Start sending frames...", driver.getDeviceId());
                 while (session.isOpen()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     remote.sendBinary(frame);
                 }
-                log.info("[{}]stop sending frames", driver.getDeviceId());
+                log.info("[{}]Stop sending frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop sending frames, cause: {}", driver.getDeviceId(),
+                log.info("[{}]Stop sending frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
@@ -98,17 +98,17 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
 
         READ_SCRCPY_FRAME_THREAD_POOL.submit(() -> {
             try {
-                log.info("[{}]start reading frames", driver.getDeviceId());
+                log.info("[{}]Start reading frames", driver.getDeviceId());
                 scrcpyFrameClient.readFrame(frame -> {
                     try {
                         blockingQueue.put(frame);
                     } catch (InterruptedException e) {
-                        log.warn("[{}]put frame interrupted", driver.getDeviceId());
+                        log.warn("[{}]Put frame interrupted", driver.getDeviceId());
                     }
                 });
-                log.info("[{}]stop reading frames", driver.getDeviceId());
+                log.info("[{}]Stop reading frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]stop reading frames, cause: {}", driver.getDeviceId(),
+                log.info("[{}]Stop reading frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
                 sendFrameThread.interrupt();

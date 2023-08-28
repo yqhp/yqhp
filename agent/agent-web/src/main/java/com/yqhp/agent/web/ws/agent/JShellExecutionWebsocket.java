@@ -46,7 +46,7 @@ public class JShellExecutionWebsocket extends AgentWebsocket {
                 try {
                     remote.sendText(JacksonUtils.writeValueAsString(_log));
                 } catch (IOException e) {
-                    log.warn("ws send error, log:{}, cause:{}", _log, e.getMessage());
+                    log.warn("Failed to send log:{}, cause:{}", _log, e.getMessage());
                 }
             }
         });

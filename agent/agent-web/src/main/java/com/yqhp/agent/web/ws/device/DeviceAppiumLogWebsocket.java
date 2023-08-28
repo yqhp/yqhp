@@ -39,7 +39,7 @@ public class DeviceAppiumLogWebsocket extends DeviceWebsocket {
                 try {
                     remote.sendText(appiumLog);
                 } catch (IOException e) {
-                    log.warn("send error, log:{}, cause:{}", appiumLog, e.getMessage());
+                    log.warn("Failed to send log:{}, cause:{}", appiumLog, e.getMessage());
                 }
             }
         });

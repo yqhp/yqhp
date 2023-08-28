@@ -88,7 +88,7 @@ public class TokenServiceImpl implements TokenService {
         try {
             return JWTToken.parseSubject(token);
         } catch (Exception e) {
-            log.warn("invalid token: {}", token, e);
+            log.warn("Invalid token: {}", token, e);
             return null;
         }
     }

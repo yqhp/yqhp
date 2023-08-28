@@ -116,12 +116,12 @@ public class DeviceServiceImpl implements DeviceService {
                 zkDevice.setModel(((IOSEmulator) device).getModel());
                 deviceDriver = new IOSEmulatorDriver((IOSEmulator) device);
             } else {
-                log.warn("unknown device={}", device);
+                log.warn("Unknown device={}", device);
                 return;
             }
 
             try {
-                log.info("create zkDevice: {}", zkDevice);
+                log.info("Create zkDevice: {}", zkDevice);
                 zkDeviceManager.create(zkDevice);
             } finally {
                 DEVICE_DRIVERS.put(device.getId(), deviceDriver);
@@ -135,7 +135,7 @@ public class DeviceServiceImpl implements DeviceService {
         synchronized (deviceId.intern()) {
             if (DEVICE_DRIVERS.containsKey(deviceId)) {
                 try {
-                    log.info("delete zkDevice: {}", deviceId);
+                    log.info("Delete zkDevice: {}", deviceId);
                     zkDeviceManager.delete(location, deviceId);
                 } finally {
                     DEVICE_DRIVERS.remove(deviceId);
@@ -165,7 +165,7 @@ public class DeviceServiceImpl implements DeviceService {
             zkDevice.setLockTime(LocalDateTime.now());
             zkDeviceManager.update(zkDevice);
             LOCKED_DEVICE_DRIVERS.put(token, getDeviceDriverById(deviceId));
-            log.info("[{}]locked by {}, token={}", deviceId, user, token);
+            log.info("[{}]Locked by {}, token={}", deviceId, user, token);
             return token;
         }
     }
@@ -189,7 +189,7 @@ public class DeviceServiceImpl implements DeviceService {
         } finally {
             DeviceDriver deviceDriver = LOCKED_DEVICE_DRIVERS.remove(token);
             if (deviceDriver != null) {
-                log.info("[{}]unlocked, token={}", deviceDriver.getDeviceId(), token);
+                log.info("[{}]Unlocked, token={}", deviceDriver.getDeviceId(), token);
             }
         }
     }

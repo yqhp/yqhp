@@ -59,7 +59,7 @@ public class UsbmuxdChannel implements Closeable {
             try {
                 socketChannel.close();
             } catch (IOException e) {
-                log.warn("close socket channel io err", e);
+                log.warn("Close socket channel failed", e);
             }
         }
     }

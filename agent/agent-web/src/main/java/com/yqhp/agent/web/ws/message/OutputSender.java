@@ -64,7 +64,7 @@ public class OutputSender {
             String text = JacksonUtils.writeValueAsString(output);
             session.getBasicRemote().sendText(text);
         } catch (Exception e) {
-            log.warn("[{}]send err, output={}", session.getId(), output, e);
+            log.warn("[{}]Failed to send output:{}", session.getId(), output, e);
         }
     }
 }

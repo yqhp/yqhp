@@ -29,13 +29,13 @@ public abstract class IOSRealDeviceChangeListener
 
     @Override
     public void deviceConnected(IDevice device) {
-        log.info("[{}]device connected", device.getSerialNumber());
+        log.info("[ios][{}]Device connected", device.getSerialNumber());
         online(new IOSRealDevice(device));
     }
 
     @Override
     public void deviceDisconnected(IDevice device) {
-        log.info("[{}]device disconnected", device.getSerialNumber());
+        log.info("[ios][{}]Device disconnected", device.getSerialNumber());
         offline(new IOSRealDevice(device));
     }
 }

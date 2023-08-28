@@ -57,7 +57,7 @@ public class DeviceDevtoolsWebsocket {
 
         localPort = SocketUtils.findAvailableTcpPort();
         iDevice = ((AndroidDeviceDriver) deviceDriver).getIDevice();
-        log.info("[devtools][{}]createForward {} -> {}", session.getId(), localPort, socket);
+        log.info("[devtools][{}]Create forward {} -> {}", session.getId(), localPort, socket);
         iDevice.createForward(localPort, socket, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         WebSocket.Listener devtoolsWSListener = new WebSocket.Listener() {
@@ -124,7 +124,7 @@ public class DeviceDevtoolsWebsocket {
             }
         } finally {
             if (iDevice != null && localPort > 0) {
-                log.info("[devtools][{}]removeForward {}", session.getId(), localPort);
+                log.info("[devtools][{}]Remove forward {}", session.getId(), localPort);
                 iDevice.removeForward(localPort);
             }
         }
