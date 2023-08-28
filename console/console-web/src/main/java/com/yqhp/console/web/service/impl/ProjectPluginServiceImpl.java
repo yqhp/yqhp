@@ -59,7 +59,7 @@ public class ProjectPluginServiceImpl
 
         try {
             if (!save(projectPlugin)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PROJECT_PLUGIN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PROJECT_PLUGIN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PROJECT_PLUGIN);
@@ -75,7 +75,7 @@ public class ProjectPluginServiceImpl
 
         try {
             if (!updateById(projectPlugin)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PROJECT_PLUGIN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PROJECT_PLUGIN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PROJECT_PLUGIN);
@@ -85,7 +85,7 @@ public class ProjectPluginServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAILED);
         }
     }
 
@@ -95,7 +95,7 @@ public class ProjectPluginServiceImpl
         query.eq(ProjectPlugin::getProjectId, param.getProjectId());
         query.eq(ProjectPlugin::getPluginId, param.getPluginId());
         if (!remove(query)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_PLUGIN_FAILED);
         }
     }
 

@@ -29,7 +29,7 @@ public abstract class AndroidDeviceChangeListener
 
     @Override
     public void deviceConnected(IDevice device) {
-        log.info("[{}]device connected, deviceState={}", device.getSerialNumber(), device.getState());
+        log.info("[{}]Device connected, deviceState={}", device.getSerialNumber(), device.getState());
         if (device.isOnline()) {
             online(new AndroidDevice(device));
         }
@@ -37,13 +37,13 @@ public abstract class AndroidDeviceChangeListener
 
     @Override
     public void deviceDisconnected(IDevice device) {
-        log.info("[{}]device disconnected, deviceState={}", device.getSerialNumber(), device.getState());
+        log.info("[{}]Device disconnected, deviceState={}", device.getSerialNumber(), device.getState());
         offline(new AndroidDevice(device));
     }
 
     @Override
     public void deviceChanged(IDevice device, int changeMask) {
-        log.info("[{}]device changed, deviceState={}, changeMask={}",
+        log.info("[{}]Device changed, deviceState={}, changeMask={}",
                 device.getSerialNumber(), device.getState(), changeMask);
         if (changeMask == IDevice.CHANGE_STATE) {
             if (device.isOnline()) {

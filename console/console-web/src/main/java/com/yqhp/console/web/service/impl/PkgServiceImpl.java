@@ -75,7 +75,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
         try {
             if (!save(pkg)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PKG_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PKG_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PKG);
@@ -106,7 +106,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         }
 
         if (!removeByIds(pkgIds)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PKG_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PKG_FAILED);
         }
     }
 
@@ -171,7 +171,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
         );
         try {
             if (!updateBatchById(toUpdatePkgs)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PKG);
@@ -184,7 +184,7 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
 
         try {
             if (!updateById(pkg)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PKG_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PKG);

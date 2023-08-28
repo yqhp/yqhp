@@ -59,7 +59,7 @@ public class UserProjectServiceImpl
 
         try {
             if (!save(userProject)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_USER_PROJECT_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_USER_PROJECT_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_USER_PROJECT);
@@ -75,7 +75,7 @@ public class UserProjectServiceImpl
 
         try {
             if (!updateById(userProject)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_USER_PROJECT_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_USER_PROJECT_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_USER_PROJECT);
@@ -85,7 +85,7 @@ public class UserProjectServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAILED);
         }
     }
 
@@ -95,7 +95,7 @@ public class UserProjectServiceImpl
         query.eq(UserProject::getUserId, param.getUserId());
         query.eq(UserProject::getProjectId, param.getProjectId());
         if (!remove(query)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_PROJECT_FAILED);
         }
     }
 

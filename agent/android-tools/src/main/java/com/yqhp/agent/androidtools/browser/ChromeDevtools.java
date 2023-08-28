@@ -79,7 +79,7 @@ public class ChromeDevtools {
                 iDevice.removeForward(localPort);
             }
         } catch (Throwable cause) {
-            log.error("[{}]getBrowser error, socketName={}",
+            log.error("[{}]GetBrowser failed, socketName={}",
                     iDevice.getSerialNumber(), socketName, cause);
             return null;
         }

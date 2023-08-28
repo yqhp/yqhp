@@ -66,7 +66,7 @@ public class PlanDocServiceImpl
 
         try {
             if (!save(planDoc)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DOC);
@@ -93,7 +93,7 @@ public class PlanDocServiceImpl
         }).collect(Collectors.toList());
         try {
             if (!saveBatch(planDocs)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DOC);
@@ -112,7 +112,7 @@ public class PlanDocServiceImpl
         planDoc.setUpdateTime(LocalDateTime.now());
         try {
             if (!updateById(planDoc)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DOC);
@@ -123,7 +123,7 @@ public class PlanDocServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAILED);
         }
     }
 
@@ -186,7 +186,7 @@ public class PlanDocServiceImpl
         );
         try {
             if (!updateBatchById(toUpdatePlanDocs)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DOC);

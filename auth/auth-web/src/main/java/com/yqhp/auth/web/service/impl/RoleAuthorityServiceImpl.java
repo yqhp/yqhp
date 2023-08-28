@@ -75,7 +75,7 @@ public class RoleAuthorityServiceImpl
 
         try {
             if (!save(roleAuthority)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_ROLE_AUTHORITY_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_ROLE_AUTHORITY_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_ROLE_AUTHORITY);
@@ -91,7 +91,7 @@ public class RoleAuthorityServiceImpl
 
         try {
             if (!updateById(roleAuthority)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_ROLE_AUTHORITY_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_ROLE_AUTHORITY_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_ROLE_AUTHORITY);
@@ -101,7 +101,7 @@ public class RoleAuthorityServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_ROLE_AUTHORITY_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_ROLE_AUTHORITY_FAILED);
         }
     }
 

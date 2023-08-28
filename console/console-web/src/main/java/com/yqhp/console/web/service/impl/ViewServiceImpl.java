@@ -53,7 +53,7 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
         view.setUpdateBy(currUid);
 
         if (!save(view)) {
-            throw new ServiceException(ResponseCodeEnum.SAVE_VIEW_FAIL);
+            throw new ServiceException(ResponseCodeEnum.SAVE_VIEW_FAILED);
         }
 
         return getById(view.getId());
@@ -62,7 +62,7 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_VIEW_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_VIEW_FAILED);
         }
     }
 
@@ -74,7 +74,7 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
         view.setUpdateTime(LocalDateTime.now());
 
         if (!updateById(view)) {
-            throw new ServiceException(ResponseCodeEnum.UPDATE_VIEW_FAIL);
+            throw new ServiceException(ResponseCodeEnum.UPDATE_VIEW_FAILED);
         }
         return getById(id);
     }

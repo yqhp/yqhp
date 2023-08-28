@@ -40,10 +40,10 @@ public class PluginServiceImpl implements PluginService {
 
     public PluginServiceImpl(AgentProperties agentProperties) {
         String baseDir = agentProperties.getPlugin().getBaseDir();
-        log.info("plugin base dir: {}", baseDir);
+        log.info("Plugin base dir: {}", baseDir);
         baseDirectory = new File(baseDir);
         if (!baseDirectory.exists() && !baseDirectory.mkdirs()) {
-            throw new IllegalStateException("mk plugin base dir fail, dir=" + baseDir);
+            throw new IllegalStateException("Mk plugin base dir failed, dir=" + baseDir);
         }
     }
 
@@ -56,7 +56,7 @@ public class PluginServiceImpl implements PluginService {
         synchronized (plugin.getId().intern()) {
             File pluginDir = new File(baseDirectory, plugin.getId());
             if (!pluginDir.exists() && !pluginDir.mkdir()) {
-                throw new IOException("mk plugin dir fail, dir=" + pluginDir);
+                throw new IOException("Mk plugin dir failed, dir=" + pluginDir);
             }
 
             List<File> files = new ArrayList<>(plugin.getFiles().size());
@@ -65,12 +65,12 @@ public class PluginServiceImpl implements PluginService {
                 if (!file.exists()) {
                     // 先下载到临时文件再重命名，防止下载过程被中断，下次文件存在
                     File tmpFile = new File(pluginDir, fileInfo.getName() + ".tmp");
-                    log.info("[plugin][{}][{}]download from {}", plugin.getName(), fileInfo.getName(), fileInfo.getUrl());
+                    log.info("[plugin][{}][{}]Download from {}", plugin.getName(), fileInfo.getName(), fileInfo.getUrl());
                     FileUtils.download(fileInfo.getUrl(), tmpFile);
                     if (!tmpFile.renameTo(file)) {
-                        throw new IOException(tmpFile + " renameTo " + file + " fail");
+                        throw new IOException(tmpFile + " renameTo " + file + " failed");
                     }
-                    log.info("[plugin][{}][{}]downloaded -> {}", plugin.getName(), fileInfo.getName(), file);
+                    log.info("[plugin][{}][{}]Downloaded -> {}", plugin.getName(), fileInfo.getName(), file);
                 }
                 files.add(file);
             }

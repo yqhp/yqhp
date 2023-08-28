@@ -70,12 +70,12 @@ public class TaskJob {
                 try {
                     task = executionRecordRpc.receiveTask(driver.getDeviceId());
                 } catch (Throwable cause) {
-                    log.error("[{}]failed to receive task", driver.getDeviceId(), cause);
+                    log.error("[{}]Failed to receive task", driver.getDeviceId(), cause);
                 }
                 if (task == null) {
                     return;
                 }
-                log.info("[{}]task received, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
+                log.info("[{}]Task received, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
 
                 // 锁定设备
                 String planName = task.getExecutionRecord().getPlan().getName();
@@ -83,12 +83,12 @@ public class TaskJob {
 
                 // 执行任务
                 try {
-                    log.info("[{}]task started, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
+                    log.info("[{}]Task started, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
                     taskService.execute(driver, task);
                 } catch (Throwable cause) {
-                    log.error("[{}]unexpected error, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId(), cause);
+                    log.error("[{}]Unexpected error, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId(), cause);
                 } finally {
-                    log.info("[{}]task finished, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
+                    log.info("[{}]Task finished, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
                     deviceService.unlockDevice(token);
                 }
             });
@@ -105,7 +105,7 @@ public class TaskJob {
         if (task == null) {
             return;
         }
-        log.info("task received, executionId={}", task.getExecutionRecord().getId());
+        log.info("Task received, executionId={}", task.getExecutionRecord().getId());
 
         // 当线程池所有线程都在执行任务，submit将会阻塞，直到有空闲线程
         NO_DEVICE_THREAD_POOL.submit(() -> {
@@ -113,12 +113,12 @@ public class TaskJob {
             String token = agentService.register(planName);
             Driver driver = agentService.getDriverByToken(token);
             try {
-                log.info("task started, executionId={}", task.getExecutionRecord().getId());
+                log.info("Task started, executionId={}", task.getExecutionRecord().getId());
                 taskService.execute(driver, task);
             } catch (Throwable cause) {
-                log.error("unexpected error, executionId={}", task.getExecutionRecord().getId(), cause);
+                log.error("Unexpected error, executionId={}", task.getExecutionRecord().getId(), cause);
             } finally {
-                log.info("task finished, executionId={}", task.getExecutionRecord().getId());
+                log.info("Task finished, executionId={}", task.getExecutionRecord().getId());
                 agentService.unregister(token);
             }
         });

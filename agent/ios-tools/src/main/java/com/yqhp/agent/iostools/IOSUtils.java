@@ -59,7 +59,7 @@ public class IOSUtils {
                 }).collect(Collectors.toSet());
             }
         } catch (Exception e) {
-            log.error("execute '{}' err", LIST_BOOTED_SIMULATOR_CMD, e);
+            log.error("Failed to execute: {}", LIST_BOOTED_SIMULATOR_CMD, e);
         }
 
         return new HashSet<>();

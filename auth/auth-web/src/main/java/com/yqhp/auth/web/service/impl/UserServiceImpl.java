@@ -74,7 +74,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         try {
             if (!save(user)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_USER_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_USER_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_USER);
@@ -90,7 +90,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException(ResponseCodeEnum.ADMIN_CANNOT_BE_DELETED);
         }
         if (!removeById(userId)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_USER_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_FAILED);
         }
     }
 
@@ -101,7 +101,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
         if (!updateById(user)) {
-            throw new ServiceException(ResponseCodeEnum.UPDATE_USER_FAIL);
+            throw new ServiceException(ResponseCodeEnum.UPDATE_USER_FAILED);
         }
         return getById(userId);
     }
@@ -134,7 +134,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
         if (!updateById(user)) {
-            throw new ServiceException(ResponseCodeEnum.RESET_PASSWORD_FAIL);
+            throw new ServiceException(ResponseCodeEnum.RESET_PASSWORD_FAILED);
         }
     }
 
@@ -184,7 +184,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
         if (!updateById(user)) {
-            throw new ServiceException(ResponseCodeEnum.CHANGE_STATUS_FAIL);
+            throw new ServiceException(ResponseCodeEnum.CHANGE_STATUS_FAILED);
         }
     }
 

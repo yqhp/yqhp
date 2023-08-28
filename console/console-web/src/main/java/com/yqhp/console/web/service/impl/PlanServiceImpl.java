@@ -94,7 +94,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         plan.setUpdateBy(currUid);
         try {
             if (!save(plan)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN);
@@ -112,7 +112,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
 
         try {
             if (!updateById(plan)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN);
@@ -123,7 +123,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_FAILED);
         }
     }
 

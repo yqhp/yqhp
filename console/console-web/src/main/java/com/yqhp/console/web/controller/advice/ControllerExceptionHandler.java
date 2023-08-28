@@ -61,7 +61,7 @@ public class ControllerExceptionHandler {
             throw (AccessDeniedException) e;
         }
 
-        log.error("unexpected exception", e);
+        log.error("Unexpected exception", e);
 
         return new Response<>(ResponseCodeEnum.INTERNAL_SERVER_ERROR);
     }

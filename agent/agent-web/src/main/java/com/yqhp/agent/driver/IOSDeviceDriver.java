@@ -32,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.File;
 import java.net.URL;
@@ -98,21 +100,20 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    protected IOSDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities) {
+    protected RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities) {
         // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
-
         if (capabilities.getCapability("skipLogCapture") == null) {
             capabilities.setCapability("skipLogCapture", true);
         }
 
-        IOSDriver iosDriver = new IOSDriver(appiumServiceURL, capabilities);
+        IOSDriver iosDriver = new IOSDriver(service.getUrl(), capabilities);
         // wdaSessionId 与 driver.getSessionId() 不一样
         wdaSessionId = WdaUtils.getSessionId(wdaUrl);
-        log.info("[ios][{}]iosDriver wdaSessionId={}", device.getId(), wdaSessionId);
+        log.info("[ios][{}]IOSDriver wdaSessionId={}", device.getId(), wdaSessionId);
 
         // https://appium.github.io/appium-xcuitest-driver/4.33/settings/
         iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
@@ -126,7 +127,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
      */
     public void createWdaSession() {
         wdaSessionId = WdaUtils.createSession(wdaUrl, Map.of());
-        log.info("[ios][{}]manual wdaSessionId={}", device.getId(), wdaSessionId);
+        log.info("[ios][{}]Manual wdaSessionId={}", device.getId(), wdaSessionId);
     }
 
     public synchronized String runWdaIfNeeded() {
@@ -135,49 +136,49 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
         }
 
         try {
-            log.info("[ios][{}]run wda, bundleId={}", device.getId(), Properties.getWdaBundleId());
+            log.info("[ios][{}]Run wda, bundleId={}", device.getId(), Properties.getWdaBundleId());
             wdaDestroyer = WdaUtils.run(device.getId(), Properties.getWdaBundleId());
 
             int wdaLocalPort = LocalPortProvider.getWdaAvailablePort();
-            log.info("[ios][{}]wda forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
+            log.info("[ios][{}]Wda forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
             wdaForwardDestroyer = IOSUtils.forward(device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
 
             String wdaLocalUrl = "http://localhost:" + wdaLocalPort;
             String checkUrl = wdaLocalUrl + "/status";
-            log.info("[ios][{}]check wda status, checkUrl={}", device.getId(), checkUrl);
+            log.info("[ios][{}]Check wda status, checkUrl={}", device.getId(), checkUrl);
             new UrlChecker().waitUntilAvailable(30, TimeUnit.SECONDS, new URL(checkUrl));
-            log.info("[ios][{}]wda is running", device.getId());
+            log.info("[ios][{}]Wda is running", device.getId());
             wdaUrl = wdaLocalUrl;
             return wdaUrl;
         } catch (Exception e) {
-            throw new RuntimeException("run wda failed. device=" + device.getId(), e);
+            throw new RuntimeException("Run wda failed. device=" + device.getId(), e);
         }
     }
 
     public String getWdaMjpegUrl() {
         try {
             int mjpegLocalPort = LocalPortProvider.getWdaMjpegAvailablePort();
-            log.info("[ios][{}]wdaMjpeg forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
+            log.info("[ios][{}]WdaMjpeg forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
             wdaMjpegForwardDestroyer = IOSUtils.forward(device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
             return "http://localhost:" + mjpegLocalPort;
         } catch (Exception e) {
-            throw new RuntimeException("get wdaMjpegUrl failed. device=" + device.getId(), e);
+            throw new RuntimeException("Get wdaMjpegUrl failed. device=" + device.getId(), e);
         }
     }
 
     public synchronized void releaseWda() {
         if (wdaDestroyer != null) {
-            log.info("[ios][{}]destroy wda", device.getId());
+            log.info("[ios][{}]Destroy wda", device.getId());
             wdaDestroyer.run();
             wdaDestroyer = null;
         }
         if (wdaForwardDestroyer != null) {
-            log.info("[ios][{}]destroy wda forward", device.getId());
+            log.info("[ios][{}]Destroy wda forward", device.getId());
             wdaForwardDestroyer.run();
             wdaForwardDestroyer = null;
         }
         if (wdaMjpegForwardDestroyer != null) {
-            log.info("[ios][{}]destroy wdaMjpeg forward", device.getId());
+            log.info("[ios][{}]Destroy wdaMjpeg forward", device.getId());
             wdaMjpegForwardDestroyer.run();
             wdaMjpegForwardDestroyer = null;
         }

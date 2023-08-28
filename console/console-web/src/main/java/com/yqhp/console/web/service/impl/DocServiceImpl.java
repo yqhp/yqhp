@@ -81,7 +81,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
         try {
             if (!save(doc)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_DOC);
@@ -178,7 +178,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         );
         try {
             if (!updateBatchById(toUpdateDocs)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_DOC);
@@ -190,7 +190,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         doc.setUpdateTime(LocalDateTime.now());
         try {
             if (!updateById(doc)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_DOC_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_DOC_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_DOC);
@@ -206,7 +206,7 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
         }
         planDocService.deleteByDocId(id);
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_DOC_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_DOC_FAILED);
         }
     }
 

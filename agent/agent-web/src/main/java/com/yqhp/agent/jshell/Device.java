@@ -57,14 +57,14 @@ public class Device extends Agent {
      * @since 0.0.1
      */
     public AppiumDriver appiumDriver() {
-        return deviceDriver().getOrCreateAppiumDriver();
+        return (AppiumDriver) deviceDriver().getOrCreateWebDriver();
     }
 
     /**
      * @since 0.0.1
      */
     public AppiumDriver refreshAppiumDriver() {
-        return deviceDriver().refreshAppiumDriver();
+        return (AppiumDriver) deviceDriver().refreshWebDriver();
     }
 
     /**

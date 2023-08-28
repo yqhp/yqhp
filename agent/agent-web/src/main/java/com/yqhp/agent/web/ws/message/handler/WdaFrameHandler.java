@@ -62,17 +62,17 @@ public class WdaFrameHandler extends InputHandler {
     protected void handle(Input input) throws Exception {
         String uid = input.getUid();
 
-        os.info(uid, "run wda...");
+        os.info(uid, "Run wda...");
         driver.runWdaIfNeeded();
-        os.info(uid, "run wda successfully");
+        os.info(uid, "Run wda successfully");
 
-        log.info("[ios][{}]create wdaSession", driver.getDeviceId());
+        log.info("[ios][{}]Create wdaSession", driver.getDeviceId());
         driver.createWdaSession();
-        log.info("[ios][{}]wdaSession created", driver.getDeviceId());
+        log.info("[ios][{}]WdaSession created", driver.getDeviceId());
 
         // 获取逻辑分辨率传给前端，后续坐标相关操作，基于该分辨率
         Size size = WdaUtils.getLogicalScreenSize(driver.getWdaUrl(), driver.getWdaSessionId());
-        log.info("[ios][{}]logical screen size: {}", driver.getDeviceId(), size);
+        log.info("[ios][{}]Logical screen size: {}", driver.getDeviceId(), size);
         os.info(uid, size);
 
         String wdaMjpegUrl = driver.getWdaMjpegUrl();
@@ -83,13 +83,13 @@ public class WdaFrameHandler extends InputHandler {
         for (; ; ) {
             try {
                 connectCount++;
-                log.info("[ios][{}]connect to wdaMjpegUrl {} ..{}", driver.getDeviceId(), wdaMjpegUrl, connectCount);
+                log.info("[ios][{}]Connect to wdaMjpegUrl {} ..{}", driver.getDeviceId(), wdaMjpegUrl, connectCount);
                 conn.connect();
-                log.info("[ios][{}]wdaMjpegUrl connected", driver.getDeviceId());
-                os.info(uid, "wdaMjpegUrl connected");
+                log.info("[ios][{}]WdaMjpegUrl connected", driver.getDeviceId());
+                os.info(uid, "WdaMjpegUrl connected");
                 break;
             } catch (Exception e) {
-                log.info("[ios][{}]connect to wdaMjpegUrl failed, reason={}", driver.getDeviceId(), e.getMessage());
+                log.info("[ios][{}]Connect to wdaMjpegUrl failed, reason={}", driver.getDeviceId(), e.getMessage());
                 if (connectCount == 10) {
                     throw new IllegalStateException("cannot connect to wdaMjpegUrl " + wdaMjpegUrl);
                 }
@@ -101,15 +101,15 @@ public class WdaFrameHandler extends InputHandler {
         Thread sendFrameThread = new Thread(() -> {
             RemoteEndpoint.Basic remote = session.getBasicRemote();
             try {
-                os.ok(uid, "start sending frames...");
-                log.info("[ios][{}]start sending frames...", driver.getDeviceId());
+                os.ok(uid, "Start sending frames...");
+                log.info("[ios][{}]Start sending frames...", driver.getDeviceId());
                 while (session.isOpen()) {
                     byte[] frame = blockingQueue.take();// 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     remote.sendBinary(ByteBuffer.wrap(frame));
                 }
-                log.info("[ios][{}]stop sending frames", driver.getDeviceId());
+                log.info("[ios][{}]Stop sending frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[ios][{}]stop sending frames, cause: {}", driver.getDeviceId(),
+                log.info("[ios][{}]Stop sending frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
@@ -117,7 +117,7 @@ public class WdaFrameHandler extends InputHandler {
 
         READ_FRAME_THREAD_POOL.submit(() -> {
             try {
-                log.info("[ios][{}]start reading frames", driver.getDeviceId());
+                log.info("[ios][{}]Start reading frames", driver.getDeviceId());
                 try (InputStream is = conn.getInputStream();
                      MjpegInputStream mis = new MjpegInputStream(is)) {
                     while (session.isOpen()) {
@@ -125,9 +125,9 @@ public class WdaFrameHandler extends InputHandler {
                         blockingQueue.put(frame);
                     }
                 }
-                log.info("[ios][{}]stop reading frames", driver.getDeviceId());
+                log.info("[ios][{}]Stop reading frames", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[ios][{}]stop reading frames, cause: {}", driver.getDeviceId(),
+                log.info("[ios][{}]Stop reading frames, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
                 conn.disconnect();

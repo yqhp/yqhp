@@ -57,7 +57,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
 
         try {
             if (!save(userRole)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_USER_ROLE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_USER_ROLE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_USER_ROLE);
@@ -73,7 +73,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
 
         try {
             if (!updateById(userRole)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_USER_ROLE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_USER_ROLE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_USER_ROLE);
@@ -83,7 +83,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_USER_ROLE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_ROLE_FAILED);
         }
     }
 
@@ -93,7 +93,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
         query.eq(UserRole::getUserId, param.getUserId());
         query.eq(UserRole::getRoleId, param.getRoleId());
         if (!remove(query)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_USER_ROLE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_USER_ROLE_FAILED);
         }
     }
 

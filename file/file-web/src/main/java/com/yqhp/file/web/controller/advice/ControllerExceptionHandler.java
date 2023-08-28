@@ -53,7 +53,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public Response handleException(Exception e) {
-        log.error("unexpected exception", e);
+        log.error("Unexpected exception", e);
         return new Response<>(ResponseCodeEnum.INTERNAL_SERVER_ERROR);
     }
 
@@ -129,7 +129,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MinioException.class)
     public Response handleMinioException(MinioException e) {
-        log.error("minio err", e);
+        log.error("Minio err", e);
         return new Response<>(ResponseCodeEnum.OSS_ERROR, e.getCause().getMessage());
     }
 

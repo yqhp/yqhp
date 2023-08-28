@@ -43,7 +43,7 @@ public class AgentServiceImpl implements AgentService {
     public String register(String user) {
         String token = UUIDUtils.getUUID();
         REGISTERED_DRIVERS.put(token, new Driver());
-        log.info("register by {}, token={}", user, token);
+        log.info("Register by {}, token={}", user, token);
         return token;
     }
 
@@ -61,6 +61,6 @@ public class AgentServiceImpl implements AgentService {
         } finally {
             REGISTERED_DRIVERS.remove(token);
         }
-        log.info("unregister, token={}", token);
+        log.info("Unregister, token={}", token);
     }
 }

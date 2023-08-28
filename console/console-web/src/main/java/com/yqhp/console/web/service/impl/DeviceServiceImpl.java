@@ -136,7 +136,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         device.setUpdateTime(LocalDateTime.now());
 
         if (!updateById(device)) {
-            throw new ServiceException(ResponseCodeEnum.UPDATE_DEVICE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.UPDATE_DEVICE_FAILED);
         }
 
         return getById(id);
@@ -151,7 +151,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_DEVICE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_DEVICE_FAILED);
         }
     }
 

@@ -89,7 +89,7 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
 
         try {
             if (!save(plugin)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLUGIN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLUGIN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLUGIN);
@@ -107,7 +107,7 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
 
         try {
             if (!updateById(plugin)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLUGIN_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLUGIN_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLUGIN);
@@ -133,7 +133,7 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
             throw new ServiceException(ResponseCodeEnum.PROJECT_IN_USE, msg);
         }
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLUGIN_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PLUGIN_FAILED);
         }
     }
 

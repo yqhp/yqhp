@@ -40,7 +40,7 @@ public class AppiumServer {
             appiumVersion = Terminal.execute(cmd);
             log.info("AppiumVersion: {}", appiumVersion);
         } catch (IOException e) {
-            log.error("exec: {}, io err", cmd, e);
+            log.error("Failed to exec: {}", cmd, e);
             return null;
         }
 

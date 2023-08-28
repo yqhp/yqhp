@@ -49,7 +49,7 @@ public class Scrcpy {
     public synchronized void start(String scrcpyServerFilePath, String scrcpyVersion, ScrcpyOptions options,
                                    int localPort, Duration timeout, Executor executor) {
         if (running)
-            throw new ScrcpyException("scrcpy is running");
+            throw new ScrcpyException("Scrcpy is running");
 
         pushScrcpyServerFileToDevice(scrcpyServerFilePath);
         running = true; // 为了防止isCancelled返回true导致scrcpy退出，先把running变为true
@@ -64,7 +64,7 @@ public class Scrcpy {
                     .add(scrcpyOptions.asString())
                     .toString();
             try {
-                log.info("[{}]start scrcpy: {}", iDevice.getSerialNumber(), startScrcpyCmd);
+                log.info("[{}]Start scrcpy: {}", iDevice.getSerialNumber(), startScrcpyCmd);
                 iDevice.executeShellCommand(startScrcpyCmd, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
@@ -82,9 +82,9 @@ public class Scrcpy {
                     }
                 }, 0, TimeUnit.SECONDS);
             } catch (Exception e) {
-                log.error("[{}]start scrcpy err", iDevice.getSerialNumber(), e);
+                log.error("[{}]Start scrcpy failed", iDevice.getSerialNumber(), e);
             }
-            log.info("[{}]scrcpy stopped", iDevice.getSerialNumber());
+            log.info("[{}]Scrcpy stopped", iDevice.getSerialNumber());
         };
 
         // 启动scrcpy
@@ -106,7 +106,7 @@ public class Scrcpy {
             throw new ScrcpyException(e);
         }
 
-        log.info("[{}]scrcpy started", iDevice.getSerialNumber());
+        log.info("[{}]Scrcpy started", iDevice.getSerialNumber());
     }
 
     public synchronized void stop() {
@@ -117,7 +117,7 @@ public class Scrcpy {
 
     private void pushScrcpyServerFileToDevice(String scrcpyServerFilePath) {
         try {
-            log.info("[{}]push {} to device:{}", iDevice.getSerialNumber(), scrcpyServerFilePath, REMOTE_SCRCPY_PATH);
+            log.info("[{}]Push {} to device:{}", iDevice.getSerialNumber(), scrcpyServerFilePath, REMOTE_SCRCPY_PATH);
             iDevice.pushFile(scrcpyServerFilePath, REMOTE_SCRCPY_PATH);
         } catch (Exception e) {
             throw new ScrcpyException(e);

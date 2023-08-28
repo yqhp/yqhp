@@ -58,7 +58,7 @@ public class PluginFileServiceImpl
 
         try {
             if (!save(pluginFile)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLUGIN_FILE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLUGIN_FILE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLUGIN_FILE);
@@ -74,7 +74,7 @@ public class PluginFileServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLUGIN_FILE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PLUGIN_FILE_FAILED);
         }
     }
 

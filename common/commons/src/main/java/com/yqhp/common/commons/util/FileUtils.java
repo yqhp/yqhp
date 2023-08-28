@@ -70,7 +70,7 @@ public class FileUtils {
             // 文件存放路径
             File fileDir = new File(directory, urlMd5);
             if (!fileDir.exists() && !fileDir.mkdirs()) {
-                throw new IOException("mkdirs err, dirs=" + fileDir);
+                throw new IOException("Failed to mkdirs, dirs=" + fileDir);
             }
             File file = new File(fileDir, filename);
             if (!file.exists()) {
@@ -78,7 +78,7 @@ public class FileUtils {
                 File tmpFile = new File(fileDir, filename + ".tmp");
                 download(url, tmpFile);
                 if (!tmpFile.renameTo(file)) {
-                    throw new IOException(tmpFile + " renameTo " + file + " fail");
+                    throw new IOException(tmpFile + " renameTo " + file + " failed");
                 }
             }
             return file;

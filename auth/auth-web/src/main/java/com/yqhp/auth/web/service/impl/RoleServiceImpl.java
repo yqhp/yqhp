@@ -81,7 +81,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         try {
             if (!save(role)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_ROLE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_ROLE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_ROLE);
@@ -97,7 +97,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         try {
             if (!updateById(role)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_ROLE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_ROLE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_ROLE);
@@ -107,7 +107,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_ROLE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_ROLE_FAILED);
         }
     }
 

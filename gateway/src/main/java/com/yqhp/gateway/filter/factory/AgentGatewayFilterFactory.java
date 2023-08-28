@@ -71,7 +71,7 @@ public class AgentGatewayFilterFactory
                     Map<String, Object> attributes = exchange.getAttributes();
                     attributes.put(GATEWAY_REQUEST_URL_ATTR, agentUri);
                 } catch (MalformedURLException | URISyntaxException e) {
-                    log.error("invalid url: {}", agentUrl, e);
+                    log.error("Invalid url: {}", agentUrl, e);
                 }
             }
 

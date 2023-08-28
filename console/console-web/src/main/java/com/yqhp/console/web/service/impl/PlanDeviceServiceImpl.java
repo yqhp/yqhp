@@ -68,7 +68,7 @@ public class PlanDeviceServiceImpl
         planDevice.setUpdateBy(currUid);
         try {
             if (!save(planDevice)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DEVICE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DEVICE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
@@ -95,7 +95,7 @@ public class PlanDeviceServiceImpl
         }).collect(Collectors.toList());
         try {
             if (!saveBatch(planDevices)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DEVICE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PLAN_DEVICE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
@@ -114,7 +114,7 @@ public class PlanDeviceServiceImpl
         planDevice.setUpdateTime(LocalDateTime.now());
         try {
             if (!updateById(planDevice)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DEVICE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DEVICE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);
@@ -125,7 +125,7 @@ public class PlanDeviceServiceImpl
     @Override
     public void deleteById(String id) {
         if (!removeById(id)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DEVICE_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DEVICE_FAILED);
         }
     }
 
@@ -185,7 +185,7 @@ public class PlanDeviceServiceImpl
         );
         try {
             if (!updateBatchById(toUpdatePlanDevices)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DEVICE_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PLAN_DEVICE_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PLAN_DEVICE);

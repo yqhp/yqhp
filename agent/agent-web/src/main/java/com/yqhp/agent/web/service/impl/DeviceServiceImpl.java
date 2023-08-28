@@ -33,6 +33,7 @@ import com.yqhp.console.repository.enums.DeviceType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.openqa.selenium.OutputType;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
@@ -229,11 +230,11 @@ public class DeviceServiceImpl implements DeviceService {
             appFile = MultipartFileUtils.toTempFile(app);
             deviceDriver.installApp(appFile);
         } catch (Exception e) {
-            log.error("install {} err", app.getOriginalFilename(), e);
-            throw new ServiceException(ResponseCodeEnum.INSTALL_APP_FAIL, e.getMessage());
+            log.error("Install {} failed", app.getOriginalFilename(), e);
+            throw new ServiceException(ResponseCodeEnum.INSTALL_APP_FAILED, e.getMessage());
         } finally {
             if (appFile != null && !appFile.delete()) {
-                log.warn("delete {} fail", appFile);
+                log.warn("Delete {} failed", appFile);
             }
         }
     }
@@ -264,10 +265,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     private String screenshot(DeviceDriver deviceDriver) {
         try {
-            return deviceDriver.screenshotAsBase64();
+            return deviceDriver.screenshotAs(OutputType.BASE64);
         } catch (Exception e) {
-            log.error("[{}]screenshot err", deviceDriver.getDeviceId(), e);
-            throw new ServiceException(ResponseCodeEnum.SCREENSHOT_FAIL, e.getMessage());
+            log.error("[{}]Screenshot failed", deviceDriver.getDeviceId(), e);
+            throw new ServiceException(ResponseCodeEnum.SCREENSHOT_FAILED, e.getMessage());
         }
     }
 

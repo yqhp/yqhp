@@ -36,7 +36,7 @@ public class WebsocketHeartbeatJob {
             try {
                 openingSession.getBasicRemote().sendText("pong");
             } catch (IOException e) {
-                log.error("[{}]send heartbeat err", openingSession.getId(), e);
+                log.error("[{}]Send heartbeat failed", openingSession.getId(), e);
             }
         }
     }

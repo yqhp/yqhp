@@ -28,8 +28,8 @@ public enum ResponseCodeEnum implements ResponseCode {
     DEVICE_NOT_FOUND(1000, "设备不存在"),
     DEVICE_LOCKED(1001, "设备已锁定"),
     INVALID_DEVICE_TOKEN(1002, "非法设备token"),
-    INSTALL_APP_FAIL(1003, "安装APP失败"),
-    SCREENSHOT_FAIL(1004, "截图失败"),
+    INSTALL_APP_FAILED(1003, "安装APP失败"),
+    SCREENSHOT_FAILED(1004, "截图失败"),
 
     INVALID_AGENT_TOKEN(2000, "非法agent token"),
     ;

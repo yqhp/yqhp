@@ -32,7 +32,7 @@ public class ApplicationContextUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
-        log.info("setApplicationContext");
+        log.info("SetApplicationContext");
         ApplicationContextUtils.context = context;
     }
 

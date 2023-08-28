@@ -57,11 +57,11 @@ public class Driver {
         if (jshellContext == null) {
             synchronized (this) {
                 if (jshellContext == null) {
-                    log.info("init jshellContext...");
+                    log.info("Init jshellContext...");
                     jshellContext = new JShellContext();
                     jshellContext.injectVar(new Logger(this));
                     injectVar(jshellContext);
-                    log.info("jshellContext inited");
+                    log.info("JshellContext inited");
                 }
             }
         }
@@ -110,13 +110,13 @@ public class Driver {
     }
 
     public void jshellAddToClasspath(String path) {
-        Assert.hasText(path, "path must has text");
+        Assert.hasText(path, "Path must has text");
         getOrCreateJShellContext().getJShellX().getJShell().addToClasspath(path);
     }
 
     public synchronized void closeJShellContext() {
         if (jshellContext != null) {
-            log.info("close jshellContext");
+            log.info("Close jshellContext");
             jshellContext.close();
             jshellContext = null;
         }
@@ -125,9 +125,9 @@ public class Driver {
     public synchronized ThreadGroup getOrCreateThreadGroup() {
         if (threadGroup == null) {
             String threadGroupName = "driver-" + THREAD_GROUP_ID.getAndIncrement();
-            log.info("init threadGroup, name={}", threadGroupName);
+            log.info("Init threadGroup, name={}", threadGroupName);
             threadGroup = new ThreadGroup(threadGroupName);
-            log.info("threadGroup inited, name={}", threadGroupName);
+            log.info("ThreadGroup inited, name={}", threadGroupName);
         }
         return threadGroup;
     }
@@ -142,7 +142,7 @@ public class Driver {
 
     public synchronized void stopThreadGroup() {
         if (threadGroup != null) {
-            log.info("stop threadGroup, name={}", threadGroup.getName());
+            log.info("Stop threadGroup, name={}", threadGroup.getName());
             threadGroup.stop();
             threadGroup = null;
         }
@@ -157,7 +157,7 @@ public class Driver {
 
     public void clearLogs() {
         if (!logs.isEmpty()) {
-            log.info("clear Logs");
+            log.info("Clear Logs");
             logs.clear();
         }
     }
@@ -168,7 +168,7 @@ public class Driver {
 
     public void clearLogConsumers() {
         if (!logConsumers.isEmpty()) {
-            log.info("clear logConsumers");
+            log.info("Clear logConsumers");
             logConsumers.clear();
         }
     }

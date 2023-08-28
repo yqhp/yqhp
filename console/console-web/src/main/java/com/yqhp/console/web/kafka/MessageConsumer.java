@@ -45,7 +45,7 @@ public class MessageConsumer {
             DocExecutionRecordMessage message = JacksonUtils.readValue(record.value(), DocExecutionRecordMessage.class);
             docExecutionRecordService.updateById(message.convertTo());
         } catch (Throwable cause) {
-            log.error("consumeDocExecutionRecordMessage failed, message={}", record.value(), cause);
+            log.error("Consume docExecutionRecordMessage failed, message={}", record.value(), cause);
         }
     }
 
@@ -55,7 +55,7 @@ public class MessageConsumer {
             PluginExecutionRecordMessage message = JacksonUtils.readValue(record.value(), PluginExecutionRecordMessage.class);
             pluginExecutionRecordService.updateById(message.convertTo());
         } catch (Throwable cause) {
-            log.error("consumePluginExecutionRecordMessage failed, message={}", record.value(), cause);
+            log.error("Consume pluginExecutionRecordMessage failed, message={}", record.value(), cause);
         }
     }
 }

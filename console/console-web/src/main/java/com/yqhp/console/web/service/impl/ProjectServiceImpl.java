@@ -62,7 +62,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         try {
             if (!save(project)) {
-                throw new ServiceException(ResponseCodeEnum.SAVE_PROJECT_FAIL);
+                throw new ServiceException(ResponseCodeEnum.SAVE_PROJECT_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PROJECT);
@@ -74,7 +74,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void deleteById(String projectId) {
         if (!removeById(projectId)) {
-            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_FAIL);
+            throw new ServiceException(ResponseCodeEnum.DEL_PROJECT_FAILED);
         }
     }
 
@@ -87,7 +87,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         try {
             if (!updateById(project)) {
-                throw new ServiceException(ResponseCodeEnum.UPDATE_PROJECT_FAIL);
+                throw new ServiceException(ResponseCodeEnum.UPDATE_PROJECT_FAILED);
             }
         } catch (DuplicateKeyException e) {
             throw new ServiceException(ResponseCodeEnum.DUPLICATE_PROJECT);

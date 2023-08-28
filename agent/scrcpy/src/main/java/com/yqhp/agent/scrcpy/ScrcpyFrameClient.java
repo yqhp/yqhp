@@ -54,7 +54,7 @@ public class ScrcpyFrameClient {
         this.scrcpyOptions = scrcpyOptions;
         if (scrcpyOptions.isTunnelForward()) {
             try {
-                log.info("[{}]adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
+                log.info("[{}]Adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
                 iDevice.createForward(localPort, REMOTE_SOCKET_NAME, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
             } catch (Exception e) {
                 throw new ScrcpyException(e);
@@ -70,7 +70,7 @@ public class ScrcpyFrameClient {
         while (scrcpyOptions.isSendDummyByte() && socketChannel.read(dummy) != 1) {
             socketChannel.close();
             if (System.currentTimeMillis() > timeoutMs) {
-                throw new ScrcpyException("read dummy byte timeout in " + readTimeout);
+                throw new ScrcpyException("Read dummy byte timeout in " + readTimeout);
             }
             try {
                 Thread.sleep(400);
@@ -81,26 +81,26 @@ public class ScrcpyFrameClient {
             socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", localPort));
         }
 
-        log.info("[{}]frameSocketChannel connected", iDevice.getSerialNumber());
+        log.info("[{}]FrameSocketChannel connected", iDevice.getSerialNumber());
     }
 
     void disconnect() {
         if (socketChannel != null) {
             try {
-                log.info("[{}]close frameSocketChannel", iDevice.getSerialNumber());
+                log.info("[{}]Close frameSocketChannel", iDevice.getSerialNumber());
                 socketChannel.close();
                 socketChannel = null;
             } catch (IOException e) {
-                log.warn("[{}]close frameSocketChannel io err", iDevice.getSerialNumber(), e);
+                log.warn("[{}]Close frameSocketChannel failed", iDevice.getSerialNumber(), e);
             }
         }
         if (localPort > 0) {
             if (scrcpyOptions.isTunnelForward()) {
                 try {
-                    log.info("[{}]adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
+                    log.info("[{}]Adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, REMOTE_SOCKET_NAME);
                     iDevice.removeForward(localPort);
                 } catch (Exception e) {
-                    log.warn("[{}]adb remove forward err", iDevice.getSerialNumber(), e);
+                    log.warn("[{}]Adb remove forward failed", iDevice.getSerialNumber(), e);
                 }
             } else {
                 // todo iDevice.removeReverse
@@ -121,7 +121,7 @@ public class ScrcpyFrameClient {
             int width = widthBuffer.order(ByteOrder.BIG_ENDIAN).getShort();
             heightBuffer.flip();
             int height = heightBuffer.order(ByteOrder.BIG_ENDIAN).getShort();
-            log.info("[{}]scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
+            log.info("[{}]Scrcpy: width={}, height={}", iDevice.getSerialNumber(), width, height);
             screenSize = new Size(width, height);
         }
     }

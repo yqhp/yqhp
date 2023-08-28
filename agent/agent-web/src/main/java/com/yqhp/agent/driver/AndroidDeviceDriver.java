@@ -36,9 +36,10 @@ import io.appium.java_client.remote.MobilePlatform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -91,28 +92,24 @@ public class AndroidDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    protected AndroidDriver newAppiumDriver(URL appiumServiceURL, DesiredCapabilities capabilities) {
+    protected RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities) {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
-
         if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
             // 默认uiautomator2
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
         }
-
         if (capabilities.getCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS) == null) {
             capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         }
-
         // 本地端口 -> 设备uiautomator2/espresso服务端口
         capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, LocalPortProvider.getAppiumAndroidSystemAvailablePort());
-
         if (capabilities.getCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE) == null) {
             // appium默认会执行logcat，关闭logcat捕获提升性能
             capabilities.setCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE, true);
         }
 
-        AndroidDriver androidDriver = new AndroidDriver(appiumServiceURL, capabilities);
+        AndroidDriver androidDriver = new AndroidDriver(service.getUrl(), capabilities);
         // appium-uiautomator2-server在很多地方加了Device.waitForIdle()，默认10秒
         // 导致设备在动态变化的时候很慢，如：点击，获取布局信息等
         // 设置waitForIdle超时时间为0，可以加速执行速度
@@ -127,10 +124,10 @@ public class AndroidDeviceDriver extends DeviceDriver {
     @Override
     public synchronized void receiveDeviceLog(Consumer<String> consumer) {
         if (logcatReceiverTask != null) {
-            throw new IllegalStateException("receiving");
+            throw new IllegalStateException("Receiving");
         }
 
-        log.info("[{}]receive deviceLog", device.getId());
+        log.info("[{}]Receive deviceLog", device.getId());
         this.logcatListener = messages -> {
             for (LogCatMessage message : messages) {
                 consumer.accept(message.toString());
@@ -144,7 +141,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
     @Override
     public synchronized void stopReceiveDeviceLog() {
         if (logcatReceiverTask != null) {
-            log.info("[{}]stop receive deviceLog", device.getId());
+            log.info("[{}]Stop receive deviceLog", device.getId());
             logcatReceiverTask.removeLogCatListener(logcatListener);
             logcatListener = null;
             logcatReceiverTask.stop();
