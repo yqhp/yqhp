@@ -31,9 +31,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.net.UrlChecker;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.File;
 import java.net.URL;
@@ -100,7 +98,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    protected RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities) {
+    protected RemoteWebDriver newWebDriver() {
         // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
@@ -113,7 +111,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             capabilities.setCapability("skipLogCapture", true);
         }
 
-        IOSDriver iosDriver = new IOSDriver(service.getUrl(), capabilities);
+        IOSDriver iosDriver = new IOSDriver(getOrStartDriverService().getUrl(), capabilities);
         // wdaSessionId 与 driver.getSessionId() 不一样
         wdaSessionId = WdaUtils.getSessionId(wdaUrl);
         log.info("[ios][{}]IOSDriver wdaSessionId={}", device.getId(), wdaSessionId);

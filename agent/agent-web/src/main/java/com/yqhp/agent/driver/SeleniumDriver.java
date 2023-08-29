@@ -17,6 +17,8 @@ package com.yqhp.agent.driver;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
@@ -27,7 +29,7 @@ import org.openqa.selenium.remote.service.DriverService;
 @Slf4j
 public abstract class SeleniumDriver extends Driver {
 
-    private DesiredCapabilities capabilities = new DesiredCapabilities();
+    protected DesiredCapabilities capabilities = new DesiredCapabilities();
     protected DriverService driverService;
     private RemoteWebDriver webDriver;
 
@@ -75,9 +77,15 @@ public abstract class SeleniumDriver extends Driver {
             return webDriver;
         }
         log.info("Create webDriver, capabilities: {}", capabilities);
-        webDriver = newRemoteWebDriver(getOrStartDriverService(), capabilities);
+        webDriver = newWebDriver();
         log.info("WebDriver created, capabilities: {}", capabilities);
         return webDriver;
+    }
+
+    protected RemoteWebDriver newWebDriver() {
+        ChromeOptions options = new ChromeOptions();
+        options.merge(capabilities);
+        return new ChromeDriver(options);
     }
 
     public synchronized void quitWebDriver() {
@@ -91,8 +99,6 @@ public abstract class SeleniumDriver extends Driver {
             webDriver = null;
         }
     }
-
-    protected abstract RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities);
 
     public <T> T screenshotAs(OutputType<T> outputType) {
         return getOrCreateWebDriver().getScreenshotAs(outputType);

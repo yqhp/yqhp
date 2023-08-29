@@ -35,9 +35,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.File;
 import java.util.List;
@@ -92,7 +90,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    protected RemoteWebDriver newRemoteWebDriver(DriverService service, DesiredCapabilities capabilities) {
+    protected RemoteWebDriver newWebDriver() {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
         if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
@@ -112,7 +110,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
             capabilities.setCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE, true);
         }
 
-        AndroidDriver androidDriver = new AndroidDriver(service.getUrl(), capabilities);
+        AndroidDriver androidDriver = new AndroidDriver(getOrStartDriverService().getUrl(), capabilities);
         // appium-uiautomator2-server在很多地方加了Device.waitForIdle()，默认10秒
         // 导致设备在动态变化的时候很慢，如：点击，获取布局信息等
         // 设置waitForIdle超时时间为0，可以加速执行速度
