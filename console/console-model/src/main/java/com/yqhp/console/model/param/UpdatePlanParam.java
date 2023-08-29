@@ -21,6 +21,7 @@ import com.yqhp.console.repository.enums.RunMode;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -36,5 +37,6 @@ public class UpdatePlanParam implements InputConverter<Plan> {
     @Size(max = 256, message = "描述长度不能超过{max}")
     private String description;
 
+    @NotNull(message = "运行模式不能为空")
     private RunMode runMode;
 }

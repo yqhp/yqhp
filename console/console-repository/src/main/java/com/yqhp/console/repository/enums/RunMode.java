@@ -26,9 +26,10 @@ import lombok.Getter;
 @Getter
 public enum RunMode implements BaseEnum<Integer> {
 
-    NO_DEVICE(0), // [agent]
+    AGENT(0), // agent
     EFFICIENT(1), // [device]高效模式，平均分配action
     COMPATIBLE(2), // [device]兼容模式，执行同一份action
+    SELENIUM(3), // selenium
     ;
 
     @EnumValue
