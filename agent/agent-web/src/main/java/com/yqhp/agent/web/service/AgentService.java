@@ -16,12 +16,13 @@
 package com.yqhp.agent.web.service;
 
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.console.repository.enums.RunMode;
 
 /**
  * @author jiangyitao
  */
 public interface AgentService {
-    String register(String user);
+    String register(String user, RunMode runMode);
 
     Driver getDriverByToken(String token);
 

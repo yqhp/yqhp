@@ -17,6 +17,7 @@ package com.yqhp.agent.web.controller;
 
 import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.auth.model.CurrentUser;
+import com.yqhp.console.repository.enums.RunMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +32,7 @@ public class AgentController {
     private AgentService agentService;
 
     @GetMapping("/register")
-    public String register() {
-        return agentService.register(CurrentUser.get().getNickname());
+    public String register(RunMode runMode) {
+        return agentService.register(CurrentUser.get().getNickname(), runMode);
     }
 }

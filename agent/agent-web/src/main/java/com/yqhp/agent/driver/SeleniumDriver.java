@@ -15,6 +15,8 @@
  */
 package com.yqhp.agent.driver;
 
+import com.yqhp.agent.jshell.Browser;
+import com.yqhp.common.jshell.JShellContext;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -27,11 +29,16 @@ import org.openqa.selenium.remote.service.DriverService;
  * @author jiangyitao
  */
 @Slf4j
-public abstract class SeleniumDriver extends Driver {
+public class SeleniumDriver extends Driver {
 
     protected DesiredCapabilities capabilities = new DesiredCapabilities();
     protected DriverService driverService;
     private RemoteWebDriver webDriver;
+
+    @Override
+    public void injectVar(JShellContext jshellCtx) {
+        jshellCtx.injectVar(new Browser(this));
+    }
 
     public void setCapability(String key, Object value) {
         capabilities.setCapability(key, value);
@@ -49,7 +56,9 @@ public abstract class SeleniumDriver extends Driver {
         return driverService;
     }
 
-    protected abstract DriverService startDriverService();
+    protected DriverService startDriverService() {
+        throw new UnsupportedOperationException();
+    }
 
     public synchronized void stopDriverService() {
         if (driverServiceIsRunning()) {

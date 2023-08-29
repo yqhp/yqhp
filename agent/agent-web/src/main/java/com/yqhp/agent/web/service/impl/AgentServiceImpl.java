@@ -16,10 +16,12 @@
 package com.yqhp.agent.web.service.impl;
 
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.agent.driver.SeleniumDriver;
 import com.yqhp.agent.web.enums.ResponseCodeEnum;
 import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.common.commons.util.UUIDUtils;
 import com.yqhp.common.web.exception.ServiceException;
+import com.yqhp.console.repository.enums.RunMode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +42,10 @@ public class AgentServiceImpl implements AgentService {
     private static final Map<String, Driver> REGISTERED_DRIVERS = new ConcurrentHashMap<>();
 
     @Override
-    public String register(String user) {
+    public String register(String user, RunMode runMode) {
         String token = UUIDUtils.getUUID();
-        REGISTERED_DRIVERS.put(token, new Driver());
-        log.info("Register by {}, token={}", user, token);
+        REGISTERED_DRIVERS.put(token, createDriverByRunMode(runMode));
+        log.info("Register by {}, RunMode={}, token={}", user, runMode, token);
         return token;
     }
 
@@ -62,5 +64,11 @@ public class AgentServiceImpl implements AgentService {
             REGISTERED_DRIVERS.remove(token);
         }
         log.info("Unregister, token={}", token);
+    }
+
+    private Driver createDriverByRunMode(RunMode runMode) {
+        return RunMode.SELENIUM.equals(runMode)
+                ? new SeleniumDriver()
+                : new Driver();
     }
 }

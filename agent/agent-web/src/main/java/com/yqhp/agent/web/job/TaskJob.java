@@ -21,6 +21,7 @@ import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.agent.web.service.DeviceService;
 import com.yqhp.agent.web.service.TaskService;
 import com.yqhp.console.model.vo.Task;
+import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.rpc.ExecutionRecordRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class TaskJob {
      * 非设备类型的任务在此线程池执行，如pc web自动化，接口自动化等。我们在此限制最大并发，并通过CallerRunsPolicy阻塞提交任务
      */
     private static final ExecutorService NO_DEVICE_THREAD_POOL = new ThreadPoolExecutor(
-            10, 10, 60L, TimeUnit.SECONDS,
+            20, 20, 60L, TimeUnit.SECONDS,
             new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy()
     );
 
@@ -109,8 +110,8 @@ public class TaskJob {
 
         // 当线程池所有线程都在执行任务，submit将会阻塞，直到有空闲线程
         NO_DEVICE_THREAD_POOL.submit(() -> {
-            String planName = task.getExecutionRecord().getPlan().getName();
-            String token = agentService.register(planName);
+            Plan plan = task.getExecutionRecord().getPlan();
+            String token = agentService.register(plan.getName(), plan.getRunMode());
             Driver driver = agentService.getDriverByToken(token);
             try {
                 log.info("Task started, executionId={}", task.getExecutionRecord().getId());
