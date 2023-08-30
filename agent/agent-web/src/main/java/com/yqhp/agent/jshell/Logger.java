@@ -16,14 +16,31 @@
 package com.yqhp.agent.jshell;
 
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.agent.driver.SeleniumDriver;
+import com.yqhp.common.commons.util.JacksonUtils;
 import com.yqhp.common.jshell.JShellVar;
+import com.yqhp.common.web.util.ApplicationContextUtils;
+import com.yqhp.common.web.util.MultipartFileUtils;
 import com.yqhp.console.repository.jsonfield.DocExecutionLog;
+import com.yqhp.file.model.OSSFile;
+import com.yqhp.file.rpc.FileRpc;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.OutputType;
 import org.springframework.util.Assert;
 
+import java.io.File;
+import java.util.Map;
+
 /**
+ * 为了减轻调用方负担，这里对外提供的api，都不抛受检异常，使用@SneakyThrows自动抛出非受检异常
+ *
  * @author jiangyitao
  */
+@Slf4j
 public class Logger implements JShellVar {
+
+    private static final FileRpc FILE_RPC = ApplicationContextUtils.getBean(FileRpc.class);
 
     private final Driver driver;
 
@@ -56,6 +73,41 @@ public class Logger implements JShellVar {
      */
     public void error(Object obj) {
         driver.log(createLog("error", obj));
+    }
+
+    /**
+     * 仅适用于UI自动化
+     * 非UI自动化调用将抛出异常，如接口自动化
+     *
+     * @since 0.3.5
+     */
+    @SneakyThrows
+    public void screenshot() {
+        screenshot("");
+    }
+
+    /**
+     * 仅适用于UI自动化
+     * 非UI自动化调用将抛出异常，如接口自动化
+     *
+     * @since 0.3.5
+     */
+    @SneakyThrows
+    public void screenshot(String info) {
+        if (!(driver instanceof SeleniumDriver)) {
+            throw new UnsupportedOperationException();
+        }
+        File screenshot = null;
+        try {
+            screenshot = ((SeleniumDriver) driver).screenshotAs(OutputType.FILE);
+            OSSFile ossFile = FILE_RPC.uploadFile(MultipartFileUtils.toMultipartFile(screenshot), false);
+            String val = JacksonUtils.writeValueAsString(Map.of("info", info, "file", ossFile));
+            driver.log(createLog("screenshot", val));
+        } finally {
+            if (screenshot != null && !screenshot.delete()) {
+                log.warn("Failed to delete " + screenshot);
+            }
+        }
     }
 
     private DocExecutionLog createLog(String tag, Object obj) {
