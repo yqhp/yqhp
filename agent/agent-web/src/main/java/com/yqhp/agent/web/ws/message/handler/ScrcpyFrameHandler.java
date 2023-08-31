@@ -24,9 +24,9 @@ import com.yqhp.agent.web.config.Properties;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.agent.web.ws.message.OutputSender;
+import com.yqhp.common.web.util.WebsocketUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -80,13 +80,12 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
 
         final BlockingQueue<ByteBuffer> blockingQueue = new SynchronousQueue<>();
         Thread sendFrameThread = new Thread(() -> {
-            RemoteEndpoint.Basic remote = session.getBasicRemote();
             try {
                 os.ok(uid, "Start sending frames...");
                 log.info("[{}]Start sending frames...", driver.getDeviceId());
                 while (session.isOpen()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
-                    remote.sendBinary(frame);
+                    WebsocketUtils.sendBinary(session, frame);
                 }
                 log.info("[{}]Stop sending frames", driver.getDeviceId());
             } catch (Throwable cause) {

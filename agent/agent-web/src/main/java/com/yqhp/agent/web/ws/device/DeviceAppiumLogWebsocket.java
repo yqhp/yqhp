@@ -15,10 +15,10 @@
  */
 package com.yqhp.agent.web.ws.device;
 
+import com.yqhp.common.web.util.WebsocketUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
-import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -33,14 +33,11 @@ public class DeviceAppiumLogWebsocket extends DeviceWebsocket {
 
     @Override
     protected void onOpened(Session session) {
-        RemoteEndpoint.Basic remote = session.getBasicRemote();
         deviceDriver.receiveAppiumLog(appiumLog -> {
-            if (session.isOpen()) {
-                try {
-                    remote.sendText(appiumLog);
-                } catch (IOException e) {
-                    log.warn("Failed to send log:{}, cause:{}", appiumLog, e.getMessage());
-                }
+            try {
+                WebsocketUtils.sendText(session, appiumLog);
+            } catch (Exception e) {
+                log.warn("Failed to send log:{}, cause:{}", appiumLog, e.getMessage());
             }
         });
     }
