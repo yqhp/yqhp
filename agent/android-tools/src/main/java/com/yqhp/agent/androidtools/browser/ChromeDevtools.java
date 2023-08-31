@@ -68,6 +68,7 @@ public class ChromeDevtools {
         }
         try {
             int localPort = SocketUtils.findAvailableTcpPort();
+            log.info("[{}]Adb forward {} -> remote {}", iDevice.getSerialNumber(), localPort, socketName);
             iDevice.createForward(localPort, socketName, IDevice.DeviceUnixSocketNamespace.ABSTRACT);
             try {
                 Browser browser = new Browser();
@@ -76,6 +77,7 @@ public class ChromeDevtools {
                 browser.setPages(listPage(localPort));
                 return browser;
             } finally {
+                log.info("[{}]Adb remove forward {} -> remote {}", iDevice.getSerialNumber(), localPort, socketName);
                 iDevice.removeForward(localPort);
             }
         } catch (Throwable cause) {

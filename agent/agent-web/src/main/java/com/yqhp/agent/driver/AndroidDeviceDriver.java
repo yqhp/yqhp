@@ -91,8 +91,20 @@ public class AndroidDeviceDriver extends DeviceDriver {
 
     @Override
     protected RemoteWebDriver newWebDriver() {
+        // https://github.com/appium/appium-uiautomator2-driver
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
+        // 本地端口 -> 设备uiautomator2/espresso服务端口
+        capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, LocalPortProvider.getAndroidSystemAvailablePort());
+        // webview 本地端口 -> devtools communication
+        capabilities.setCapability(AndroidMobileCapabilityType.WEBVIEW_DEVTOOLS_PORT, LocalPortProvider.getAndroidWebviewDevtoolsAvailablePort());
+        // webview 启动chromedriver时 --port参数
+        capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_PORT, LocalPortProvider.getAndroidChromeDriverAvailablePort());
+
+        if (capabilities.getCapability(AndroidMobileCapabilityType.RECREATE_CHROME_DRIVER_SESSIONS) == null) {
+            // webview切换到native时，kill chromedriver
+            capabilities.setCapability(AndroidMobileCapabilityType.RECREATE_CHROME_DRIVER_SESSIONS, true);
+        }
         if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
             capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
         }
@@ -103,8 +115,6 @@ public class AndroidDeviceDriver extends DeviceDriver {
         if (capabilities.getCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS) == null) {
             capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         }
-        // 本地端口 -> 设备uiautomator2/espresso服务端口
-        capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, LocalPortProvider.getAppiumAndroidSystemAvailablePort());
         if (capabilities.getCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE) == null) {
             // appium默认会执行logcat，关闭logcat捕获提升性能
             capabilities.setCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE, true);

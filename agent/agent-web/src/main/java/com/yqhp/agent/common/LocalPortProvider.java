@@ -26,7 +26,9 @@ public class LocalPortProvider {
     // port: { rangeBegin, rangeEnd, current }
     private static final int[] SCRCPY_PORTS = {20000, 20999, 20000};
     private static final int[] APPIUM_SERVICE_PORTS = {21000, 21999, 21000};
-    private static final int[] APPIUM_ANDROID_SYSTEM_PORTS = {22000, 22999, 22000};
+    private static final int[] ANDROID_SYSTEM_PORTS = {22000, 22999, 22000};
+    private static final int[] ANDROID_WEBVIEW_DEVTOOLS_PORTS = {23000, 23999, 23000};
+    private static final int[] ANDROID_CHROME_DRIVER_PORTS = {24000, 24999, 24000};
     private static final int[] WDA_PORTS = {30000, 30999, 30000};
     private static final int[] WDA_MJPEG_PORTS = {31000, 31999, 31000};
 
@@ -42,9 +44,21 @@ public class LocalPortProvider {
         }
     }
 
-    public static int getAppiumAndroidSystemAvailablePort() {
-        synchronized (APPIUM_ANDROID_SYSTEM_PORTS) {
-            return getAvailablePort(APPIUM_ANDROID_SYSTEM_PORTS);
+    public static int getAndroidSystemAvailablePort() {
+        synchronized (ANDROID_SYSTEM_PORTS) {
+            return getAvailablePort(ANDROID_SYSTEM_PORTS);
+        }
+    }
+
+    public static int getAndroidWebviewDevtoolsAvailablePort() {
+        synchronized (ANDROID_WEBVIEW_DEVTOOLS_PORTS) {
+            return getAvailablePort(ANDROID_WEBVIEW_DEVTOOLS_PORTS);
+        }
+    }
+
+    public static int getAndroidChromeDriverAvailablePort() {
+        synchronized (ANDROID_CHROME_DRIVER_PORTS) {
+            return getAvailablePort(ANDROID_CHROME_DRIVER_PORTS);
         }
     }
 
