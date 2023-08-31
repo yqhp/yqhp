@@ -230,4 +230,40 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
         return _findElement(AppiumBy.androidUIAutomator(uiautomatorText), timeout);
     }
 
+    /**
+     * 通过iOSNsPredicateString查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.7
+     */
+    public WebElement predicate(String predicate) {
+        return findElement(AppiumBy.iOSNsPredicateString(predicate));
+    }
+
+    /**
+     * 通过iOSNsPredicateString查找元素(找不到则返回null)
+     *
+     * @since 0.0.7
+     */
+    public WebElement _predicate(String predicate) {
+        return _findElement(AppiumBy.iOSNsPredicateString(predicate));
+    }
+
+    /**
+     * 通过iOSNsPredicateString查找元素(找不到则抛出异常)
+     *
+     * @since 0.0.7
+     */
+    public WebElement predicate(String predicate, Duration timeout) {
+        return findElement(AppiumBy.iOSNsPredicateString(predicate), timeout);
+    }
+
+    /**
+     * 通过iOSNsPredicateString查找元素(找不到则返回null)
+     *
+     * @since 0.0.7
+     */
+    public WebElement _predicate(String predicate, Duration timeout) {
+        return _findElement(AppiumBy.iOSNsPredicateString(predicate), timeout);
+    }
+
 }
