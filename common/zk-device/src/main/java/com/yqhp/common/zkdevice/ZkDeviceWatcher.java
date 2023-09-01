@@ -16,19 +16,19 @@
 package com.yqhp.common.zkdevice;
 
 import com.yqhp.common.zookeeper.ZkTemplate;
-import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.framework.recipes.cache.*;
 
 /**
  * @author jiangyitao
  */
+@Slf4j
 public class ZkDeviceWatcher {
 
     private final ZkTemplate zkTemplate;
     private final ZkDeviceManager zkDeviceManager;
 
-    private TreeCache treeCache;
+    private CuratorCache curatorCache;
 
     public ZkDeviceWatcher(ZkTemplate zkTemplate) {
         this.zkTemplate = zkTemplate;
@@ -36,45 +36,40 @@ public class ZkDeviceWatcher {
     }
 
     public synchronized void start(ZkDeviceListener listener) {
-        if (treeCache != null) {
+        if (curatorCache != null) {
             throw new IllegalStateException("ZkDeviceWatcher is running");
         }
 
-        treeCache = zkTemplate.watch(zkDeviceManager.getWatchPath(), ((client, event) -> {
-            TreeCacheEvent.Type eventType = event.getType();
-            if (eventType != TreeCacheEvent.Type.NODE_ADDED
-                    && eventType != TreeCacheEvent.Type.NODE_REMOVED
-                    && eventType != TreeCacheEvent.Type.NODE_UPDATED) {
-                return;
-            }
-
-            ChildData node = event.getData();
-            if (node == null) {
-                return;
-            }
-
-            ZkDevice zkDevice = zkDeviceManager.toZkDevice(node.getData());
-            if (zkDevice == null) {
-                return;
-            }
-
-            switch (eventType) {
-                case NODE_ADDED:
-                    listener.added(zkDevice);
-                    break;
-                case NODE_REMOVED:
-                    listener.removed(zkDevice);
-                    break;
-                case NODE_UPDATED:
-                    listener.updated(zkDevice);
-                    break;
-            }
-        }));
+        CuratorCacheListener cacheListener = CuratorCacheListener.builder()
+                .forCreates((node) -> {
+                    log.info("zk node added, path={}", node.getPath());
+                    ZkDevice zkDevice = zkDeviceManager.toZkDevice(node.getData());
+                    if (zkDevice != null) {
+                        listener.added(zkDevice);
+                    }
+                })
+                .forChanges(((oldNode, node) -> {
+                    log.info("zk node updated, path={}", node.getPath());
+                    ZkDevice zkDevice = zkDeviceManager.toZkDevice(node.getData());
+                    if (zkDevice != null) {
+                        listener.updated(zkDevice);
+                    }
+                }))
+                .forDeletes((node) -> {
+                    log.info("zk node removed, path={}", node.getPath());
+                    ZkDevice zkDevice = zkDeviceManager.toZkDevice(node.getData());
+                    if (zkDevice != null) {
+                        listener.removed(zkDevice);
+                    }
+                }).build();
+        curatorCache = zkTemplate.watch(zkDeviceManager.getWatchPath(), cacheListener);
     }
 
     public synchronized void stop() {
-        if (treeCache != null) {
-            treeCache.close();
+        if (curatorCache != null) {
+            log.info("Close CuratorCache");
+            curatorCache.close();
+            curatorCache = null;
         }
     }
 }

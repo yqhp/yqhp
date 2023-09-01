@@ -19,13 +19,11 @@ import com.yqhp.common.zookeeper.exception.ZkException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.listen.Listenable;
-import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.zookeeper.CreateMode;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * @author jiangyitao
@@ -130,24 +128,10 @@ public class ZkTemplate {
         }
     }
 
-    public TreeCache watch(String path, TreeCacheListener listener) {
-        return watch(path, listener, null);
-    }
-
-    public TreeCache watch(String path, TreeCacheListener listener, Executor executor) {
-        TreeCache treeCache = new TreeCache(curator, path);
-        Listenable<TreeCacheListener> listenable = treeCache.getListenable();
-        if (executor != null) {
-            listenable.addListener(listener, executor);
-        } else {
-            listenable.addListener(listener);
-        }
-
-        try {
-            treeCache.start();
-            return treeCache;
-        } catch (Exception e) {
-            throw new ZkException(e);
-        }
+    public CuratorCache watch(String path, CuratorCacheListener listener) {
+        CuratorCache cache = CuratorCache.build(curator, path);
+        cache.listenable().addListener(listener);
+        cache.start();
+        return cache;
     }
 }
