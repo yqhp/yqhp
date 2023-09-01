@@ -49,11 +49,11 @@ public class MessageHandler {
         try {
             input = JacksonUtils.readValue(message, Input.class);
             if (input == null || input.getCommand() == null) {
-                throw new IllegalArgumentException("command not found");
+                throw new IllegalArgumentException("Command not found");
             }
             InputHandler<?> handler = handlers.get(input.getCommand());
             if (handler == null) {
-                throw new IllegalStateException("handler not found");
+                throw new IllegalStateException("Handler not found");
             }
 
             Type superclass = handler.getClass().getGenericSuperclass();

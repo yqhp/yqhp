@@ -51,7 +51,7 @@ class IOSEmulatorScheduledScanner {
 
     synchronized void start(Duration scanPeriod, DeviceChangeListener listener) {
         if (running)
-            throw new IllegalStateException("scanner is running");
+            throw new IllegalStateException("Scanner is running");
 
         if (scanPeriod == null) scanPeriod = Duration.ofSeconds(30);
         long scanPeriodMs = scanPeriod.toMillis();

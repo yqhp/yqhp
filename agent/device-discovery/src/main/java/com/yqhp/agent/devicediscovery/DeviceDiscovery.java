@@ -27,7 +27,7 @@ public abstract class DeviceDiscovery {
      */
     public synchronized void start(DeviceChangeListener listener) {
         if (running) {
-            throw new IllegalStateException("running");
+            throw new IllegalStateException("DeviceDiscovery is running");
         }
 
         run(listener);

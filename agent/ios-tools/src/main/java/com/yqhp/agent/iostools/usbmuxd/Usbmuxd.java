@@ -54,7 +54,7 @@ public class Usbmuxd {
 
     public synchronized void startListenDevices(IDeviceChangeListener listener) {
         if (devicesListening) {
-            throw new IllegalStateException("listening");
+            throw new IllegalStateException("DevicesListener is listening");
         }
         devicesListening = true;
         new Thread(() -> {

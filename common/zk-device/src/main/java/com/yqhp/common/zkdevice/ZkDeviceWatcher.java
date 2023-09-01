@@ -30,15 +30,13 @@ public class ZkDeviceWatcher {
 
     private TreeCache treeCache;
 
-    private volatile boolean running = false;
-
     public ZkDeviceWatcher(ZkTemplate zkTemplate) {
         this.zkTemplate = zkTemplate;
         zkDeviceManager = new ZkDeviceManager(zkTemplate);
     }
 
     public synchronized void start(ZkDeviceListener listener) {
-        if (running) {
+        if (treeCache != null) {
             throw new IllegalStateException("ZkDeviceWatcher is running");
         }
 
@@ -72,14 +70,11 @@ public class ZkDeviceWatcher {
                     break;
             }
         }));
-
-        running = true;
     }
 
     public synchronized void stop() {
-        if (running) {
+        if (treeCache != null) {
             treeCache.close();
-            running = false;
         }
     }
 }

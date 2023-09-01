@@ -91,7 +91,7 @@ public class WdaFrameHandler extends InputHandler {
             } catch (Exception e) {
                 log.info("[ios][{}]Connect to wdaMjpegUrl failed, reason={}", driver.getDeviceId(), e.getMessage());
                 if (connectCount == 10) {
-                    throw new IllegalStateException("cannot connect to wdaMjpegUrl " + wdaMjpegUrl);
+                    throw new IllegalStateException("Failed to connect to wdaMjpegUrl " + wdaMjpegUrl);
                 }
                 Thread.sleep(300);
             }
