@@ -43,15 +43,22 @@ public class Browser extends Agent {
     /**
      * @since 0.3.4
      */
-    public ChromeDriver chromeDriver() {
-        return (ChromeDriver) seleniumDriver().refreshWebDriver();
+    public Browser cap(String key, Object value) {
+        seleniumDriver().setCapability(key, value);
+        return this;
     }
 
     /**
      * @since 0.3.4
      */
-    public Browser cap(String key, Object value) {
-        seleniumDriver().setCapability(key, value);
-        return this;
+    public ChromeDriver chromeDriver() {
+        return (ChromeDriver) seleniumDriver().getOrCreateWebDriver();
+    }
+
+    /**
+     * @since 0.3.8
+     */
+    public ChromeDriver refreshChromeDriver() {
+        return (ChromeDriver) seleniumDriver().refreshWebDriver();
     }
 }
