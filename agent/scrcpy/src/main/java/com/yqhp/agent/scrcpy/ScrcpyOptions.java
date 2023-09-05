@@ -21,6 +21,7 @@ import java.util.StringJoiner;
 
 /**
  * @author jiangyitao
+ * https://github.com/Genymobile/scrcpy/blob/v1.25/server/src/main/java/com/genymobile/scrcpy/Options.java
  */
 @Data
 public class ScrcpyOptions {
