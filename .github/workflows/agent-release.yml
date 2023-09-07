@@ -26,6 +26,6 @@ jobs:
           repo_token: ${{ secrets.GIT_TOKEN }}
           file: yqhp-agent.zip
           asset_name: yqhp-agent.zip
-          tag: yqhp-agent@0.3.8
+          tag: yqhp-agent@1.0.0
           overwrite: true
           body: ""
