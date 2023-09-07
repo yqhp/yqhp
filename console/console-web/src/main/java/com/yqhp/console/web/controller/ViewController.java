@@ -44,8 +44,8 @@ public class ViewController {
     }
 
     @PostMapping
-    public void createView(@RequestBody @Valid CreateViewParam createViewParam) {
-        viewService.createView(createViewParam);
+    public View createView(@RequestBody @Valid CreateViewParam param) {
+        return viewService.createView(param);
     }
 
     @DeleteMapping("/{id}")
@@ -54,8 +54,8 @@ public class ViewController {
     }
 
     @PutMapping("/{id}")
-    public void updateView(@PathVariable String id, @Valid @RequestBody UpdateViewParam updateViewParam) {
-        viewService.updateView(id, updateViewParam);
+    public View updateView(@PathVariable String id, @Valid @RequestBody UpdateViewParam param) {
+        return viewService.updateView(id, param);
     }
 
 }

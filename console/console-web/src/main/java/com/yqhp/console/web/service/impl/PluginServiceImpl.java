@@ -79,8 +79,8 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
     }
 
     @Override
-    public Plugin createPlugin(CreatePluginParam createPluginParam) {
-        Plugin plugin = createPluginParam.convertTo();
+    public Plugin createPlugin(CreatePluginParam param) {
+        Plugin plugin = param.convertTo();
         plugin.setId(snowflake.nextIdStr());
 
         String currUid = CurrentUser.id();
@@ -99,9 +99,9 @@ public class PluginServiceImpl extends ServiceImpl<PluginMapper, Plugin> impleme
     }
 
     @Override
-    public Plugin updatePlugin(String id, UpdatePluginParam updatePluginParam) {
+    public Plugin updatePlugin(String id, UpdatePluginParam param) {
         Plugin plugin = getPluginById(id);
-        updatePluginParam.update(plugin);
+        param.update(plugin);
         plugin.setUpdateBy(CurrentUser.id());
         plugin.setUpdateTime(LocalDateTime.now());
 

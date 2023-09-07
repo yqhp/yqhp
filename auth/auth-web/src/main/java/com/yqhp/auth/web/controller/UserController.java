@@ -22,6 +22,7 @@ import com.yqhp.auth.model.param.CreateUserParam;
 import com.yqhp.auth.model.param.UpdateUserParam;
 import com.yqhp.auth.model.param.query.UserPageQuery;
 import com.yqhp.auth.model.vo.UserVO;
+import com.yqhp.auth.repository.entity.User;
 import com.yqhp.auth.repository.enums.UserStatus;
 import com.yqhp.auth.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +56,14 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping
-    public void createUser(@RequestBody @Valid CreateUserParam createUserParam) {
-        userService.createUser(createUserParam);
+    public User createUser(@RequestBody @Valid CreateUserParam param) {
+        return userService.createUser(param);
     }
 
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{userId}")
-    public void updateUser(@PathVariable String userId, @RequestBody @Valid UpdateUserParam updateUserParam) {
-        userService.updateUser(userId, updateUserParam);
+    public void updateUser(@PathVariable String userId, @RequestBody @Valid UpdateUserParam param) {
+        userService.updateUser(userId, param);
     }
 
     @PreAuthorize("hasAuthority('admin')")
@@ -86,8 +87,8 @@ public class UserController {
     }
 
     @PutMapping
-    public void updateUser(@RequestBody @Valid UpdateUserParam updateUserParam) {
-        userService.updateUser(CurrentUser.id(), updateUserParam);
+    public void updateUser(@RequestBody @Valid UpdateUserParam param) {
+        userService.updateUser(CurrentUser.id(), param);
     }
 
     @GetMapping("/info")

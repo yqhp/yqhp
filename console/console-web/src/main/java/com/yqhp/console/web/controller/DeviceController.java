@@ -55,8 +55,8 @@ public class DeviceController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
-    public void updateDevice(@PathVariable String id, @Valid @RequestBody UpdateDeviceParam updateDeviceParam) {
-        deviceService.updateDevice(id, updateDeviceParam);
+    public Device updateDevice(@PathVariable String id, @Valid @RequestBody UpdateDeviceParam param) {
+        return deviceService.updateDevice(id, param);
     }
 
     @PreAuthorize("hasAuthority('admin')")

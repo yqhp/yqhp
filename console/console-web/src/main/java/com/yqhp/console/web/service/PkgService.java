@@ -29,11 +29,11 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface PkgService extends IService<Pkg> {
-    Pkg createPkg(CreatePkgParam createPkgParam);
+    Pkg createPkg(CreatePkgParam param);
 
     void deleteById(String id);
 
-    Pkg updatePkg(String id, UpdatePkgParam updatePkgParam);
+    Pkg updatePkg(String id, UpdatePkgParam param);
 
     void move(TreeNodeMoveEvent moveEvent);
 

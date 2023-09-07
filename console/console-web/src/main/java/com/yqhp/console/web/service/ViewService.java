@@ -26,11 +26,11 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface ViewService extends IService<View> {
-    View createView(CreateViewParam createViewParam);
+    View createView(CreateViewParam param);
 
     void deleteById(String id);
 
-    View updateView(String id, UpdateViewParam updateViewParam);
+    View updateView(String id, UpdateViewParam param);
 
     View getViewById(String id);
 

@@ -63,8 +63,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private Snowflake snowflake;
 
     @Override
-    public User createUser(CreateUserParam createUserParam) {
-        User user = createUserParam.convertTo();
+    public User createUser(CreateUserParam param) {
+        User user = param.convertTo();
         user.setId(snowflake.nextIdStr());
         user.setPassword(encodePassword(user.getPassword()));
 
@@ -95,9 +95,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User updateUser(String userId, UpdateUserParam updateUserParam) {
+    public User updateUser(String userId, UpdateUserParam param) {
         User user = getUserById(userId);
-        updateUserParam.update(user);
+        param.update(user);
         user.setUpdateBy(CurrentUser.id());
         user.setUpdateTime(LocalDateTime.now());
         if (!updateById(user)) {

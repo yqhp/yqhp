@@ -44,8 +44,8 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
     private Snowflake snowflake;
 
     @Override
-    public View createView(CreateViewParam createViewParam) {
-        View view = createViewParam.convertTo();
+    public View createView(CreateViewParam param) {
+        View view = param.convertTo();
         view.setId(snowflake.nextIdStr());
 
         String currUid = CurrentUser.id();
@@ -67,9 +67,9 @@ public class ViewServiceImpl extends ServiceImpl<ViewMapper, View> implements Vi
     }
 
     @Override
-    public View updateView(String id, UpdateViewParam updateViewParam) {
+    public View updateView(String id, UpdateViewParam param) {
         View view = getViewById(id);
-        updateViewParam.update(view);
+        param.update(view);
         view.setUpdateBy(CurrentUser.id());
         view.setUpdateTime(LocalDateTime.now());
 

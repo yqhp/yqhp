@@ -66,8 +66,8 @@ public class PluginController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping
-    public Plugin createPlugin(@Valid @RequestBody CreatePluginParam createPluginParam) {
-        return pluginService.createPlugin(createPluginParam);
+    public Plugin createPlugin(@Valid @RequestBody CreatePluginParam param) {
+        return pluginService.createPlugin(param);
     }
 
     @PreAuthorize("hasAuthority('admin')")
@@ -78,8 +78,8 @@ public class PluginController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
-    public Plugin updatePlugin(@PathVariable String id, @Valid @RequestBody UpdatePluginParam updatePluginParam) {
-        return pluginService.updatePlugin(id, updatePluginParam);
+    public Plugin updatePlugin(@PathVariable String id, @Valid @RequestBody UpdatePluginParam param) {
+        return pluginService.updatePlugin(id, param);
     }
 
 }

@@ -44,7 +44,7 @@ public interface DeviceService extends IService<Device> {
 
     List<Device> listInIds(Collection<String> ids);
 
-    Device updateDevice(String id, UpdateDeviceParam updateDeviceParam);
+    Device updateDevice(String id, UpdateDeviceParam param);
 
     Device getDeviceById(String id);
 

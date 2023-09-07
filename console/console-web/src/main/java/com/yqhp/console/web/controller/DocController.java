@@ -52,8 +52,8 @@ public class DocController {
     }
 
     @PostMapping
-    public Doc createDoc(@RequestBody @Valid CreateDocParam createDocParam) {
-        return docService.createDoc(createDocParam);
+    public Doc createDoc(@RequestBody @Valid CreateDocParam param) {
+        return docService.createDoc(param);
     }
 
     @GetMapping("/{id}/copy")
@@ -67,8 +67,8 @@ public class DocController {
     }
 
     @PutMapping("/{id}")
-    public Doc updateDoc(@PathVariable String id, @Valid @RequestBody UpdateDocParam updateDocParam) {
-        return docService.updateDoc(id, updateDocParam);
+    public Doc updateDoc(@PathVariable String id, @Valid @RequestBody UpdateDocParam param) {
+        return docService.updateDoc(id, param);
     }
 
     @PutMapping("/{id}/content")

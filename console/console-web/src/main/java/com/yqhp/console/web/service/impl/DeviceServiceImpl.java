@@ -129,9 +129,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public Device updateDevice(String id, UpdateDeviceParam updateDeviceParam) {
+    public Device updateDevice(String id, UpdateDeviceParam param) {
         Device device = getDeviceById(id);
-        updateDeviceParam.update(device);
+        param.update(device);
         device.setUpdateBy(CurrentUser.id());
         device.setUpdateTime(LocalDateTime.now());
 

@@ -63,14 +63,14 @@ public class ProjectController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping
-    public void createProject(@RequestBody @Valid CreateProjectParam createProjectParam) {
-        projectService.createProject(createProjectParam);
+    public Project createProject(@RequestBody @Valid CreateProjectParam param) {
+        return projectService.createProject(param);
     }
 
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{projectId}")
-    public void updateProject(@PathVariable String projectId, @RequestBody @Valid UpdateProjectParam updateProjectParam) {
-        projectService.updateProject(projectId, updateProjectParam);
+    public Project updateProject(@PathVariable String projectId, @RequestBody @Valid UpdateProjectParam param) {
+        return projectService.updateProject(projectId, param);
     }
 
     @PreAuthorize("hasAuthority('admin')")

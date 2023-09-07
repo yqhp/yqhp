@@ -31,9 +31,9 @@ import java.util.List;
 public interface PluginService extends IService<Plugin> {
     IPage<Plugin> pageBy(PluginPageQuery query);
 
-    Plugin createPlugin(CreatePluginParam createPluginParam);
+    Plugin createPlugin(CreatePluginParam param);
 
-    Plugin updatePlugin(String id, UpdatePluginParam updatePluginParam);
+    Plugin updatePlugin(String id, UpdatePluginParam param);
 
     Plugin getPluginById(String id);
 

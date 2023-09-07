@@ -33,11 +33,11 @@ import java.util.Set;
  * @author jiangyitao
  */
 public interface UserService extends IService<User> {
-    User createUser(CreateUserParam createUserParam);
+    User createUser(CreateUserParam param);
 
     void deleteById(String userId);
 
-    User updateUser(String userId, UpdateUserParam updateUserParam);
+    User updateUser(String userId, UpdateUserParam param);
 
     IPage<UserVO> pageBy(UserPageQuery query);
 

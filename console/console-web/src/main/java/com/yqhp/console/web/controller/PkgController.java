@@ -20,6 +20,7 @@ import com.yqhp.console.model.param.CreatePkgParam;
 import com.yqhp.console.model.param.TreeNodeMoveEvent;
 import com.yqhp.console.model.param.UpdatePkgParam;
 import com.yqhp.console.model.param.query.PkgTreeQuery;
+import com.yqhp.console.repository.entity.Pkg;
 import com.yqhp.console.web.service.PkgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -45,8 +46,8 @@ public class PkgController {
     }
 
     @PostMapping
-    public void createPkg(@RequestBody @Valid CreatePkgParam createPkgParam) {
-        pkgService.createPkg(createPkgParam);
+    public Pkg createPkg(@RequestBody @Valid CreatePkgParam param) {
+        return pkgService.createPkg(param);
     }
 
     @DeleteMapping("/{id}")
@@ -55,8 +56,8 @@ public class PkgController {
     }
 
     @PutMapping("/{id}")
-    public void updatePkg(@PathVariable String id, @Valid @RequestBody UpdatePkgParam updatePkgParam) {
-        pkgService.updatePkg(id, updatePkgParam);
+    public Pkg updatePkg(@PathVariable String id, @Valid @RequestBody UpdatePkgParam param) {
+        return pkgService.updatePkg(id, param);
     }
 
     @PutMapping("/move")

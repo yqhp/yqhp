@@ -68,11 +68,11 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
     private PkgService pkgService;
 
     @Override
-    public Doc createDoc(CreateDocParam createDocParam) {
-        Doc doc = createDocParam.convertTo();
+    public Doc createDoc(CreateDocParam param) {
+        Doc doc = param.convertTo();
         doc.setId(snowflake.nextIdStr());
 
-        int maxWeight = getMaxWeightByProjectId(createDocParam.getProjectId());
+        int maxWeight = getMaxWeightByProjectId(param.getProjectId());
         doc.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
@@ -101,23 +101,23 @@ public class DocServiceImpl extends ServiceImpl<DocMapper, Doc>
 
     @Transactional
     @Override
-    public Doc updateDoc(String id, UpdateDocParam updateDocParam) {
+    public Doc updateDoc(String id, UpdateDocParam param) {
         Doc doc = getDocById(id);
         if (ResourceFlags.unupdatable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNUPDATABLE);
         }
-        boolean renamed = !doc.getName().equals(updateDocParam.getName());
+        boolean renamed = !doc.getName().equals(param.getName());
         if (renamed && ResourceFlags.unrenamable(doc.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.DOC_UNRENAMABLE);
         }
 
         boolean actionToInit = DocKind.JSH_ACTION.equals(doc.getKind())
-                && DocKind.JSH_INIT.equals(updateDocParam.getKind());
+                && DocKind.JSH_INIT.equals(param.getKind());
         if (actionToInit) {
             planDocService.deleteByDocId(id);
         }
 
-        updateDocParam.update(doc);
+        param.update(doc);
         update(doc);
         return getById(id);
     }

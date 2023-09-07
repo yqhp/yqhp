@@ -52,8 +52,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private UserProjectService userProjectService;
 
     @Override
-    public Project createProject(CreateProjectParam createProjectParam) {
-        Project project = createProjectParam.convertTo();
+    public Project createProject(CreateProjectParam param) {
+        Project project = param.convertTo();
         project.setId(snowflake.nextIdStr());
 
         String currUid = CurrentUser.id();
@@ -79,9 +79,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public Project updateProject(String projectId, UpdateProjectParam updateProjectParam) {
+    public Project updateProject(String projectId, UpdateProjectParam param) {
         Project project = getProjectById(projectId);
-        updateProjectParam.update(project);
+        param.update(project);
         project.setUpdateBy(CurrentUser.id());
         project.setUpdateTime(LocalDateTime.now());
 

@@ -104,7 +104,7 @@ public class AndroidUtils {
             String kB = StringUtils.splitByWholeSeparator(memInfo, null)[1];
             return Long.valueOf(kB);
         } catch (Exception e) {
-            log.warn("get memSize err, memInfo={}", memInfo, e);
+            log.warn("[{}]Failed to get memSize, memInfo={}", iDevice.getSerialNumber(), memInfo, e);
             return null;
         }
     }

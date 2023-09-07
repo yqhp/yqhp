@@ -29,11 +29,11 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface DocService extends IService<Doc> {
-    Doc createDoc(CreateDocParam createDocParam);
+    Doc createDoc(CreateDocParam param);
 
     Doc copy(String id);
 
-    Doc updateDoc(String id, UpdateDocParam updateDocParam);
+    Doc updateDoc(String id, UpdateDocParam param);
 
     void updateContent(String id, String content);
 

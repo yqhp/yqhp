@@ -28,11 +28,11 @@ import java.util.List;
  * @author jiangyitao
  */
 public interface ProjectService extends IService<Project> {
-    Project createProject(CreateProjectParam createProjectParam);
+    Project createProject(CreateProjectParam param);
 
     void deleteById(String projectId);
 
-    Project updateProject(String projectId, UpdateProjectParam updateProjectParam);
+    Project updateProject(String projectId, UpdateProjectParam param);
 
     IPage<Project> pageBy(ProjectPageQuery query);
 

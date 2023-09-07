@@ -62,11 +62,11 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     private Snowflake snowflake;
 
     @Override
-    public Pkg createPkg(CreatePkgParam createPkgParam) {
-        Pkg pkg = createPkgParam.convertTo();
+    public Pkg createPkg(CreatePkgParam param) {
+        Pkg pkg = param.convertTo();
         pkg.setId(snowflake.nextIdStr());
 
-        int maxWeight = getMaxWeightByProjectIdAndType(createPkgParam.getProjectId(), createPkgParam.getType());
+        int maxWeight = getMaxWeightByProjectIdAndType(param.getProjectId(), param.getType());
         pkg.setWeight(maxWeight + 1);
 
         String currUid = CurrentUser.id();
@@ -111,17 +111,17 @@ public class PkgServiceImpl extends ServiceImpl<PkgMapper, Pkg> implements PkgSe
     }
 
     @Override
-    public Pkg updatePkg(String id, UpdatePkgParam updatePkgParam) {
+    public Pkg updatePkg(String id, UpdatePkgParam param) {
         Pkg pkg = getPkgById(id);
         if (ResourceFlags.unupdatable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNUPDATABLE);
         }
-        boolean renamed = !pkg.getName().equals(updatePkgParam.getName());
+        boolean renamed = !pkg.getName().equals(param.getName());
         if (renamed && ResourceFlags.unrenamable(pkg.getFlags())) {
             throw new ServiceException(ResponseCodeEnum.PKG_UNRENAMABLE);
         }
 
-        updatePkgParam.update(pkg);
+        param.update(pkg);
         update(pkg);
         return getById(id);
     }
