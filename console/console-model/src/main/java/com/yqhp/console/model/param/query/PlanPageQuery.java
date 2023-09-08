@@ -16,6 +16,7 @@
 package com.yqhp.console.model.param.query;
 
 import com.yqhp.common.web.model.PageQuery;
+import com.yqhp.console.repository.enums.RunMode;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -27,6 +28,6 @@ import javax.validation.constraints.NotBlank;
 public class PlanPageQuery extends PageQuery {
     @NotBlank(message = "项目不能为空")
     private String projectId;
-
+    private RunMode runMode;
     private String keyword;
 }

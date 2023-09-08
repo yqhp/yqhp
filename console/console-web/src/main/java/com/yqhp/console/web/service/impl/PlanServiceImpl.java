@@ -74,6 +74,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     public IPage<Plan> pageBy(PlanPageQuery query) {
         LambdaQueryWrapper<Plan> q = new LambdaQueryWrapper<>();
         q.eq(Plan::getProjectId, query.getProjectId());
+        q.eq(query.getRunMode() != null, Plan::getRunMode, query.getRunMode());
         String keyword = query.getKeyword();
         q.and(StringUtils.hasText(keyword), c -> c
                 .like(Plan::getId, keyword)
