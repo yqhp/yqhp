@@ -81,7 +81,7 @@ public class JShellX implements Closeable {
                 item.setInsertText("");
                 return item;
             }).collect(toList());
-        } else if (suggestions.size() < 200) {
+        } else if (suggestions.size() < 300) { // 如: String a = " 将提示接近1000个
             return suggestions.stream().map(suggestion -> {
                 CompletionItem item = new CompletionItem();
                 item.setLabel(suggestion);
