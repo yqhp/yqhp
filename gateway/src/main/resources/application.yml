@@ -16,9 +16,11 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
-            allowed-headers: "*"
-            allowed-methods: "*"
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+        add-to-simple-url-handler-mapping: true
       discovery:
         locator:
           enabled: true
