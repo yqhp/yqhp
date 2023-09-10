@@ -30,10 +30,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.*;
 
 /**
  * @author jiangyitao
@@ -102,13 +99,13 @@ public class WdaFrameHandler extends InputHandler {
             try {
                 os.ok(uid, "Start sending frames...");
                 log.info("[ios][{}]Start sending frames...", driver.getDeviceId());
-                while (session.isOpen()) {
-                    byte[] frame = blockingQueue.take();// 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
+                while (!Thread.currentThread().isInterrupted()) {
+                    byte[] frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     WebsocketUtils.sendBinary(session, ByteBuffer.wrap(frame));
                 }
-                log.info("[ios][{}]Stop sending frames", driver.getDeviceId());
+                log.info("[ios][{}]Sending frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[ios][{}]Stop sending frames, cause: {}", driver.getDeviceId(),
+                log.info("[ios][{}]Sending frames stopped, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
@@ -121,16 +118,19 @@ public class WdaFrameHandler extends InputHandler {
                      MjpegInputStream mis = new MjpegInputStream(is)) {
                     while (session.isOpen()) {
                         byte[] frame = mis.readFrame();
-                        blockingQueue.put(frame);
+                        boolean ok = blockingQueue.offer(frame, 1, TimeUnit.SECONDS);
+                        if (!ok) {
+                            log.warn("[{}]Skip frame", driver.getDeviceId());
+                        }
                     }
                 }
-                log.info("[ios][{}]Stop reading frames", driver.getDeviceId());
+                log.info("[ios][{}]Reading frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[ios][{}]Stop reading frames, cause: {}", driver.getDeviceId(),
+                log.info("[ios][{}]Reading frames stopped, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
-                conn.disconnect();
                 sendFrameThread.interrupt();
+                conn.disconnect();
             }
         });
     }

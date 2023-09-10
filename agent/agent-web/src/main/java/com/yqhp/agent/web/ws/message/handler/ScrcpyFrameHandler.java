@@ -30,10 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.websocket.Session;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.*;
 
 /**
  * @author jiangyitao
@@ -83,13 +80,13 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
             try {
                 os.ok(uid, "Start sending frames...");
                 log.info("[{}]Start sending frames...", driver.getDeviceId());
-                while (session.isOpen()) {
+                while (!Thread.currentThread().isInterrupted()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
                     WebsocketUtils.sendBinary(session, frame);
                 }
-                log.info("[{}]Stop sending frames", driver.getDeviceId());
+                log.info("[{}]Sending frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]Stop sending frames, cause: {}", driver.getDeviceId(),
+                log.info("[{}]Sending frames stopped, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             }
         });
@@ -100,14 +97,17 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
                 log.info("[{}]Start reading frames", driver.getDeviceId());
                 scrcpyFrameClient.readFrame(frame -> {
                     try {
-                        blockingQueue.put(frame);
+                        boolean ok = blockingQueue.offer(frame, 1, TimeUnit.SECONDS);
+                        if (!ok) {
+                            log.warn("[{}]Skip frame", driver.getDeviceId());
+                        }
                     } catch (InterruptedException e) {
-                        log.warn("[{}]Put frame interrupted", driver.getDeviceId());
+                        log.info("[{}]Frame to queue interrupted", driver.getDeviceId());
                     }
                 });
-                log.info("[{}]Stop reading frames", driver.getDeviceId());
+                log.info("[{}]Reading frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {
-                log.info("[{}]Stop reading frames, cause: {}", driver.getDeviceId(),
+                log.info("[{}]Reading frames stopped, cause: {}", driver.getDeviceId(),
                         cause.getMessage() == null ? cause.getClass() : cause.getMessage());
             } finally {
                 sendFrameThread.interrupt();
