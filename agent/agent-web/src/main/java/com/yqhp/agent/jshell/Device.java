@@ -19,6 +19,7 @@ import com.android.ddmlib.IDevice;
 import com.yqhp.agent.androidtools.AndroidUtils;
 import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
+import com.yqhp.common.jshell.JShellVar;
 import io.appium.java_client.AppiumDriver;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +32,12 @@ import java.io.File;
  * @author jiangyitao
  */
 @Slf4j
-public class Device extends Agent {
+public class Device implements JShellVar {
 
-    public Device(DeviceDriver deviceDriver) {
-        super(deviceDriver);
+    protected DeviceDriver driver;
+
+    public Device(DeviceDriver driver) {
+        this.driver = driver;
     }
 
     @Override
@@ -42,36 +45,32 @@ public class Device extends Agent {
         return "device";
     }
 
-    private DeviceDriver deviceDriver() {
-        return (DeviceDriver) driver;
-    }
-
     /**
      * @since 0.2.2
      */
     public String getId() {
-        return deviceDriver().getDeviceId();
+        return driver.getDeviceId();
     }
 
     /**
      * @since 0.0.1
      */
     public AppiumDriver appiumDriver() {
-        return (AppiumDriver) deviceDriver().getOrCreateWebDriver();
+        return (AppiumDriver) driver.getOrCreateWebDriver();
     }
 
     /**
      * @since 0.0.1
      */
     public AppiumDriver refreshAppiumDriver() {
-        return (AppiumDriver) deviceDriver().refreshWebDriver();
+        return (AppiumDriver) driver.refreshWebDriver();
     }
 
     /**
      * @since 0.0.1
      */
     public Device cap(String key, Object value) {
-        deviceDriver().setCapability(key, value);
+        driver.setCapability(key, value);
         return this;
     }
 
@@ -81,14 +80,14 @@ public class Device extends Agent {
      */
     @SneakyThrows
     public void installApp(String uri) {
-        deviceDriver().installApp(uri);
+        driver.installApp(uri);
     }
 
     /**
      * @since 0.0.1
      */
     public void installApp(File file) {
-        deviceDriver().installApp(file);
+        driver.installApp(file);
     }
 
     /**

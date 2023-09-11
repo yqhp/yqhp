@@ -59,6 +59,7 @@ public class Driver {
                 if (jshellContext == null) {
                     log.info("Init jshellContext...");
                     jshellContext = new JShellContext();
+                    jshellContext.injectVar(new Agent(this));
                     jshellContext.injectVar(new Logger(this));
                     injectVar(jshellContext);
                     log.info("JshellContext inited");
@@ -68,8 +69,8 @@ public class Driver {
         return jshellContext;
     }
 
-    public void injectVar(JShellContext jshellCtx) {
-        jshellCtx.injectVar(new Agent(this));
+    protected void injectVar(JShellContext jshellCtx) {
+
     }
 
     public JShellEvalResult jshellEval(String input) {

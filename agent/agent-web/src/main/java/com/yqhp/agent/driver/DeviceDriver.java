@@ -55,7 +55,7 @@ public abstract class DeviceDriver extends SeleniumDriver {
     }
 
     @Override
-    public void injectVar(JShellContext jshellCtx) {
+    protected void injectVar(JShellContext jshellCtx) {
         jshellCtx.injectVar(new com.yqhp.agent.jshell.Device(this));
     }
 

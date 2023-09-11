@@ -16,6 +16,7 @@
 package com.yqhp.agent.jshell;
 
 import com.yqhp.agent.driver.SeleniumDriver;
+import com.yqhp.common.jshell.JShellVar;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.chrome.ChromeDriver;
 
@@ -25,10 +26,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
  * @author jiangyitao
  */
 @Slf4j
-public class Browser extends Agent {
+public class Browser implements JShellVar {
+
+    protected SeleniumDriver driver;
 
     public Browser(SeleniumDriver driver) {
-        super(driver);
+        this.driver = driver;
     }
 
     @Override
@@ -36,15 +39,11 @@ public class Browser extends Agent {
         return "browser";
     }
 
-    private SeleniumDriver seleniumDriver() {
-        return (SeleniumDriver) driver;
-    }
-
     /**
      * @since 0.3.4
      */
     public Browser cap(String key, Object value) {
-        seleniumDriver().setCapability(key, value);
+        driver.setCapability(key, value);
         return this;
     }
 
@@ -52,13 +51,13 @@ public class Browser extends Agent {
      * @since 0.3.4
      */
     public ChromeDriver chromeDriver() {
-        return (ChromeDriver) seleniumDriver().getOrCreateWebDriver();
+        return (ChromeDriver) driver.getOrCreateWebDriver();
     }
 
     /**
      * @since 0.3.8
      */
     public ChromeDriver refreshChromeDriver() {
-        return (ChromeDriver) seleniumDriver().refreshWebDriver();
+        return (ChromeDriver) driver.refreshWebDriver();
     }
 }

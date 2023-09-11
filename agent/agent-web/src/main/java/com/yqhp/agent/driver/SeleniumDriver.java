@@ -36,7 +36,7 @@ public class SeleniumDriver extends Driver {
     private RemoteWebDriver webDriver;
 
     @Override
-    public void injectVar(JShellContext jshellCtx) {
+    protected void injectVar(JShellContext jshellCtx) {
         jshellCtx.injectVar(new Browser(this));
     }
 
