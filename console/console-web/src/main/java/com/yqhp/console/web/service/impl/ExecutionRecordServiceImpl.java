@@ -61,7 +61,7 @@ public class ExecutionRecordServiceImpl
         extends ServiceImpl<ExecutionRecordMapper, ExecutionRecord>
         implements ExecutionRecordService {
 
-    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED);
+    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED, ExecutionStatus.SKIPPED);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -296,7 +296,13 @@ public class ExecutionRecordServiceImpl
 
             boolean allSuccessful = deviceExecutionResults.stream()
                     .allMatch(res -> ExecutionStatus.SUCCESSFUL.equals(res.getStatus()));
-            result.setStatus(allSuccessful ? ExecutionStatus.SUCCESSFUL : ExecutionStatus.FAILED);
+            if (allSuccessful) {
+                result.setStatus(ExecutionStatus.SUCCESSFUL);
+            } else {
+                boolean allSkipped = deviceExecutionResults.stream()
+                        .allMatch(res -> ExecutionStatus.SKIPPED.equals(res.getStatus()));
+                result.setStatus(allSkipped ? ExecutionStatus.SKIPPED : ExecutionStatus.FAILED);
+            }
         } else {
             boolean allTodo = deviceExecutionResults.stream()
                     .allMatch(res -> ExecutionStatus.TODO.equals(res.getStatus()));
@@ -309,21 +315,25 @@ public class ExecutionRecordServiceImpl
 
         long passCount = 0;
         long failureCount = 0;
+        long skipCount = 0;
         int totalCount = 0;
         for (ExecutionResult executionResult : deviceExecutionResults) {
             DocExecutionResult docResult = executionResult.getDocExecutionResult();
             passCount += docResult.getPassCount();
             failureCount += docResult.getFailureCount();
+            skipCount += docResult.getSkipCount();
             totalCount += docResult.getTotalCount();
         }
         result.setPassCount(passCount);
         result.setFailureCount(failureCount);
+        result.setSkipCount(skipCount);
         result.setTotalCount(totalCount);
         if (totalCount != 0) {
-            BigDecimal percent = BigDecimal.valueOf(passCount)
+            BigDecimal passPercent = BigDecimal.valueOf(passCount)
                     .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100));
-            String passRate = new DecimalFormat("#.##").format(percent) + "%";
+            String passRate = new DecimalFormat("#.##").format(passPercent) + "%";
+            result.setPassPercent(passPercent);
             result.setPassRate(passRate);
         }
         return result;
@@ -341,26 +351,21 @@ public class ExecutionRecordServiceImpl
 
         // 汇总pluginResult与docResult
         long startTime;
-        if (pluginResult.getStartTime() != 0) {
-            startTime = pluginResult.getStartTime();
-        } else {
+        if (pluginResult.getStartTime() == 0) {
+            // 未配置插件 或 插件未开始执行
             startTime = docResult.getStartTime();
+        } else {
+            // 插件优先执行，开始时间为插件开始执行时间
+            startTime = pluginResult.getStartTime();
         }
         result.setStartTime(startTime);
 
-        if (pluginResult.isFinished()) {
-            if (ExecutionStatus.FAILED.equals(pluginResult.getStatus())) {
-                result.setFinished(true);
-                result.setEndTime(pluginResult.getEndTime());
-                result.setStatus(pluginResult.getStatus());
-                return result;
-            }
-            if (docResult.isFinished()) {
-                result.setFinished(true);
-                result.setEndTime(docResult.getEndTime());
-                result.setStatus(docResult.getStatus());
-                return result;
-            }
+        if (docResult.isFinished()) {
+            result.setFinished(true);
+            result.setEndTime(Math.max(pluginResult.getEndTime(), docResult.getEndTime()));
+            // 插件执行失败，docResult.getStatus()为SKIPPED
+            result.setStatus(ExecutionStatus.FAILED.equals(pluginResult.getStatus()) ? ExecutionStatus.FAILED : docResult.getStatus());
+            return result;
         }
 
         result.setFinished(false);

@@ -33,4 +33,4 @@ jobs:
           push: true
           tags: |
             registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:latest
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:1.0.2
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:1.0.3

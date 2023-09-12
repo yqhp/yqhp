@@ -30,6 +30,7 @@ public enum ExecutionStatus implements BaseEnum<Integer> {
     STARTED(1),
     SUCCESSFUL(2),
     FAILED(3),
+    SKIPPED(4),
     ;
 
     @EnumValue

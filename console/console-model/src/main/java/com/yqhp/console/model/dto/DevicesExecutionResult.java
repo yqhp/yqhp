@@ -18,6 +18,7 @@ package com.yqhp.console.model.dto;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,6 +36,8 @@ public class DevicesExecutionResult {
     // for action
     private Long passCount = 0L;
     private Long failureCount = 0L;
+    private Long skipCount = 0L;
     private Integer totalCount = 0;
+    private BigDecimal passPercent;
     private String passRate;
 }

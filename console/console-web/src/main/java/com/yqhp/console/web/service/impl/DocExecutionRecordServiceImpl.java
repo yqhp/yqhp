@@ -19,7 +19,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.console.model.dto.DocExecutionResult;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
-import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.DocKind;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.mapper.DocExecutionRecordMapper;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
 public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecordMapper, DocExecutionRecord>
         implements DocExecutionRecordService {
 
-    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED);
+    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED, ExecutionStatus.SKIPPED);
 
     @Override
     public List<DocExecutionRecord> listByExecutionRecordId(String executionRecordId) {
@@ -100,38 +99,35 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
         long failureCount = actionRecords.stream()
                 .filter(record -> ExecutionStatus.FAILED.equals(record.getStatus()))
                 .count();
+        long skipCount = actionRecords.stream()
+                .filter(record -> ExecutionStatus.SKIPPED.equals(record.getStatus()))
+                .count();
         int totalCount = actionRecords.size();
-        BigDecimal percent = BigDecimal.valueOf(passCount)
+        BigDecimal passPercent = BigDecimal.valueOf(passCount)
                 .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
-        String passRate = new DecimalFormat("#.##").format(percent) + "%";
+        String passRate = new DecimalFormat("#.##").format(passPercent) + "%";
         result.setPassCount(passCount);
         result.setFailureCount(failureCount);
+        result.setSkipCount(skipCount);
         result.setTotalCount(totalCount);
+        result.setPassPercent(passPercent);
         result.setPassRate(passRate);
 
         DocExecutionRecord firstRecord = records.get(0);
         result.setStartTime(firstRecord.getStartTime());
 
-        boolean stopRunning = records.stream()
-                .anyMatch(record ->
-                        ExecutionStatus.FAILED.equals(record.getStatus())
-                                && DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())
-                );
-        if (stopRunning) {
-            result.setFinished(true);
-            result.setEndTime(getEndTime(false, records));
-            result.setStatus(ExecutionStatus.FAILED);
-            return result;
-        }
-
         boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
         if (allFinished) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(true, records));
-            boolean anyFailed = records.stream()
-                    .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
-            result.setStatus(anyFailed ? ExecutionStatus.FAILED : ExecutionStatus.SUCCESSFUL);
+            result.setEndTime(getEndTime(records));
+            boolean allSuccessful = records.stream().allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
+            if (allSuccessful) {
+                result.setStatus(ExecutionStatus.SUCCESSFUL);
+            } else {
+                boolean allSkipped = records.stream().allMatch(record -> ExecutionStatus.SKIPPED.equals(record.getStatus()));
+                result.setStatus(allSkipped ? ExecutionStatus.SKIPPED : ExecutionStatus.FAILED);
+            }
             return result;
         }
 
@@ -144,11 +140,7 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
         return result;
     }
 
-    private long getEndTime(boolean allFinished, List<DocExecutionRecord> records) {
-        if (allFinished) {
-            DocExecutionRecord lastRecord = records.get(records.size() - 1);
-            return lastRecord.getEndTime();
-        }
+    private long getEndTime(List<DocExecutionRecord> records) {
         return records.stream()
                 .mapToLong(DocExecutionRecord::getEndTime)
                 .max().orElse(0);

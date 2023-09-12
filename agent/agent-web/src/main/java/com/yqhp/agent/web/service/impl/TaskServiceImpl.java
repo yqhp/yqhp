@@ -43,21 +43,35 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void execute(Driver driver, Task task) {
-        // 加载插件
+        boolean skip = false;
+
         for (PluginExecutionRecord record : task.getPluginExecutionRecords()) {
-            boolean ok = loadPluginQuietly(driver, record);
-            if (!ok) {
-                // 插件加载失败，停止运行
-                return;
+            if (skip) {
+                skipPlugin(record);
+            } else {
+                // 加载插件失败, skip -> true
+                skip = !loadPluginQuietly(driver, record);
             }
         }
-        // 执行doc
+
         for (DocExecutionRecord record : task.getDocExecutionRecords()) {
-            boolean ok = evalDocQuietly(driver, record);
-            if (!ok && DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())) {
-                return;
+            if (skip) {
+                skipDoc(record);
+            } else {
+                if (!evalDocQuietly(driver, record)
+                        && DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())) {
+                    // 执行doc失败 且 流程为失败终止
+                    skip = true;
+                }
             }
         }
+    }
+
+    private void skipPlugin(PluginExecutionRecord record) {
+        PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(ExecutionStatus.SKIPPED);
+        producer.sendPluginExecutionRecordMessage(message);
     }
 
     private boolean loadPluginQuietly(Driver driver, PluginExecutionRecord record) {
@@ -94,6 +108,13 @@ public class TaskServiceImpl implements TaskService {
         message.setStatus(ExecutionStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
+    }
+
+    private void skipDoc(DocExecutionRecord record) {
+        DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+        message.setId(record.getId());
+        message.setStatus(ExecutionStatus.SKIPPED);
+        producer.sendDocExecutionRecordMessage(message);
     }
 
     private boolean evalDocQuietly(Driver driver, DocExecutionRecord record) {

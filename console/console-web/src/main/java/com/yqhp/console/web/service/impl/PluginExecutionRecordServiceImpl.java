@@ -36,6 +36,8 @@ public class PluginExecutionRecordServiceImpl
         extends ServiceImpl<PluginExecutionRecordMapper, PluginExecutionRecord>
         implements PluginExecutionRecordService {
 
+    public static final List<ExecutionStatus> FINISHED_STATUS = List.of(ExecutionStatus.SUCCESSFUL, ExecutionStatus.FAILED, ExecutionStatus.SKIPPED);
+
     @Override
     public List<PluginExecutionRecord> listByExecutionRecordId(String executionRecordId) {
         Assert.hasText(executionRecordId, "executionRecordId must has text");
@@ -85,21 +87,17 @@ public class PluginExecutionRecordServiceImpl
         PluginExecutionRecord firstRecord = records.get(0);
         result.setStartTime(firstRecord.getStartTime());
 
-        boolean anyFailed = records.stream()
-                .anyMatch(record -> ExecutionStatus.FAILED.equals(record.getStatus()));
-        if (anyFailed) {
+        boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
+        if (allFinished) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(true, records));
-            result.setStatus(ExecutionStatus.FAILED);
-            return result;
-        }
-
-        boolean allSuccessful = records.stream()
-                .allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
-        if (allSuccessful) {
-            result.setFinished(true);
-            result.setEndTime(getEndTime(false, records));
-            result.setStatus(ExecutionStatus.SUCCESSFUL);
+            result.setEndTime(getEndTime(records));
+            boolean allSuccessful = records.stream().allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
+            if (allSuccessful) {
+                result.setStatus(ExecutionStatus.SUCCESSFUL);
+            } else {
+                boolean allSkipped = records.stream().allMatch(record -> ExecutionStatus.SKIPPED.equals(record.getStatus()));
+                result.setStatus(allSkipped ? ExecutionStatus.SKIPPED : ExecutionStatus.FAILED);
+            }
             return result;
         }
 
@@ -112,13 +110,9 @@ public class PluginExecutionRecordServiceImpl
         return result;
     }
 
-    private long getEndTime(boolean anyFailed, List<PluginExecutionRecord> records) {
-        if (anyFailed) {
-            return records.stream()
-                    .mapToLong(PluginExecutionRecord::getEndTime)
-                    .max().orElse(0);
-        }
-        PluginExecutionRecord lastRecord = records.get(records.size() - 1);
-        return lastRecord.getEndTime();
+    private long getEndTime(List<PluginExecutionRecord> records) {
+        return records.stream()
+                .mapToLong(PluginExecutionRecord::getEndTime)
+                .max().orElse(0);
     }
 }
