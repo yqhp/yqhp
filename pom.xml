@@ -26,8 +26,6 @@
         <selenium.version>4.11.0</selenium.version>
         <!-- 覆盖spring-boot-dependencies，解决minio依赖冲突 -->
         <okhttp3.version>4.10.0</okhttp3.version>
-        <!-- 覆盖spring-boot-dependencies -->
-        <rest-assured.version>5.3.1</rest-assured.version>
     </properties>
 
     <dependencyManagement>
@@ -307,16 +305,6 @@
                 <version>${junixsocket.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.googlejavaformat</groupId>
-                <artifactId>google-java-format</artifactId>
-                <version>1.14.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup</groupId>
-                <artifactId>javapoet</artifactId>
-                <version>1.13.0</version>
-            </dependency>
-            <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
                 <version>${jwt.version}</version>
@@ -331,50 +319,6 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>3.24.2</version>
-            </dependency>
-
-            <!-- 覆盖spring-boot-dependencies start -->
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>json-schema-validator</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>scala-support</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>spring-mock-mvc</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>spring-web-test-client</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>xml-path</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <!-- 覆盖spring-boot-dependencies end -->
-
             <dependency>
                 <groupId>org.openpnp</groupId>
                 <artifactId>opencv</artifactId>

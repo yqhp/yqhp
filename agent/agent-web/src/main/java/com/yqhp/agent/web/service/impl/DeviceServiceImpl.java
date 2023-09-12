@@ -230,7 +230,7 @@ public class DeviceServiceImpl implements DeviceService {
             appFile = MultipartFileUtils.toTempFile(app);
             deviceDriver.installApp(appFile);
         } catch (Exception e) {
-            log.error("Install {} failed", app.getOriginalFilename(), e);
+            log.error("[{}]Install {} failed", deviceDriver.getDeviceId(), app.getOriginalFilename(), e);
             throw new ServiceException(ResponseCodeEnum.INSTALL_APP_FAILED, e.getMessage());
         } finally {
             if (appFile != null && !appFile.delete()) {

@@ -27,6 +27,7 @@ import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.DocFlow;
 import com.yqhp.console.repository.enums.ExecutionStatus;
 import com.yqhp.console.repository.jsonfield.DocExecutionLog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ import java.util.List;
 /**
  * @author jiangyitao
  */
+@Slf4j
 @Service
 public class TaskServiceImpl implements TaskService {
 
@@ -108,6 +110,7 @@ public class TaskServiceImpl implements TaskService {
         message.setStatus(ExecutionStatus.FAILED);
         message.setEndTime(System.currentTimeMillis());
         producer.sendPluginExecutionRecordMessage(message);
+        log.error("Load plugin={} failed", record.getPlugin().getName(), cause);
     }
 
     private void skipDoc(DocExecutionRecord record) {
@@ -163,6 +166,10 @@ public class TaskServiceImpl implements TaskService {
         message.setResults(results);
         message.setLogs(logs);
         producer.sendDocExecutionRecordMessage(message);
+        // 目前还没遇到过cause != null的情况，在此记录下
+        if (cause != null) {
+            log.error("Unexpected err, recordId={}", record.getId(), cause);
+        }
     }
 
 }
