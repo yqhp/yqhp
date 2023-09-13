@@ -55,8 +55,8 @@ public class Driver {
     private final List<DocExecutionLog> logs = Collections.synchronizedList(new LinkedList<>());
     private final List<Consumer<DocExecutionLog>> logConsumers = new ArrayList<>();
 
-    private DataSource jdbcDataSource;
-    private JdbcTemplate jdbcTemplate;
+    private final List<DataSource> jdbcDataSources = new ArrayList<>();
+    private final List<JdbcTemplate> jdbcTemplates = new ArrayList<>();
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
@@ -179,32 +179,32 @@ public class Driver {
         }
     }
 
-    public synchronized JdbcTemplate createJdbcTemplate(DataSource ds) {
-        if (jdbcTemplate != null) {
-            throw new IllegalStateException("JdbcTemplate already created");
-        }
+    public JdbcTemplate createJdbcTemplate(DataSource ds) {
         Assert.notNull(ds, "DataSource cannot be null");
-        jdbcDataSource = ds;
-        jdbcTemplate = new JdbcTemplate(ds);
+        jdbcDataSources.add(ds);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+        jdbcTemplates.add(jdbcTemplate);
         return jdbcTemplate;
     }
 
-    public synchronized void releaseJdbc() {
-        if (jdbcDataSource != null) {
-            // 释放连接池全部资源
-            if (jdbcDataSource instanceof AutoCloseable) {
+    public void releaseJdbc() {
+        for (DataSource ds : jdbcDataSources) {
+            if (ds instanceof AutoCloseable) {
                 try {
-                    log.info("Close jdbcDataSource");
-                    ((AutoCloseable) jdbcDataSource).close();
+                    // 释放连接池全部资源
+                    ((AutoCloseable) ds).close();
                 } catch (Exception e) {
-                    log.error("Close jdbcDataSource failed", e);
+                    log.error("Close ds failed", e);
                 }
             }
-            jdbcDataSource = null;
         }
-        if (jdbcTemplate != null) {
-            log.info("JdbcTemplate be null");
-            jdbcTemplate = null;
+        if (!jdbcDataSources.isEmpty()) {
+            log.info("Clear jdbcDataSources");
+            jdbcDataSources.clear();
+        }
+        if (!jdbcTemplates.isEmpty()) {
+            log.info("Clear jdbcTemplates");
+            jdbcTemplates.clear();
         }
     }
 
