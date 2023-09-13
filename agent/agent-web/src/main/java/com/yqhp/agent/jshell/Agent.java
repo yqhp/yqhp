@@ -22,6 +22,8 @@ import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellVar;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -46,6 +48,16 @@ public class Agent implements JShellVar {
     @Override
     public String getName() {
         return "agent";
+    }
+
+    /**
+     * 休眠
+     *
+     * @since 1.0.7
+     */
+    @SneakyThrows
+    public void sleep(Duration duration) {
+        Thread.sleep(duration.toMillis());
     }
 
     /**
@@ -109,5 +121,17 @@ public class Agent implements JShellVar {
             }
             Thread.sleep(intervalMs);
         }
+    }
+
+
+    /**
+     * 创建JdbcTemplate，用于操作数据库
+     *
+     * @since 1.0.7
+     */
+    public JdbcTemplate createJdbcTemplate(String url, String username, String password, String driverClassName) {
+        DriverManagerDataSource ds = new DriverManagerDataSource(url, username, password);
+        ds.setDriverClassName(driverClassName);
+        return driver.createJdbcTemplate(ds);
     }
 }

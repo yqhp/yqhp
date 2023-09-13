@@ -11,11 +11,11 @@
 
     <artifactId>agent-web</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 
     <properties>
         <!-- 注意: dependencies发生变化，需要更新这个版本号  -->
-        <lib.version>v106</lib.version>
+        <lib.version>v107</lib.version>
     </properties>
 
     <dependencies>
@@ -55,6 +55,16 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--给jshell执行sql用的-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <!--给jshell执行sql用的-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

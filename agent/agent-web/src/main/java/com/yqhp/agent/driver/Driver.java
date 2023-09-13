@@ -27,9 +27,11 @@ import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,10 +50,13 @@ public class Driver {
     private static final AtomicInteger THREAD_GROUP_ID = new AtomicInteger();
 
     private volatile JShellContext jshellContext;
-    private volatile ThreadGroup threadGroup;
+    private ThreadGroup threadGroup;
     @Getter
     private final List<DocExecutionLog> logs = Collections.synchronizedList(new LinkedList<>());
     private final List<Consumer<DocExecutionLog>> logConsumers = new ArrayList<>();
+
+    private DataSource jdbcDataSource;
+    private JdbcTemplate jdbcTemplate;
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
@@ -174,10 +179,40 @@ public class Driver {
         }
     }
 
+    public synchronized JdbcTemplate createJdbcTemplate(DataSource ds) {
+        if (jdbcTemplate != null) {
+            throw new IllegalStateException("JdbcTemplate already created");
+        }
+        Assert.notNull(ds, "DataSource cannot be null");
+        jdbcDataSource = ds;
+        jdbcTemplate = new JdbcTemplate(ds);
+        return jdbcTemplate;
+    }
+
+    public synchronized void releaseJdbc() {
+        if (jdbcDataSource != null) {
+            // 释放连接池全部资源
+            if (jdbcDataSource instanceof AutoCloseable) {
+                try {
+                    log.info("Close jdbcDataSource");
+                    ((AutoCloseable) jdbcDataSource).close();
+                } catch (Exception e) {
+                    log.error("Close jdbcDataSource failed", e);
+                }
+            }
+            jdbcDataSource = null;
+        }
+        if (jdbcTemplate != null) {
+            log.info("JdbcTemplate be null");
+            jdbcTemplate = null;
+        }
+    }
+
     public void release() {
         closeJShellContext();
         stopThreadGroup();
         clearLogs();
         clearLogConsumers();
+        releaseJdbc();
     }
 }
