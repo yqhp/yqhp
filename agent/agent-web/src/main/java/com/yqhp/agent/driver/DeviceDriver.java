@@ -59,14 +59,14 @@ public abstract class DeviceDriver extends SeleniumDriver {
         jshellCtx.injectVar(new com.yqhp.agent.jshell.Device(this));
     }
 
-    public void installApp(String uri) throws IOException {
+    public void installApp(String uri, String... extraArgs) throws IOException {
         File app = uri.startsWith("http")
                 ? FileUtils.downloadIfAbsent(uri, new File(Properties.getDownloadDir()))
                 : new File(uri);
-        installApp(app);
+        installApp(app, extraArgs);
     }
 
-    public void installApp(File app) {
+    public void installApp(File app, String... extraArgs) {
         ((InteractsWithApps) getOrCreateWebDriver()).installApp(app.getAbsolutePath());
     }
 

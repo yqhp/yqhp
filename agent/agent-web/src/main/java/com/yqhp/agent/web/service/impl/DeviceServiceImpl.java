@@ -222,13 +222,13 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public void installAppByToken(String token, MultipartFile app) {
+    public void installAppByToken(String token, MultipartFile app, String... extraArgs) {
         DeviceDriver deviceDriver = getDeviceDriverByToken(token);
 
         File appFile = null;
         try {
             appFile = MultipartFileUtils.toTempFile(app);
-            deviceDriver.installApp(appFile);
+            deviceDriver.installApp(appFile, extraArgs);
         } catch (Exception e) {
             log.error("[{}]Install {} failed", deviceDriver.getDeviceId(), app.getOriginalFilename(), e);
             throw new ServiceException(ResponseCodeEnum.INSTALL_APP_FAILED, e.getMessage());

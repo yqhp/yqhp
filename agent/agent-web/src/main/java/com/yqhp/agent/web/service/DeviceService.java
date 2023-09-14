@@ -44,7 +44,7 @@ public interface DeviceService {
 
     DeviceDriver getDeviceDriverByToken(String token);
 
-    void installAppByToken(String token, MultipartFile app);
+    void installAppByToken(String token, MultipartFile app, String... extraArgs);
 
     Hierarchy dumpHierarchy(String token);
 

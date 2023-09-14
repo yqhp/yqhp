@@ -64,7 +64,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    public void installApp(File app) {
+    public void installApp(File app, String... extraArgs) {
         IOSUtils.installApp(device.getId(), app);
     }
 

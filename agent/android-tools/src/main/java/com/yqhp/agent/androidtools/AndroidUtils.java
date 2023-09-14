@@ -38,8 +38,8 @@ import java.util.regex.Pattern;
 @Slf4j
 public class AndroidUtils {
 
-    public static void installApp(IDevice iDevice, File apkFile) {
-        installApp(iDevice, apkFile, true);
+    public static void installApp(IDevice iDevice, File apkFile, String... extraArgs) {
+        installApp(iDevice, apkFile, true, extraArgs);
     }
 
     public static void installApp(IDevice iDevice, File apkFile, boolean reinstall, String... extraArgs) {

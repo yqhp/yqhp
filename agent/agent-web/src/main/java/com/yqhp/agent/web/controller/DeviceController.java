@@ -52,8 +52,9 @@ public class DeviceController {
 
     @PostMapping("/installApp")
     public void installApp(@RequestHeader("deviceToken") String token,
-                           @NotNull(message = "app不能为空") MultipartFile app) {
-        deviceService.installAppByToken(token, app);
+                           @NotNull(message = "app不能为空") MultipartFile app,
+                           String... extraArgs) {
+        deviceService.installAppByToken(token, app, extraArgs);
     }
 
     @GetMapping("/dumpHierarchy")

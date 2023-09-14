@@ -62,8 +62,8 @@ public class AndroidDeviceDriver extends DeviceDriver {
     }
 
     @Override
-    public void installApp(File app) {
-        AndroidUtils.installApp(getIDevice(), app);
+    public void installApp(File app, String... extraArgs) {
+        AndroidUtils.installApp(getIDevice(), app, extraArgs);
     }
 
     @Override

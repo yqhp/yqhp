@@ -79,15 +79,15 @@ public class Device implements JShellVar {
      * @since 0.0.1
      */
     @SneakyThrows
-    public void installApp(String uri) {
-        driver.installApp(uri);
+    public void installApp(String uri, String... extraArgs) {
+        driver.installApp(uri, extraArgs);
     }
 
     /**
      * @since 0.0.1
      */
-    public void installApp(File file) {
-        driver.installApp(file);
+    public void installApp(File file, String... extraArgs) {
+        driver.installApp(file, extraArgs);
     }
 
     /**
