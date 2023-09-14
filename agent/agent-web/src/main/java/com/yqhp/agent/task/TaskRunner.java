@@ -93,7 +93,7 @@ public class TaskRunner {
 
     private boolean onTaskStarted(Task task) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onTaskStarted(task);
             } catch (Throwable cause) {
@@ -106,7 +106,7 @@ public class TaskRunner {
 
     private boolean onTaskFinished(Task task) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onTaskFinished(task);
             } catch (Throwable cause) {
@@ -119,7 +119,7 @@ public class TaskRunner {
 
     private boolean onLoadPluginSkipped(PluginExecutionRecord record) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onLoadPluginSkipped(record);
             } catch (Throwable cause) {
@@ -132,7 +132,7 @@ public class TaskRunner {
 
     private boolean onLoadPluginStarted(PluginExecutionRecord record) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onLoadPluginStarted(record);
             } catch (Throwable cause) {
@@ -145,7 +145,7 @@ public class TaskRunner {
 
     private boolean onLoadPluginSucceed(PluginExecutionRecord record) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onLoadPluginSucceed(record);
             } catch (Throwable cause) {
@@ -158,7 +158,7 @@ public class TaskRunner {
 
     private boolean onLoadPluginFailed(PluginExecutionRecord record, Throwable cause) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onLoadPluginFailed(record, cause);
             } catch (Throwable t) {
@@ -171,7 +171,7 @@ public class TaskRunner {
 
     private boolean onEvalDocSkipped(DocExecutionRecord record) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onEvalDocSkipped(record);
             } catch (Throwable cause) {
@@ -184,7 +184,7 @@ public class TaskRunner {
 
     private boolean onEvalDocStarted(DocExecutionRecord record) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onEvalDocStarted(record);
             } catch (Throwable cause) {
@@ -197,7 +197,7 @@ public class TaskRunner {
 
     private boolean onEvalDocSucceed(DocExecutionRecord record, List<JShellEvalResult> results) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onEvalDocSucceed(record, results, driver.getLogs());
             } catch (Throwable cause) {
@@ -211,7 +211,7 @@ public class TaskRunner {
 
     private boolean onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, Throwable cause) {
         boolean succeed = true;
-        for (TaskExecutionListener listener : listeners) {
+        for (TaskExecutionListener listener : getListeners()) {
             try {
                 listener.onEvalDocFailed(record, results, driver.getLogs(), cause);
             } catch (Throwable t) {
@@ -221,6 +221,18 @@ public class TaskRunner {
         }
         driver.clearLogs();
         return succeed;
+    }
+
+    private boolean driverListenerAdded = false;
+
+    private List<TaskExecutionListener> getListeners() {
+        TaskExecutionListener listener = driver.getTaskExecutionListener();
+        if (!driverListenerAdded && listener != null) {
+            // 优先执行从driver设置的listener
+            listeners.add(0, listener);
+            driverListenerAdded = true;
+        }
+        return listeners;
     }
 
 }

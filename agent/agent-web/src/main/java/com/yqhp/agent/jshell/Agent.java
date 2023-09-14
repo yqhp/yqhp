@@ -16,6 +16,7 @@
 package com.yqhp.agent.jshell;
 
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.agent.task.TaskExecutionListener;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.exception.TimeoutException;
 import com.yqhp.common.commons.util.FileUtils;
@@ -133,5 +134,14 @@ public class Agent implements JShellVar {
         DriverManagerDataSource ds = new DriverManagerDataSource(url, username, password);
         ds.setDriverClassName(driverClassName);
         return driver.createJdbcTemplate(ds);
+    }
+
+    /**
+     * 设置任务执行监听器
+     *
+     * @since 1.0.9
+     */
+    public void setTaskExecutionListener(TaskExecutionListener listener) {
+        driver.setTaskExecutionListener(listener);
     }
 }

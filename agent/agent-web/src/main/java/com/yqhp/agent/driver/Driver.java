@@ -17,6 +17,7 @@ package com.yqhp.agent.driver;
 
 import com.yqhp.agent.jshell.Agent;
 import com.yqhp.agent.jshell.Logger;
+import com.yqhp.agent.task.TaskExecutionListener;
 import com.yqhp.agent.web.service.PluginService;
 import com.yqhp.common.jshell.CompletionItem;
 import com.yqhp.common.jshell.JShellContext;
@@ -26,6 +27,7 @@ import com.yqhp.common.web.util.ApplicationContextUtils;
 import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import com.yqhp.console.repository.jsonfield.PluginDTO;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
@@ -57,6 +59,10 @@ public class Driver {
 
     private final List<DataSource> jdbcDataSources = new ArrayList<>();
     private final List<JdbcTemplate> jdbcTemplates = new ArrayList<>();
+
+    @Getter
+    @Setter
+    private TaskExecutionListener taskExecutionListener;
 
     public JShellContext getOrCreateJShellContext() {
         if (jshellContext == null) {
@@ -208,11 +214,19 @@ public class Driver {
         }
     }
 
+    public void clearTaskExecutionListener() {
+        if (taskExecutionListener != null) {
+            log.info("Clear taskExecutionListener");
+            taskExecutionListener = null;
+        }
+    }
+
     public void release() {
         closeJShellContext();
         stopThreadGroup();
         clearLogs();
         clearLogConsumers();
         releaseJdbc();
+        clearTaskExecutionListener();
     }
 }
