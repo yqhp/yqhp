@@ -17,11 +17,20 @@ package com.yqhp.agent.web.job;
 
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.driver.Driver;
+import com.yqhp.agent.task.TaskExecutionListener;
+import com.yqhp.agent.task.TaskRunner;
+import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.agent.web.service.DeviceService;
-import com.yqhp.agent.web.service.TaskService;
+import com.yqhp.common.jshell.JShellEvalResult;
+import com.yqhp.common.kafka.message.DocExecutionRecordMessage;
+import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
 import com.yqhp.console.model.vo.Task;
+import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.Plan;
+import com.yqhp.console.repository.entity.PluginExecutionRecord;
+import com.yqhp.console.repository.enums.ExecutionStatus;
+import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import com.yqhp.console.rpc.ExecutionRecordRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +68,10 @@ public class TaskJob {
     @Autowired
     private AgentService agentService;
     @Autowired
-    private TaskService taskService;
+    private MessageProducer producer;
 
     @Scheduled(fixedDelay = 10_000)
-    public void executeDeviceTask() {
+    public void runDeviceTask() {
         List<DeviceDriver> drivers = deviceService.getUnlockedDeviceDrivers(); // 闲置设备
         for (DeviceDriver driver : drivers) {
             DEVICE_THREAD_POOL.submit(() -> {
@@ -83,15 +92,11 @@ public class TaskJob {
                 String token = deviceService.lockDevice(driver.getDeviceId(), planName);
 
                 // 执行任务
-                try {
-                    log.info("[{}]Task started, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
-                    taskService.execute(driver, task);
-                } catch (Throwable cause) {
-                    log.error("[{}]Unexpected error, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId(), cause);
-                } finally {
-                    log.info("[{}]Task finished, executionId={}", driver.getDeviceId(), task.getExecutionRecord().getId());
-                    deviceService.unlockDevice(token);
-                }
+                new TaskRunner(driver)
+                        .addListener(new ExecutionListener())
+                        .runQuietly(task);
+
+                deviceService.unlockDevice(token);
             });
         }
     }
@@ -100,7 +105,7 @@ public class TaskJob {
      * fixedDelay并不会导致重叠调用方法，而是等方法执行完成后，休眠fixedDelay再调用
      */
     @Scheduled(fixedDelay = 10_000)
-    public void executeTask() {
+    public void runTask() {
         // 领取任务
         Task task = executionRecordRpc.receiveTask(null);
         if (task == null) {
@@ -113,15 +118,112 @@ public class TaskJob {
             Plan plan = task.getExecutionRecord().getPlan();
             String token = agentService.register(plan.getName(), plan.getRunMode());
             Driver driver = agentService.getDriverByToken(token);
-            try {
-                log.info("Task started, executionId={}", task.getExecutionRecord().getId());
-                taskService.execute(driver, task);
-            } catch (Throwable cause) {
-                log.error("Unexpected error, executionId={}", task.getExecutionRecord().getId(), cause);
-            } finally {
-                log.info("Task finished, executionId={}", task.getExecutionRecord().getId());
-                agentService.unregister(token);
-            }
+
+            new TaskRunner(driver)
+                    .addListener(new ExecutionListener())
+                    .runQuietly(task);
+
+            agentService.unregister(token);
         });
+    }
+
+    class ExecutionListener implements TaskExecutionListener {
+
+        @Override
+        public void onTaskStarted(Task task) {
+            log.info("onTaskStarted, executionRecordId={}", task.getExecutionRecord().getId());
+        }
+
+        @Override
+        public void onTaskFinished(Task task) {
+            log.info("onTaskFinished, executionRecordId={}", task.getExecutionRecord().getId());
+        }
+
+        @Override
+        public void onLoadPluginSkipped(PluginExecutionRecord record) {
+            log.info("onLoadPluginSkipped, recordId={}", record.getId());
+            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.SKIPPED);
+            producer.sendPluginExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onLoadPluginStarted(PluginExecutionRecord record) {
+            log.info("onLoadPluginStarted, recordId={}", record.getId());
+            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.STARTED);
+            message.setStartTime(System.currentTimeMillis());
+            producer.sendPluginExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onLoadPluginSucceed(PluginExecutionRecord record) {
+            log.info("onLoadPluginSucceed, recordId={}", record.getId());
+            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.SUCCESSFUL);
+            message.setEndTime(System.currentTimeMillis());
+            producer.sendPluginExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onLoadPluginFailed(PluginExecutionRecord record, Throwable cause) {
+            log.info("onLoadPluginFailed, recordId={}", record.getId());
+            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.FAILED);
+            message.setEndTime(System.currentTimeMillis());
+            producer.sendPluginExecutionRecordMessage(message);
+            log.error("Load plugin={} failed", record.getPlugin().getName(), cause);
+        }
+
+        @Override
+        public void onEvalDocSkipped(DocExecutionRecord record) {
+            log.info("onEvalDocSkipped, recordId={}", record.getId());
+            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.SKIPPED);
+            producer.sendDocExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onEvalDocStarted(DocExecutionRecord record) {
+            log.info("onEvalDocStarted, recordId={}", record.getId());
+            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.STARTED);
+            message.setStartTime(System.currentTimeMillis());
+            producer.sendDocExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onEvalDocSucceed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs) {
+            log.info("onEvalDocSucceed, recordId={}", record.getId());
+            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.SUCCESSFUL);
+            message.setEndTime(System.currentTimeMillis());
+            message.setResults(results);
+            message.setLogs(logs);
+            producer.sendDocExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs, Throwable cause) {
+            log.info("onEvalDocFailed, recordId={}", record.getId());
+            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.FAILED);
+            message.setEndTime(System.currentTimeMillis());
+            message.setResults(results);
+            message.setLogs(logs);
+            producer.sendDocExecutionRecordMessage(message);
+            // 目前还没遇到过cause != null的情况，在此记录下
+            if (cause != null) {
+                log.error("Unexpected err, recordId={}", record.getId(), cause);
+            }
+        }
     }
 }
