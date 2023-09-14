@@ -226,8 +226,12 @@ public class TaskRunner {
     private boolean driverListenerAdded = false;
 
     private List<TaskExecutionListener> getListeners() {
+        if (driverListenerAdded) {
+            return listeners;
+        }
+
         TaskExecutionListener listener = driver.getTaskExecutionListener();
-        if (!driverListenerAdded && listener != null) {
+        if (listener != null) {
             // 优先执行从driver设置的listener
             listeners.add(0, listener);
             driverListenerAdded = true;
