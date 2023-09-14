@@ -15,13 +15,9 @@
  */
 package com.yqhp.agent.task;
 
-import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.console.model.vo.Task;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
-import com.yqhp.console.repository.jsonfield.DocExecutionLog;
-
-import java.util.List;
 
 /**
  * @author jiangyitao
@@ -51,9 +47,9 @@ public interface TaskExecutionListener {
     default void onEvalDocStarted(DocExecutionRecord record) {
     }
 
-    default void onEvalDocSucceed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs) {
+    default void onEvalDocSucceed(DocExecutionRecord record) {
     }
 
-    default void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs, Throwable cause) {
+    default void onEvalDocFailed(DocExecutionRecord record, Throwable cause) {
     }
 }

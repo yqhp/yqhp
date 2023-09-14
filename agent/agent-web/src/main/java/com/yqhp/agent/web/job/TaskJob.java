@@ -22,7 +22,6 @@ import com.yqhp.agent.task.TaskRunner;
 import com.yqhp.agent.web.kafka.MessageProducer;
 import com.yqhp.agent.web.service.AgentService;
 import com.yqhp.agent.web.service.DeviceService;
-import com.yqhp.common.jshell.JShellEvalResult;
 import com.yqhp.common.kafka.message.DocExecutionRecordMessage;
 import com.yqhp.common.kafka.message.PluginExecutionRecordMessage;
 import com.yqhp.console.model.vo.Task;
@@ -30,7 +29,6 @@ import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.Plan;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.ExecutionStatus;
-import com.yqhp.console.repository.jsonfield.DocExecutionLog;
 import com.yqhp.console.rpc.ExecutionRecordRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +183,7 @@ public class TaskJob {
             DocExecutionRecordMessage message = new DocExecutionRecordMessage();
             message.setId(record.getId());
             message.setStatus(ExecutionStatus.SKIPPED);
+            message.setLogs(record.getLogs());
             producer.sendDocExecutionRecordMessage(message);
         }
 
@@ -199,26 +198,26 @@ public class TaskJob {
         }
 
         @Override
-        public void onEvalDocSucceed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs) {
+        public void onEvalDocSucceed(DocExecutionRecord record) {
             log.info("onEvalDocSucceed, recordId={}", record.getId());
             DocExecutionRecordMessage message = new DocExecutionRecordMessage();
             message.setId(record.getId());
             message.setStatus(ExecutionStatus.SUCCESSFUL);
             message.setEndTime(System.currentTimeMillis());
-            message.setResults(results);
-            message.setLogs(logs);
+            message.setResults(record.getResults());
+            message.setLogs(record.getLogs());
             producer.sendDocExecutionRecordMessage(message);
         }
 
         @Override
-        public void onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, List<DocExecutionLog> logs, Throwable cause) {
+        public void onEvalDocFailed(DocExecutionRecord record, Throwable cause) {
             log.info("onEvalDocFailed, recordId={}", record.getId());
             DocExecutionRecordMessage message = new DocExecutionRecordMessage();
             message.setId(record.getId());
             message.setStatus(ExecutionStatus.FAILED);
             message.setEndTime(System.currentTimeMillis());
-            message.setResults(results);
-            message.setLogs(logs);
+            message.setResults(record.getResults());
+            message.setLogs(record.getLogs());
             producer.sendDocExecutionRecordMessage(message);
             // 目前还没遇到过cause != null的情况，在此记录下
             if (cause != null) {

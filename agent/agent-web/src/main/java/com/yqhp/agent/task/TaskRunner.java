@@ -62,16 +62,19 @@ public class TaskRunner {
         }
 
         for (DocExecutionRecord record : task.getDocExecutionRecords()) {
+            driver.clearLogs();
+            record.setLogs(driver.getLogs());
+
             if (skipped || !onEvalDocStarted(record)) {
                 onEvalDocSkipped(record);
                 continue;
             }
 
-            List<JShellEvalResult> results = null;
             boolean failed;
             Throwable err = null;
             try {
-                results = driver.jshellAnalysisAndEval(record.getDoc().getContent());
+                List<JShellEvalResult> results = driver.jshellAnalysisAndEval(record.getDoc().getContent());
+                record.setResults(results);
                 failed = results.stream().anyMatch(JShellEvalResult::isFailed);
             } catch (Throwable cause) {
                 failed = true;
@@ -79,12 +82,12 @@ public class TaskRunner {
             }
 
             if (failed) {
-                onEvalDocFailed(record, results, err);
+                onEvalDocFailed(record, err);
                 if (DocFlow.STOP_RUNNING_NEXT_IF_ERROR.equals(record.getDoc().getFlow())) {
                     skipped = true;
                 }
             } else {
-                onEvalDocSucceed(record, results);
+                onEvalDocSucceed(record);
             }
         }
 
@@ -195,31 +198,29 @@ public class TaskRunner {
         return succeed;
     }
 
-    private boolean onEvalDocSucceed(DocExecutionRecord record, List<JShellEvalResult> results) {
+    private boolean onEvalDocSucceed(DocExecutionRecord record) {
         boolean succeed = true;
         for (TaskExecutionListener listener : getListeners()) {
             try {
-                listener.onEvalDocSucceed(record, results, driver.getLogs());
+                listener.onEvalDocSucceed(record);
             } catch (Throwable cause) {
                 log.error("Error onEvalDocSucceed, recordId={}", record.getId(), cause);
                 succeed = false;
             }
         }
-        driver.clearLogs();
         return succeed;
     }
 
-    private boolean onEvalDocFailed(DocExecutionRecord record, List<JShellEvalResult> results, Throwable cause) {
+    private boolean onEvalDocFailed(DocExecutionRecord record, Throwable cause) {
         boolean succeed = true;
         for (TaskExecutionListener listener : getListeners()) {
             try {
-                listener.onEvalDocFailed(record, results, driver.getLogs(), cause);
+                listener.onEvalDocFailed(record, cause);
             } catch (Throwable t) {
                 log.error("Error onEvalDocFailed, recordId={}", record.getId(), t);
                 succeed = false;
             }
         }
-        driver.clearLogs();
         return succeed;
     }
 
