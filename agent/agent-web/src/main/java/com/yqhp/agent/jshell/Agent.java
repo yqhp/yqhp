@@ -24,9 +24,9 @@ import com.yqhp.common.jshell.JShellVar;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.util.Assert;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -130,9 +130,7 @@ public class Agent implements JShellVar {
      *
      * @since 1.0.7
      */
-    public JdbcTemplate createJdbcTemplate(String url, String username, String password, String driverClassName) {
-        DriverManagerDataSource ds = new DriverManagerDataSource(url, username, password);
-        ds.setDriverClassName(driverClassName);
+    public JdbcTemplate createJdbcTemplate(DataSource ds) {
         return driver.createJdbcTemplate(ds);
     }
 

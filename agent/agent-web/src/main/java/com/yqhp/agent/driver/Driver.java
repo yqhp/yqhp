@@ -195,9 +195,9 @@ public class Driver {
 
     public void releaseJdbc() {
         for (DataSource ds : jdbcDataSources) {
+            // 主流的连接池HikariDataSource 实现了 AutoCloseable，通过close释放连接池资源
             if (ds instanceof AutoCloseable) {
                 try {
-                    // 释放连接池全部资源
                     ((AutoCloseable) ds).close();
                 } catch (Exception e) {
                     log.error("Close ds failed", e);
