@@ -42,9 +42,13 @@ public class ZkDeviceManager {
         zkTemplate.create(CreateMode.EPHEMERAL, path, toJSONString(device));
     }
 
-    public void delete(String location, String deviceId) {
+    public boolean delete(String location, String deviceId) {
         String path = getDevicePath(location, deviceId);
-        zkTemplate.delete(path);
+        if (zkTemplate.exists(path)) {
+            zkTemplate.delete(path);
+            return true;
+        }
+        return false;
     }
 
     public void update(ZkDevice device) {
