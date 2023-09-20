@@ -197,6 +197,8 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
     /**
      * 通过uiautomator查找元素(找不到则抛出异常)
      *
+     * @param uiautomatorText 示例: new UiSelector().textContains("你好")
+     *                        <a href="https://developer.android.com/reference/androidx/test/uiautomator/UiSelector">更多用法</a>
      * @since 0.0.1
      */
     public WebElement uia(String uiautomatorText) {
@@ -206,6 +208,8 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
     /**
      * 通过uiautomator查找元素(找不到则返回null)
      *
+     * @param uiautomatorText 示例: new UiSelector().textContains("你好")
+     *                        <a href="https://developer.android.com/reference/androidx/test/uiautomator/UiSelector">更多用法</a>
      * @since 0.0.1
      */
     public WebElement _uia(String uiautomatorText) {
@@ -215,6 +219,8 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
     /**
      * 通过uiautomator查找元素(找不到则抛出异常)
      *
+     * @param uiautomatorText 示例: new UiSelector().textContains("你好")
+     *                        <a href="https://developer.android.com/reference/androidx/test/uiautomator/UiSelector">更多用法</a>
      * @since 0.0.1
      */
     public WebElement uia(String uiautomatorText, Duration timeout) {
@@ -224,6 +230,8 @@ public class AppiumDriverWrapper extends RemoteWebDriverWrapper {
     /**
      * 通过uiautomator查找元素(找不到则返回null)
      *
+     * @param uiautomatorText 示例: new UiSelector().textContains("你好")
+     *                        <a href="https://developer.android.com/reference/androidx/test/uiautomator/UiSelector">更多用法</a>
      * @since 0.0.1
      */
     public WebElement _uia(String uiautomatorText, Duration timeout) {
