@@ -29,9 +29,6 @@ public interface TaskExecutionListener {
     default void onTaskFinished(Task task) {
     }
 
-    default void onLoadPluginSkipped(PluginExecutionRecord record) {
-    }
-
     default void onLoadPluginStarted(PluginExecutionRecord record) {
     }
 
@@ -41,7 +38,11 @@ public interface TaskExecutionListener {
     default void onLoadPluginFailed(PluginExecutionRecord record, Throwable cause) {
     }
 
-    default void onEvalDocSkipped(DocExecutionRecord record) {
+    default void onLoadPluginSkipped(PluginExecutionRecord record) {
+    }
+
+    default  void onEvalActionsStarted(Task task) {
+
     }
 
     default void onEvalDocStarted(DocExecutionRecord record) {
@@ -51,5 +52,8 @@ public interface TaskExecutionListener {
     }
 
     default void onEvalDocFailed(DocExecutionRecord record, Throwable cause) {
+    }
+
+    default void onEvalDocSkipped(DocExecutionRecord record) {
     }
 }

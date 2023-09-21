@@ -21,6 +21,7 @@ import com.yqhp.console.model.vo.Task;
 import com.yqhp.console.repository.entity.DocExecutionRecord;
 import com.yqhp.console.repository.entity.PluginExecutionRecord;
 import com.yqhp.console.repository.enums.DocFlow;
+import com.yqhp.console.repository.enums.DocKind;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class TaskRunner {
         boolean skipped = !onTaskStarted(task);
 
         for (PluginExecutionRecord record : task.getPluginExecutionRecords()) {
-            if (skipped || !onLoadPluginStarted(record)) {
+            if (!onLoadPluginStarted(record) || skipped) {
                 onLoadPluginSkipped(record);
                 continue;
             }
@@ -61,11 +62,16 @@ public class TaskRunner {
             }
         }
 
+        boolean actionsStarted = false;
         for (DocExecutionRecord record : task.getDocExecutionRecords()) {
             driver.clearLogs();
             record.setLogs(driver.getLogs());
 
-            if (skipped || !onEvalDocStarted(record)) {
+            if (!actionsStarted && DocKind.JSH_ACTION.equals(record.getDoc().getKind())) {
+                actionsStarted = true;
+                skipped = !onEvalActionsStarted(task);
+            }
+            if (!onEvalDocStarted(record) || skipped) {
                 onEvalDocSkipped(record);
                 continue;
             }
@@ -166,6 +172,19 @@ public class TaskRunner {
                 listener.onLoadPluginFailed(record, cause);
             } catch (Throwable t) {
                 log.error("Error onLoadPluginFailed, recordId={}", record.getId(), t);
+                succeed = false;
+            }
+        }
+        return succeed;
+    }
+
+    private boolean onEvalActionsStarted(Task task) {
+        boolean succeed = true;
+        for (TaskExecutionListener listener : getListeners()) {
+            try {
+                listener.onEvalActionsStarted(task);
+            } catch (Throwable cause) {
+                log.error("Error onEvalActionsStarted, executionId={}", task.getExecutionRecord().getId(), cause);
                 succeed = false;
             }
         }

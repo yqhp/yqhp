@@ -120,7 +120,7 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
         boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
         if (allFinished) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(records));
+            result.setEndTime(CollectionUtils.lastElement(records).getEndTime());
             boolean allSuccessful = records.stream().allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
             if (allSuccessful) {
                 result.setStatus(ExecutionStatus.SUCCESSFUL);
@@ -138,11 +138,5 @@ public class DocExecutionRecordServiceImpl extends ServiceImpl<DocExecutionRecor
             result.setStatus(ExecutionStatus.STARTED);
         }
         return result;
-    }
-
-    private long getEndTime(List<DocExecutionRecord> records) {
-        return records.stream()
-                .mapToLong(DocExecutionRecord::getEndTime)
-                .max().orElse(0);
     }
 }

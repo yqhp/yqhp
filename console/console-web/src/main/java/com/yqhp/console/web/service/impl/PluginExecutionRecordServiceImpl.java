@@ -90,7 +90,7 @@ public class PluginExecutionRecordServiceImpl
         boolean allFinished = records.stream().allMatch(record -> FINISHED_STATUS.contains(record.getStatus()));
         if (allFinished) {
             result.setFinished(true);
-            result.setEndTime(getEndTime(records));
+            result.setEndTime(CollectionUtils.lastElement(records).getEndTime());
             boolean allSuccessful = records.stream().allMatch(record -> ExecutionStatus.SUCCESSFUL.equals(record.getStatus()));
             if (allSuccessful) {
                 result.setStatus(ExecutionStatus.SUCCESSFUL);
@@ -108,11 +108,5 @@ public class PluginExecutionRecordServiceImpl
             result.setStatus(ExecutionStatus.STARTED);
         }
         return result;
-    }
-
-    private long getEndTime(List<PluginExecutionRecord> records) {
-        return records.stream()
-                .mapToLong(PluginExecutionRecord::getEndTime)
-                .max().orElse(0);
     }
 }

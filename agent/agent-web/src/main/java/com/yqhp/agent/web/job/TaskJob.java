@@ -138,15 +138,6 @@ public class TaskJob {
         }
 
         @Override
-        public void onLoadPluginSkipped(PluginExecutionRecord record) {
-            log.info("onLoadPluginSkipped, recordId={}", record.getId());
-            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
-            message.setId(record.getId());
-            message.setStatus(ExecutionStatus.SKIPPED);
-            producer.sendPluginExecutionRecordMessage(message);
-        }
-
-        @Override
         public void onLoadPluginStarted(PluginExecutionRecord record) {
             log.info("onLoadPluginStarted, recordId={}", record.getId());
             PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
@@ -178,13 +169,18 @@ public class TaskJob {
         }
 
         @Override
-        public void onEvalDocSkipped(DocExecutionRecord record) {
-            log.info("onEvalDocSkipped, recordId={}", record.getId());
-            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+        public void onLoadPluginSkipped(PluginExecutionRecord record) {
+            log.info("onLoadPluginSkipped, recordId={}", record.getId());
+            PluginExecutionRecordMessage message = new PluginExecutionRecordMessage();
             message.setId(record.getId());
             message.setStatus(ExecutionStatus.SKIPPED);
-            message.setLogs(record.getLogs());
-            producer.sendDocExecutionRecordMessage(message);
+            message.setEndTime(System.currentTimeMillis());
+            producer.sendPluginExecutionRecordMessage(message);
+        }
+
+        @Override
+        public void onEvalActionsStarted(Task task) {
+            log.info("onEvalActionsStarted, executionRecordId={}", task.getExecutionRecord().getId());
         }
 
         @Override
@@ -223,6 +219,17 @@ public class TaskJob {
             if (cause != null) {
                 log.error("Unexpected err, recordId={}", record.getId(), cause);
             }
+        }
+
+        @Override
+        public void onEvalDocSkipped(DocExecutionRecord record) {
+            log.info("onEvalDocSkipped, recordId={}", record.getId());
+            DocExecutionRecordMessage message = new DocExecutionRecordMessage();
+            message.setId(record.getId());
+            message.setStatus(ExecutionStatus.SKIPPED);
+            message.setEndTime(System.currentTimeMillis());
+            message.setLogs(record.getLogs());
+            producer.sendDocExecutionRecordMessage(message);
         }
     }
 }

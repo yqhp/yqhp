@@ -348,7 +348,7 @@ public class ExecutionRecordServiceImpl
 
         if (docResult.isFinished()) {
             result.setFinished(true);
-            result.setEndTime(Math.max(pluginResult.getEndTime(), docResult.getEndTime()));
+            result.setEndTime(docResult.getEndTime());
             // 插件执行失败，docResult.getStatus()为SKIPPED
             result.setStatus(ExecutionStatus.FAILED.equals(pluginResult.getStatus()) ? ExecutionStatus.FAILED : docResult.getStatus());
             return result;

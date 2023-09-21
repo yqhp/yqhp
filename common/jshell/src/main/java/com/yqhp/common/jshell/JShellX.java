@@ -133,16 +133,11 @@ public class JShellX implements Closeable {
         result.setEvalStart(System.currentTimeMillis());
         List<SnippetEvent> events = jShell.eval(source);
         result.setEvalEnd(System.currentTimeMillis());
-        handleEvents(events, result);
-        if (consumer != null) consumer.accept(result);
-        return result;
-    }
-
-    private void handleEvents(List<SnippetEvent> events, JShellEvalResult result) {
-        if (events == null) return;
         for (SnippetEvent event : events) {
             handleEvent(event, result);
         }
+        if (consumer != null) consumer.accept(result);
+        return result;
     }
 
     private void handleEvent(SnippetEvent snippetEvent, JShellEvalResult result) {
