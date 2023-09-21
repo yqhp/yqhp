@@ -171,9 +171,8 @@ public class ExecutionRecordServiceImpl
     @Override
     public void deleteDeviceExecutionRecord(String id, String deviceId) {
         boolean removed = removePushedForDevice(deviceId, id);
-        if (!removed) {
-            throw new ServiceException(ResponseCodeEnum.DEVICE_TASK_HAS_BEEN_RECEIVED);
-        }
+        log.info("RemovePushedForDevice, removed={}, executionRecordId={}, deviceId={}", removed, id, deviceId);
+        // 无论设备是否已领取，都删除相关数据
         pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
         docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
     }
@@ -182,36 +181,23 @@ public class ExecutionRecordServiceImpl
     @Override
     public void deleteById(String id) {
         ExecutionRecord executionRecord = getExecutionRecordById(id);
-        if (planService.isDeviceMode(executionRecord.getPlan())) {
+        boolean isDeviceMode = planService.isDeviceMode(executionRecord.getPlan());
+        if (isDeviceMode) {
             Set<String> deviceIds = docExecutionRecordService.listByExecutionRecordId(id).stream()
                     .map(DocExecutionRecord::getDeviceId)
                     .collect(Collectors.toSet());
-            List<String> unRemovedDevices = new ArrayList<>();
             for (String deviceId : deviceIds) {
                 boolean removed = removePushedForDevice(deviceId, id);
-                // 移除成功，设备则领取不到任务，可以删除该设备相关任务数据
-                if (removed) {
-                    pluginExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
-                    docExecutionRecordService.deleteByExecutionRecordIdAndDeviceId(id, deviceId);
-                } else {
-                    unRemovedDevices.add(deviceId);
-                }
-            }
-            if (unRemovedDevices.isEmpty()) {
-                removeById(id);
-            } else {
-                // 不做处理，有设备已经领取了任务
+                log.info("RemovePushedForDevice, removed={}, executionRecordId={}, deviceId={}", removed, id, deviceId);
             }
         } else {
-            // 非设备模式
             boolean removed = removePushed(id);
-            if (!removed) {
-                throw new ServiceException(ResponseCodeEnum.TASK_HAS_BEEN_RECEIVED);
-            }
-            pluginExecutionRecordService.deleteByExecutionRecordId(id);
-            docExecutionRecordService.deleteByExecutionRecordId(id);
-            removeById(id);
+            log.info("RemovePushed, removed={}, executionRecordId={}", removed, id);
         }
+        // 无论是否已领取，都删除相关数据
+        pluginExecutionRecordService.deleteByExecutionRecordId(id);
+        docExecutionRecordService.deleteByExecutionRecordId(id);
+        removeById(id);
     }
 
     @Override
