@@ -38,6 +38,8 @@ public class ExecutionReport {
     private String creator;
     private LocalDateTime createTime;
 
+    private boolean isDeviceMode;
+
     // 设备
     private Map<String, Device> devices;
     private DevicesExecutionResult devicesResult;

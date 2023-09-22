@@ -203,6 +203,7 @@ public class ExecutionRecordServiceImpl
     @Override
     public ExecutionReport getReportById(String id) {
         ExecutionRecord executionRecord = getExecutionRecordById(id);
+        boolean isDeviceMode = planService.isDeviceMode(executionRecord.getPlan());
 
         ExecutionReport report = new ExecutionReport();
         report.setId(executionRecord.getId());
@@ -210,8 +211,9 @@ public class ExecutionRecordServiceImpl
         report.setPlan(executionRecord.getPlan());
         report.setCreator(userRpc.getVOById(executionRecord.getCreateBy()).getNickname());
         report.setCreateTime(executionRecord.getCreateTime());
+        report.setDeviceMode(isDeviceMode);
 
-        if (planService.isDeviceMode(executionRecord.getPlan())) {
+        if (isDeviceMode) {
             DevicesExecutionResult result = statDevicesExecutionResult(executionRecord);
             report.setDevicesResult(result);
             Set<String> deviceIds = result.getDeviceExecutionResults().stream()
