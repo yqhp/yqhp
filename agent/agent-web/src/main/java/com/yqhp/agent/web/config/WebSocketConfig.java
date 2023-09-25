@@ -18,12 +18,25 @@ package com.yqhp.agent.web.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 /**
  * @author jiangyitao
  */
 @Configuration
 public class WebSocketConfig {
+
+    /**
+     * 默认情况下，通过ws发送过来的数据，若超过8192字节(8KB)，agent将直接断开ws连接
+     */
+    @Bean
+    public ServletServerContainerFactoryBean servletServerContainerFactoryBean() {
+        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+        container.setMaxTextMessageBufferSize(1024 * 1024 * 10); // 10MB
+        container.setMaxBinaryMessageBufferSize(1024 * 1024 * 10); // 10MB
+        return container;
+    }
+
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
