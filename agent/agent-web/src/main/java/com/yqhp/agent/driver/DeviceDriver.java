@@ -103,7 +103,8 @@ public abstract class DeviceDriver extends SeleniumDriver {
                 .withArgument(GeneralServerFlag.RELAXED_SECURITY)
                 .withArgument(GeneralServerFlag.SESSION_OVERRIDE)
                 .withArgument(GeneralServerFlag.LOG_TIMESTAMP)
-                .withArgument(GeneralServerFlag.LOCAL_TIMEZONE);
+                .withArgument(GeneralServerFlag.LOCAL_TIMEZONE)
+                .withArgument(GeneralServerFlag.LOG_NO_COLORS);
 //                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
         String appiumJsPath = Properties.getAppiumJsPath();
         if (StringUtils.isNotBlank(appiumJsPath)) {
