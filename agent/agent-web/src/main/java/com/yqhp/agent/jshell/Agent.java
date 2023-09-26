@@ -18,7 +18,8 @@ package com.yqhp.agent.jshell;
 import com.yqhp.agent.driver.Driver;
 import com.yqhp.agent.task.TaskExecutionListener;
 import com.yqhp.agent.web.config.Properties;
-import com.yqhp.common.commons.exception.TimeoutException;
+import com.yqhp.common.commons.exception.ExecutionExceededException;
+import com.yqhp.common.commons.function.Executable;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellVar;
 import lombok.SneakyThrows;
@@ -91,17 +92,17 @@ public class Agent implements JShellVar {
     }
 
     /**
-     * 执行supplier，无异常则直接返回，有异常则休眠500ms再执行，超过timeout仍未执行成功将抛出TimeoutException
+     * 执行supplier，无异常则直接返回，有异常则休眠200ms再执行，超过timeout仍未执行成功将抛出异常
      *
      * @param timeout 执行超时时间
      * @since 0.2.5
      */
     public <T> T execute(Duration timeout, Supplier<T> supplier) {
-        return execute(timeout, Duration.ofMillis(500), supplier);
+        return execute(timeout, Duration.ofMillis(200), supplier);
     }
 
     /**
-     * 执行supplier，无异常则直接返回，有异常则休眠interval再执行，超过timeout仍未执行成功将抛出TimeoutException
+     * 执行supplier，无异常则直接返回，有异常则休眠interval再执行，超过timeout仍未执行成功将抛出异常
      *
      * @param timeout  执行超时时间
      * @param interval 执行间隔时间
@@ -118,12 +119,117 @@ public class Agent implements JShellVar {
 
             }
             if (System.currentTimeMillis() > endTime) {
-                throw new TimeoutException("Execution timeout, timeout=" + timeout + ", interval=" + interval);
+                throw new ExecutionExceededException("Execution exceeded, timeout=" + timeout + ", interval=" + interval);
             }
             Thread.sleep(intervalMs);
         }
     }
 
+    /**
+     * 执行executable，无异常则直接返回，有异常则休眠200ms再执行，超过timeout仍未执行成功将抛出异常
+     *
+     * @param timeout 执行超时时间
+     * @since 1.1.6
+     */
+    public void execute(Duration timeout, Executable executable) {
+        execute(timeout, Duration.ofMillis(200), executable);
+    }
+
+    /**
+     * 执行executable，无异常则直接返回，有异常则休眠interval再执行，超过timeout仍未执行成功将抛出异常
+     *
+     * @param timeout  执行超时时间
+     * @param interval 执行间隔时间
+     * @since 1.1.6
+     */
+    @SneakyThrows
+    public void execute(Duration timeout, Duration interval, Executable executable) {
+        long endTime = System.currentTimeMillis() + timeout.toMillis();
+        long intervalMs = interval.toMillis();
+        for (; ; ) {
+            try {
+                executable.execute();
+                return;
+            } catch (Throwable ignore) {
+
+            }
+            if (System.currentTimeMillis() > endTime) {
+                throw new ExecutionExceededException("Execution exceeded, timeout=" + timeout + ", interval=" + interval);
+            }
+            Thread.sleep(intervalMs);
+        }
+    }
+
+    /**
+     * 执行supplier，无异常则直接返回，有异常则休眠200ms再执行，超过maxCount仍未执行成功将抛出异常
+     *
+     * @param maxCount 最大执行次数
+     * @since 1.1.6
+     */
+    public <T> T execute(int maxCount, Supplier<T> supplier) {
+        return execute(maxCount, Duration.ofMillis(200), supplier);
+    }
+
+    /**
+     * 执行supplier，无异常则直接返回，有异常则休眠interval再执行，超过maxCount仍未执行成功将抛出异常
+     *
+     * @param maxCount 最大执行次数
+     * @param interval 执行间隔时间
+     * @since 1.1.6
+     */
+    @SneakyThrows
+    public <T> T execute(int maxCount, Duration interval, Supplier<T> supplier) {
+        long intervalMs = interval.toMillis();
+        int count = 0;
+        for (; ; ) {
+            try {
+                count++;
+                return supplier.get();
+            } catch (Throwable ignore) {
+
+            }
+            if (count >= maxCount) {
+                throw new ExecutionExceededException("Execution exceeded, maxCount=" + maxCount + ", interval=" + interval);
+            }
+            Thread.sleep(intervalMs);
+        }
+    }
+
+    /**
+     * 执行executable，无异常则直接返回，有异常则休眠200ms再执行，超过maxCount仍未执行成功将抛出异常
+     *
+     * @param maxCount 最大执行次数
+     * @since 1.1.6
+     */
+    public void execute(int maxCount, Executable executable) {
+        execute(maxCount, Duration.ofMillis(200), executable);
+    }
+
+    /**
+     * 执行executable，无异常则直接返回，有异常则休眠interval再执行，超过maxCount仍未执行成功将抛出异常
+     *
+     * @param maxCount 最大执行次数
+     * @param interval 执行间隔时间
+     * @since 1.1.6
+     */
+    @SneakyThrows
+    public void execute(int maxCount, Duration interval, Executable executable) {
+        long intervalMs = interval.toMillis();
+        int count = 0;
+        for (; ; ) {
+            try {
+                count++;
+                executable.execute();
+                return;
+            } catch (Throwable ignore) {
+
+            }
+            if (count >= maxCount) {
+                throw new ExecutionExceededException("Execution exceeded, maxCount=" + maxCount + ", interval=" + interval);
+            }
+            Thread.sleep(intervalMs);
+        }
+    }
 
     /**
      * 创建JdbcTemplate，用于操作数据库

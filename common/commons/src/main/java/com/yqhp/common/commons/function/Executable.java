@@ -13,18 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.common.commons.exception;
+package com.yqhp.common.commons.function;
 
 /**
  * @author jiangyitao
  */
-public class TimeoutException extends RuntimeException {
-
-    public TimeoutException() {
-
-    }
-
-    public TimeoutException(String message) {
-        super(message);
-    }
+public interface Executable {
+    void execute() throws Throwable;
 }

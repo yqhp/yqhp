@@ -41,8 +41,7 @@ public interface TaskExecutionListener {
     default void onLoadPluginSkipped(PluginExecutionRecord record) {
     }
 
-    default  void onEvalActionsStarted(Task task) {
-
+    default void onEvalActionsStarted(Task task) {
     }
 
     default void onEvalDocStarted(DocExecutionRecord record) {
