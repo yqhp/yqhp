@@ -69,7 +69,9 @@ public class TaskRunner {
 
             if (!actionsStarted && DocKind.JSH_ACTION.equals(record.getDoc().getKind())) {
                 actionsStarted = true;
-                skipped = !onEvalActionsStarted(task);
+                if (!onEvalActionsStarted(task)) {
+                    skipped = true;
+                }
             }
             if (!onEvalDocStarted(record) || skipped) {
                 onEvalDocSkipped(record);
