@@ -31,40 +31,31 @@ import java.util.concurrent.TimeUnit;
  * @author jiangyitao
  */
 @Slf4j
-class IOSEmulatorScheduledScanner {
+class IOSSimulatorScheduledScanner {
 
-    private static final IOSEmulatorScheduledScanner SINGLE_INSTANCE = new IOSEmulatorScheduledScanner();
+    private static final ScheduledExecutorService SCHEDULED_SERVICE = Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
+    private static Set<Simulator> lastSimulators = new HashSet<>();
+    private static Set<Simulator> currSimulators;
 
-    private Set<Simulator> lastSimulators = new HashSet<>();
-    private Set<Simulator> currSimulators;
+    private static volatile boolean running = false;
 
-    private volatile boolean running = false;
-
-    private IOSEmulatorScheduledScanner() {
-    }
-
-    static IOSEmulatorScheduledScanner getInstance() {
-        return SINGLE_INSTANCE;
-    }
-
-    synchronized void start(Duration scanPeriod, DeviceChangeListener listener) {
+    static synchronized void start(Duration scanPeriod, DeviceChangeListener listener) {
         if (running)
             throw new IllegalStateException("Scanner is running");
 
         if (scanPeriod == null) scanPeriod = Duration.ofSeconds(30);
         long scanPeriodMs = scanPeriod.toMillis();
 
-        scheduledService.scheduleAtFixedRate(() -> {
+        SCHEDULED_SERVICE.scheduleAtFixedRate(() -> {
             currSimulators = IOSUtils.listBootedSimulator();
 
             currSimulators.stream()
-                    .filter(currSimulator -> !lastSimulators.contains(currSimulator))
-                    .forEach(currSimulator -> listener.online(new IOSEmulator(currSimulator.getModel(), currSimulator.getId())));
+                    .filter(curr -> !lastSimulators.contains(curr))
+                    .forEach(curr -> listener.online(new IOSSimulator(curr)));
             lastSimulators.stream()
-                    .filter(lastSimulator -> !currSimulators.contains(lastSimulator))
-                    .forEach(lastSimulator -> listener.offline(new IOSEmulator(lastSimulator.getModel(), lastSimulator.getId())));
+                    .filter(last -> !currSimulators.contains(last))
+                    .forEach(last -> listener.offline(new IOSSimulator(last)));
 
             lastSimulators = currSimulators;
         }, 0, scanPeriodMs, TimeUnit.MILLISECONDS);
@@ -72,9 +63,9 @@ class IOSEmulatorScheduledScanner {
         running = true;
     }
 
-    synchronized void stop() {
+    static synchronized void stop() {
         if (running) {
-            scheduledService.shutdown();
+            SCHEDULED_SERVICE.shutdown();
             running = false;
         }
     }

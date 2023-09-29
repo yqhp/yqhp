@@ -16,6 +16,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.CreatePlanDevicesParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.model.vo.PlanDeviceVO;
@@ -46,8 +47,8 @@ public class PlanDeviceController {
     }
 
     @PostMapping("/batch")
-    public List<PlanDevice> createPlanDevices(@Valid @RequestBody List<CreatePlanDeviceParam> params) {
-        return planDeviceService.createPlanDevices(params);
+    public List<PlanDevice> createPlanDevices(@Valid @RequestBody CreatePlanDevicesParam param) {
+        return planDeviceService.createPlanDevices(param);
     }
 
     @DeleteMapping("/{id}")

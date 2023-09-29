@@ -95,11 +95,9 @@ public class LocalPortProvider {
                 res = curr;
             }
             curr++;
-
             if (curr > max) {
                 curr = min;
             }
-
             if (available) {
                 ports[2] = curr;
                 return res;

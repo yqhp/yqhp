@@ -42,7 +42,7 @@ public class ADB {
         if (StringUtils.isEmpty(adbPath)) {
             String androidHome = System.getenv("ANDROID_HOME");
             if (StringUtils.isEmpty(androidHome)) {
-                throw new IllegalStateException("AdbPath is empty && System env ANDROID_HOME is empty");
+                throw new IllegalStateException("AdbPath is empty && SystemEnv ANDROID_HOME is empty");
             }
             adbPath = androidHome + File.separator + "platform-tools" + File.separator
                     + (OS.isWindows() ? "adb.exe" : "adb");

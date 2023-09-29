@@ -21,20 +21,25 @@ import com.yqhp.agent.web.config.Properties;
 import com.yqhp.common.commons.util.FileUtils;
 import com.yqhp.common.jshell.JShellContext;
 import com.yqhp.console.repository.enums.ViewType;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.remote.SupportsContextSwitching;
+import io.appium.java_client.screenrecording.CanRecordScreen;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.service.DriverService;
+import org.springframework.util.Base64Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.time.Duration;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -141,7 +146,7 @@ public abstract class DeviceDriver extends SeleniumDriver {
 
     public synchronized void stopReceiveAppiumLog() {
         if (appiumLogOutput != null) {
-            log.info("[{}]Stop receive appiumLog", device.getId());
+            log.info("[{}]Stop to receive appiumLog", device.getId());
             if (driverService != null) {
                 ((AppiumDriverLocalService) driverService).removeOutPutStream(appiumLogOutput);
             }
@@ -152,6 +157,26 @@ public abstract class DeviceDriver extends SeleniumDriver {
             }
             appiumLogOutput = null;
         }
+    }
+
+    @Override
+    public void startRecordingScreen(Map<String, Object> args) {
+        args = args == null ? Map.of() : args;
+        // appium提供的CanRecordScreen startRecordingScreen不好用
+        // https://github.com/appium/appium-android-driver/blob/master/lib/commands/types.ts StartScreenRecordingOpts
+        // https://github.com/appium/appium-xcuitest-driver/blob/master/lib/commands/types.ts StartRecordingScreenOptions
+        ((AppiumDriver) getOrCreateWebDriver()).execute("startRecordingScreen", Map.of("options", args));
+    }
+
+    @Override
+    public File stopRecordingScreen() throws IOException {
+        String base64 = ((CanRecordScreen) getOrCreateWebDriver()).stopRecordingScreen();
+        if (StringUtils.isBlank(base64)) {
+            return null;
+        }
+        File video = Files.createTempFile(null, ".mp4").toFile();
+        org.apache.commons.io.FileUtils.writeByteArrayToFile(video, Base64Utils.decodeFromString(base64));
+        return video;
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yqhp.auth.model.vo.UserVO;
 import com.yqhp.auth.rpc.UserRpc;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.dto.DevicesExecutionResult;
@@ -209,7 +210,7 @@ public class ExecutionRecordServiceImpl
         report.setId(executionRecord.getId());
         report.setProject(projectService.getProjectById(executionRecord.getProjectId()));
         report.setPlan(executionRecord.getPlan());
-        report.setCreator(userRpc.getVOById(executionRecord.getCreateBy()).getNickname());
+        report.setCreator(Optional.ofNullable(userRpc.getVOById(executionRecord.getCreateBy())).map(UserVO::getNickname).orElse(""));
         report.setCreateTime(executionRecord.getCreateTime());
         report.setDeviceMode(isDeviceMode);
 

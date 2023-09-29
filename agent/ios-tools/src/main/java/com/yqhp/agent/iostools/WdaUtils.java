@@ -19,6 +19,7 @@ import com.yqhp.common.commons.model.Size;
 import com.yqhp.common.commons.util.HttpUtils;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.Map;
 public class WdaUtils {
 
     public static ShutdownHookProcessDestroyer run(String udid, String bundleId) throws IOException {
+        Validate.notBlank(bundleId, "wda bundleId must has text");
         return IOSUtils.runTest(
                 udid,
                 bundleId + ".xctrunner",
@@ -54,6 +56,13 @@ public class WdaUtils {
     public static String getSessionId(String wdaUrl) {
         Map resp = HttpUtils.get(wdaUrl + "/status", Map.class);
         return (String) resp.get("sessionId");
+    }
+
+    // https://appium.github.io/appium-xcuitest-driver/4.33/settings/
+    public static Map appiumSettings(String wdaUrl, String sessionId, Map<String, Object> settings) {
+        String url = wdaUrl + "/session/" + sessionId + "/appium/settings";
+        Map allSettings = (Map) HttpUtils.postJSON(url, Map.of("settings", settings), Map.class).get("value");
+        return allSettings;
     }
 
     /**

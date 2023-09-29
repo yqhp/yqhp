@@ -81,7 +81,6 @@ public class Logger implements JShellVar {
      *
      * @since 0.3.5
      */
-    @SneakyThrows
     public void screenshot() {
         screenshot("");
     }
@@ -106,6 +105,32 @@ public class Logger implements JShellVar {
         } finally {
             if (screenshot != null && !screenshot.delete()) {
                 log.warn("Failed to delete " + screenshot);
+            }
+        }
+    }
+
+    /**
+     * @since 1.1.7
+     */
+    public void video(File file) {
+        video(file, "");
+    }
+
+    /**
+     * @since 1.1.7
+     */
+    @SneakyThrows
+    public void video(File file, String info) {
+        if (file == null) {
+            return;
+        }
+        try {
+            OSSFile ossFile = FILE_RPC.uploadFile(MultipartFileUtils.toMultipartFile(file), false);
+            String val = JacksonUtils.writeValueAsString(Map.of("info", info, "file", ossFile));
+            driver.log(createLog("video", val));
+        } finally {
+            if (!file.delete()) {
+                log.warn("Failed to delete " + file);
             }
         }
     }

@@ -18,7 +18,7 @@ package com.yqhp.agent.web.service.impl;
 import com.yqhp.agent.androidtools.browser.Browser;
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.devicediscovery.android.AndroidDevice;
-import com.yqhp.agent.devicediscovery.ios.IOSEmulator;
+import com.yqhp.agent.devicediscovery.ios.IOSSimulator;
 import com.yqhp.agent.devicediscovery.ios.IOSRealDevice;
 import com.yqhp.agent.driver.*;
 import com.yqhp.agent.web.enums.ResponseCodeEnum;
@@ -106,15 +106,16 @@ public class DeviceServiceImpl implements DeviceService {
                         location
                 );
                 deviceDriver = new IOSRealDeviceDriver((IOSRealDevice) device);
-            } else if (device instanceof IOSEmulator) {
+            } else if (device instanceof IOSSimulator) {
                 zkDevice = new ZkDevice(
                         device.getId(),
                         DevicePlatform.iOS,
                         DeviceType.EMULATOR,
                         location
                 );
-                zkDevice.setModel(((IOSEmulator) device).getModel());
-                deviceDriver = new IOSEmulatorDriver((IOSEmulator) device);
+                IOSSimulator iosSimulator = (IOSSimulator) device;
+                zkDevice.setModel(iosSimulator.getSimulator().getModel());
+                deviceDriver = new IOSSimulatorDriver(iosSimulator);
             } else {
                 log.warn("Unknown device={}", device);
                 return;

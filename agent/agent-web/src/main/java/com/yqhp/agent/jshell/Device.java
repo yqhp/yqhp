@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * 为了减轻调用方负担，这里对外提供的api，都不抛受检异常，使用@SneakyThrows自动抛出非受检异常
@@ -98,6 +99,35 @@ public class Device implements JShellVar {
      */
     public String androidShell(String shellCommand) {
         return AndroidUtils.executeShellCommand(getIDevice(), shellCommand);
+    }
+
+    /**
+     * 启动录屏
+     *
+     * @since 1.1.7
+     */
+    public void startRecordingScreen() {
+        driver.startRecordingScreen(null);
+    }
+
+    /**
+     * 启动录屏
+     *
+     * @since 1.1.7
+     */
+    public void startRecordingScreen(Map<String, Object> args) {
+        driver.startRecordingScreen(args);
+    }
+
+    /**
+     * 停止录屏
+     *
+     * @return 录屏文件
+     * @since 1.1.7
+     */
+    @SneakyThrows
+    public File stopRecordingScreen() {
+        return driver.stopRecordingScreen();
     }
 
     /**

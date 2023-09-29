@@ -17,6 +17,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.CreatePlanDevicesParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.model.vo.PlanDeviceVO;
@@ -31,7 +32,7 @@ public interface PlanDeviceService extends IService<PlanDevice> {
 
     PlanDevice createPlanDevice(CreatePlanDeviceParam param);
 
-    List<PlanDevice> createPlanDevices(List<CreatePlanDeviceParam> params);
+    List<PlanDevice> createPlanDevices(CreatePlanDevicesParam param);
 
     PlanDevice updatePlanDevice(String id, UpdatePlanDeviceParam param);
 

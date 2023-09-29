@@ -17,9 +17,10 @@ package com.yqhp.agent.web;
 
 import com.yqhp.agent.devicediscovery.Device;
 import com.yqhp.agent.devicediscovery.DeviceChangeListener;
+import com.yqhp.agent.devicediscovery.DeviceDiscovery;
 import com.yqhp.agent.devicediscovery.android.AndroidDeviceChangeListener;
 import com.yqhp.agent.devicediscovery.android.AndroidDeviceDiscovery;
-import com.yqhp.agent.devicediscovery.ios.IOSEmulatorDiscovery;
+import com.yqhp.agent.devicediscovery.ios.IOSSimulatorDiscovery;
 import com.yqhp.agent.devicediscovery.ios.IOSRealDeviceChangeListener;
 import com.yqhp.agent.devicediscovery.ios.IOSRealDeviceDiscovery;
 import com.yqhp.agent.web.config.prop.AgentProperties;
@@ -45,9 +46,9 @@ public class AgentLifecycle implements SmartLifecycle {
     @Autowired
     private DeviceService deviceService;
 
-    private AndroidDeviceDiscovery androidDeviceDiscovery;
-    private IOSRealDeviceDiscovery iosRealDeviceDiscovery;
-    private IOSEmulatorDiscovery iosEmulatorDiscovery;
+    private DeviceDiscovery androidDeviceDiscovery;
+    private DeviceDiscovery iOSRealDeviceDiscovery;
+    private DeviceDiscovery iOSSimulatorDiscovery;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
@@ -58,10 +59,8 @@ public class AgentLifecycle implements SmartLifecycle {
 
         if (agentProperties.getAndroid().isEnabled()) {
             log.info("Start to discover android device");
-            androidDeviceDiscovery = new AndroidDeviceDiscovery(
-                    agentProperties.getAndroid().getAdbPath(),
-                    Duration.ofMinutes(2)
-            );
+            String adbPath = agentProperties.getAndroid().getAdbPath();
+            androidDeviceDiscovery = new AndroidDeviceDiscovery(adbPath, Duration.ofMinutes(2));
             androidDeviceDiscovery.start(new AndroidDeviceChangeListener() {
                 @Override
                 public void online(Device device) {
@@ -79,8 +78,8 @@ public class AgentLifecycle implements SmartLifecycle {
 
         if (agentProperties.getIOS().getRealDevice().isEnabled()) {
             log.info("Start to discover iOS real device");
-            iosRealDeviceDiscovery = new IOSRealDeviceDiscovery();
-            iosRealDeviceDiscovery.start(new IOSRealDeviceChangeListener() {
+            iOSRealDeviceDiscovery = new IOSRealDeviceDiscovery();
+            iOSRealDeviceDiscovery.start(new IOSRealDeviceChangeListener() {
                 @Override
                 public void online(Device device) {
                     log.info("[ios-real-device][online] {}", device);
@@ -95,21 +94,20 @@ public class AgentLifecycle implements SmartLifecycle {
             });
         }
 
-        if (agentProperties.getIOS().getEmulator().isEnabled()) {
-            log.info("Start to discover iOS emulator");
-            iosEmulatorDiscovery = new IOSEmulatorDiscovery(
-                    agentProperties.getIOS().getEmulator().getScanPeriod()
-            );
-            iosEmulatorDiscovery.start(new DeviceChangeListener() {
+        if (agentProperties.getIOS().getSimulator().isEnabled()) {
+            Duration scanPeriod = agentProperties.getIOS().getSimulator().getScanPeriod();
+            log.info("Start to discover iOS simulator, scanPeriod={}", scanPeriod);
+            iOSSimulatorDiscovery = new IOSSimulatorDiscovery(scanPeriod);
+            iOSSimulatorDiscovery.start(new DeviceChangeListener() {
                 @Override
                 public void online(Device device) {
-                    log.info("[ios-emulator][online] {}", device);
+                    log.info("[ios-simulator][online] {}", device);
                     deviceService.online(device);
                 }
 
                 @Override
                 public void offline(Device device) {
-                    log.info("[ios-emulator][offline] {}", device);
+                    log.info("[ios-simulator][offline] {}", device);
                     deviceService.offline(device.getId());
                 }
             });
@@ -132,13 +130,13 @@ public class AgentLifecycle implements SmartLifecycle {
             log.info("Stop to discover android device");
             androidDeviceDiscovery.stop();
         }
-        if (iosRealDeviceDiscovery != null) {
+        if (iOSRealDeviceDiscovery != null) {
             log.info("Stop to discover iOS real device");
-            iosRealDeviceDiscovery.stop();
+            iOSRealDeviceDiscovery.stop();
         }
-        if (iosEmulatorDiscovery != null) {
-            log.info("Stop to discover iOS emulator");
-            iosEmulatorDiscovery.stop();
+        if (iOSSimulatorDiscovery != null) {
+            log.info("Stop to discover iOS simulator");
+            iOSSimulatorDiscovery.stop();
         }
     }
 

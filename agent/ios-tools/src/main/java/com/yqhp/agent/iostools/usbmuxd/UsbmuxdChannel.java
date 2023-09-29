@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class UsbmuxdChannel implements Closeable {
 
-    private static final int WINDOWS_USBMUXD_LOCAL_PORT = 27015;
     private static final AtomicInteger TAG = new AtomicInteger(1);
 
     private final SocketChannel socketChannel;
@@ -46,7 +45,7 @@ public class UsbmuxdChannel implements Closeable {
     public UsbmuxdChannel() {
         try {
             socketChannel = OS.isWindows()
-                    ? SocketChannel.open(new InetSocketAddress("127.0.0.1", WINDOWS_USBMUXD_LOCAL_PORT))
+                    ? SocketChannel.open(new InetSocketAddress("127.0.0.1", 27015))
                     : AFUNIXSocketChannel.open(AFUNIXSocketAddress.of(new File("/var/run/usbmuxd")));
         } catch (IOException e) {
             throw new UsbmuxdException(e);

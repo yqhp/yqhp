@@ -147,10 +147,11 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
     public void exec(String id, String submitBy) {
         Plan plan = getPlanById(id);
         String createBy = StringUtils.hasText(submitBy) ? submitBy : plan.getCreateBy();
+        boolean deviceMode = isDeviceMode(plan);
 
         // 检查设备模式配置的device
         List<String> deviceIds = null;
-        if (isDeviceMode(plan)) {
+        if (deviceMode) {
             deviceIds = planDeviceService.listEnabledAndSortedDeviceIdByPlanId(plan.getId());
             if (CollectionUtils.isEmpty(deviceIds)) {
                 throw new ServiceException(ResponseCodeEnum.ENABLED_PLAN_DEVICES_NOT_FOUND);
@@ -181,7 +182,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         List<DocExecutionRecord> docExecutionRecords = new ArrayList<>();
         List<PluginExecutionRecord> pluginExecutionRecords = new ArrayList<>();
         Set<String> finalDeviceIds = null;
-        if (isDeviceMode(plan)) {
+        if (deviceMode) {
             // 给设备分配action, deviceId -> List<Doc>
             Map<String, List<Doc>> deviceActionsMap = assignActionsToDevices(plan.getRunMode(), deviceIds, planActions);
             // 高效模式下，有的device可能分不到action，以finalDeviceIds为准
@@ -224,7 +225,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         }
         docExecutionRecordService.saveBatch(docExecutionRecords);
 
-        if (isDeviceMode(plan)) {
+        if (deviceMode) {
             for (String deviceId : finalDeviceIds) {
                 executionRecordService.pushForDevice(deviceId, executionRecord.getId());
             }

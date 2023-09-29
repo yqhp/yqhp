@@ -13,16 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.yqhp.agent.driver;
+package com.yqhp.console.model.param;
 
-import com.yqhp.agent.devicediscovery.ios.IOSEmulator;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * @author jiangyitao
  */
-public class IOSEmulatorDriver extends IOSDeviceDriver {
-
-    public IOSEmulatorDriver(IOSEmulator iosEmulator) {
-        super(iosEmulator);
-    }
+@Data
+public class CreatePlanDocsParam {
+    @NotBlank(message = "planId不能为空")
+    private String planId;
+    @NotEmpty(message = "docIds不能为空")
+    private List<String> docIds;
 }

@@ -43,7 +43,7 @@ import java.util.function.Consumer;
  * @author jiangyitao
  */
 @Slf4j
-public abstract class IOSDeviceDriver extends DeviceDriver {
+public class IOSDeviceDriver extends DeviceDriver {
 
     private static final int WDA_REMOTE_PORT = 8100;
     private static final int WDA_REMOTE_MJPEG_PORT = 9100;
@@ -148,7 +148,7 @@ public abstract class IOSDeviceDriver extends DeviceDriver {
             String checkUrl = wdaLocalUrl + "/status";
             log.info("[ios][{}]Check wda status, checkUrl={}", device.getId(), checkUrl);
             new UrlChecker().waitUntilAvailable(30, TimeUnit.SECONDS, new URL(checkUrl));
-            log.info("[ios][{}]Wda is running", device.getId());
+            log.info("[ios][{}]Wda is running now", device.getId());
             wdaUrl = wdaLocalUrl;
             return wdaUrl;
         } catch (Exception e) {

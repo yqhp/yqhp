@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanDeviceParam;
+import com.yqhp.console.model.param.CreatePlanDevicesParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDeviceParam;
 import com.yqhp.console.model.vo.DeviceVO;
@@ -78,16 +79,17 @@ public class PlanDeviceServiceImpl
     }
 
     @Override
-    public List<PlanDevice> createPlanDevices(List<CreatePlanDeviceParam> params) {
-        if (CollectionUtils.isEmpty(params)) return new ArrayList<>();
-        String planId = params.get(0).getPlanId();
+    public List<PlanDevice> createPlanDevices(CreatePlanDevicesParam param) {
+        String planId = param.getPlanId();
         AtomicInteger maxWeight = new AtomicInteger(getMaxWeightByPlanId(planId));
 
         String currUid = CurrentUser.id();
 
-        List<PlanDevice> planDevices = params.stream().map(param -> {
-            PlanDevice planDevice = param.convertTo();
+        List<PlanDevice> planDevices = param.getDeviceIds().stream().map(deviceId -> {
+            PlanDevice planDevice = new PlanDevice();
             planDevice.setId(snowflake.nextIdStr());
+            planDevice.setPlanId(planId);
+            planDevice.setDeviceId(deviceId);
             planDevice.setWeight(maxWeight.incrementAndGet());
             planDevice.setCreateBy(currUid);
             planDevice.setUpdateBy(currUid);

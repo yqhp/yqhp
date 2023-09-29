@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
 import com.yqhp.console.model.param.CreatePlanDocParam;
+import com.yqhp.console.model.param.CreatePlanDocsParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDocParam;
 import com.yqhp.console.repository.entity.PlanDoc;
@@ -76,16 +77,17 @@ public class PlanDocServiceImpl
     }
 
     @Override
-    public List<PlanDoc> createPlanDocs(List<CreatePlanDocParam> params) {
-        if (CollectionUtils.isEmpty(params)) return new ArrayList<>();
-        String planId = params.get(0).getPlanId();
+    public List<PlanDoc> createPlanDocs(CreatePlanDocsParam param) {
+        String planId = param.getPlanId();
         AtomicInteger maxWeight = new AtomicInteger(getMaxWeightByPlanId(planId));
 
         String currUid = CurrentUser.id();
 
-        List<PlanDoc> planDocs = params.stream().map(param -> {
-            PlanDoc planDoc = param.convertTo();
+        List<PlanDoc> planDocs = param.getDocIds().stream().map(docId -> {
+            PlanDoc planDoc = new PlanDoc();
             planDoc.setId(snowflake.nextIdStr());
+            planDoc.setPlanId(planId);
+            planDoc.setDocId(docId);
             planDoc.setWeight(maxWeight.incrementAndGet());
             planDoc.setCreateBy(currUid);
             planDoc.setUpdateBy(currUid);

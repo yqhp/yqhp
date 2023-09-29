@@ -23,21 +23,21 @@ import java.time.Duration;
 /**
  * @author jiangyitao
  */
-public class IOSEmulatorDiscovery extends DeviceDiscovery {
+public class IOSSimulatorDiscovery extends DeviceDiscovery {
 
     private final Duration scanPeriod;
 
-    public IOSEmulatorDiscovery(Duration scanPeriod) {
+    public IOSSimulatorDiscovery(Duration scanPeriod) {
         this.scanPeriod = scanPeriod;
     }
 
     @Override
     protected void run(DeviceChangeListener listener) {
-        IOSEmulatorScheduledScanner.getInstance().start(scanPeriod, listener);
+        IOSSimulatorScheduledScanner.start(scanPeriod, listener);
     }
 
     @Override
     protected void terminate() {
-        IOSEmulatorScheduledScanner.getInstance().stop();
+        IOSSimulatorScheduledScanner.stop();
     }
 }

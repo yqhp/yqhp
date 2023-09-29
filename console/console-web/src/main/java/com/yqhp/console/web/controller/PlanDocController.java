@@ -16,6 +16,7 @@
 package com.yqhp.console.web.controller;
 
 import com.yqhp.console.model.param.CreatePlanDocParam;
+import com.yqhp.console.model.param.CreatePlanDocsParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDocParam;
 import com.yqhp.console.repository.entity.PlanDoc;
@@ -45,8 +46,8 @@ public class PlanDocController {
     }
 
     @PostMapping("/batch")
-    public List<PlanDoc> createPlanDocs(@Valid @RequestBody List<CreatePlanDocParam> params) {
-        return planDocService.createPlanDocs(params);
+    public List<PlanDoc> createPlanDocs(@Valid @RequestBody CreatePlanDocsParam param) {
+        return planDocService.createPlanDocs(param);
     }
 
     @DeleteMapping("/{id}")

@@ -17,6 +17,7 @@ package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yqhp.console.model.param.CreatePlanDocParam;
+import com.yqhp.console.model.param.CreatePlanDocsParam;
 import com.yqhp.console.model.param.TableRowMoveEvent;
 import com.yqhp.console.model.param.UpdatePlanDocParam;
 import com.yqhp.console.repository.entity.PlanDoc;
@@ -30,7 +31,7 @@ public interface PlanDocService extends IService<PlanDoc> {
 
     PlanDoc createPlanDoc(CreatePlanDocParam param);
 
-    List<PlanDoc> createPlanDocs(List<CreatePlanDocParam> params);
+    List<PlanDoc> createPlanDocs(CreatePlanDocsParam param);
 
     PlanDoc updatePlanDoc(String id, UpdatePlanDocParam param);
 

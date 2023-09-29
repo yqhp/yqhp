@@ -25,6 +25,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 /**
  * @author jiangyitao
  */
@@ -111,6 +115,14 @@ public class SeleniumDriver extends Driver {
 
     public <T> T screenshotAs(OutputType<T> outputType) {
         return getOrCreateWebDriver().getScreenshotAs(outputType);
+    }
+
+    public void startRecordingScreen(Map<String, Object> args) {
+        throw new UnsupportedOperationException();
+    }
+
+    public File stopRecordingScreen() throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     @Override

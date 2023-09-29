@@ -48,7 +48,7 @@ agent:
     wda-bundle-id: ${WDA_BUNDLE_ID:}
     realDevice:
       enabled: false
-    emulator:
+    simulator:
       enabled: false
       #  ns for nanoseconds
       #  us for microseconds

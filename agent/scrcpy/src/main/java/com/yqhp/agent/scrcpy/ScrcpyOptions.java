@@ -30,8 +30,9 @@ public class ScrcpyOptions {
     private int maxSize;
     private int bitRate = 4_000_000; // bps
     private int maxFps;
-
+    private boolean control = true;
     private boolean tunnelForward = true;
+
     // Options not used by the scrcpy client, but useful to use scrcpy-server directly
     private boolean sendDummyByte = true; // write a byte on start to detect connection issues
     private boolean sendFrameMeta = false; // send PTS so that the client may record properly
@@ -43,6 +44,7 @@ public class ScrcpyOptions {
                 .add("max_size=" + maxSize)
                 .add("bit_rate=" + bitRate)
                 .add("max_fps=" + maxFps)
+                .add("control=" + control)
                 .add("tunnel_forward=" + tunnelForward)
                 .add("send_dummy_byte=" + sendDummyByte)
                 .add("send_frame_meta=" + sendFrameMeta)

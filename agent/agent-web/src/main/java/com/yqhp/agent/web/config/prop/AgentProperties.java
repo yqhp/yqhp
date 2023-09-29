@@ -54,7 +54,7 @@ public class AgentProperties {
 
         private String wdaBundleId;
         private RealDevice realDevice = new RealDevice();
-        private Emulator emulator = new Emulator();
+        private Simulator simulator = new Simulator();
 
         @Data
         public class RealDevice {
@@ -62,7 +62,7 @@ public class AgentProperties {
         }
 
         @Data
-        public class Emulator {
+        public class Simulator {
             private boolean enabled = false;
             private Duration scanPeriod;
         }

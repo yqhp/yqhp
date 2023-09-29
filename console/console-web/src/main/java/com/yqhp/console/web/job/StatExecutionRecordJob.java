@@ -50,7 +50,7 @@ public class StatExecutionRecordJob {
     @Autowired
     private MessageProducer producer;
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void statExecutionRecord() {
         RLock lock = redissonClient.getLock(LOCK_NAME);
         if (!lock.tryLock()) {

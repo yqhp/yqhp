@@ -15,18 +15,19 @@
  */
 package com.yqhp.agent.devicediscovery.ios;
 
+import com.yqhp.agent.iostools.Simulator;
 import lombok.Getter;
 
 /**
  * @author jiangyitao
  */
-public class IOSEmulator extends IOSDevice {
+public class IOSSimulator extends IOSDevice {
 
     @Getter
-    private final String model;
+    private final Simulator simulator;
 
-    IOSEmulator(String model, String udid) {
-        super(udid, true);
-        this.model = model;
+    IOSSimulator(Simulator simulator) {
+        super(simulator.getId(), true);
+        this.simulator = simulator;
     }
 }

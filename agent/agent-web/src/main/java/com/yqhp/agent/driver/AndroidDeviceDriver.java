@@ -16,7 +16,6 @@
 package com.yqhp.agent.driver;
 
 import com.android.ddmlib.IDevice;
-import com.android.ddmlib.logcat.LogCatListener;
 import com.android.ddmlib.logcat.LogCatMessage;
 import com.android.ddmlib.logcat.LogCatReceiverTask;
 import com.yqhp.agent.androidtools.AndroidUtils;
@@ -51,7 +50,6 @@ public class AndroidDeviceDriver extends DeviceDriver {
 
     private static final ExecutorService LOGCAT_RECEIVER_TASK_THREAD_POOL = Executors.newCachedThreadPool();
     private LogCatReceiverTask logcatReceiverTask;
-    private LogCatListener logcatListener;
 
     @Getter
     private final Scrcpy scrcpy;
@@ -139,22 +137,19 @@ public class AndroidDeviceDriver extends DeviceDriver {
         }
 
         log.info("[{}]Receive deviceLog", device.getId());
-        this.logcatListener = messages -> {
+        logcatReceiverTask = new LogCatReceiverTask(getIDevice());
+        logcatReceiverTask.addLogCatListener(messages -> {
             for (LogCatMessage message : messages) {
                 consumer.accept(message.toString());
             }
-        };
-        logcatReceiverTask = new LogCatReceiverTask(getIDevice());
-        logcatReceiverTask.addLogCatListener(logcatListener);
+        });
         LOGCAT_RECEIVER_TASK_THREAD_POOL.submit(logcatReceiverTask);
     }
 
     @Override
     public synchronized void stopReceiveDeviceLog() {
         if (logcatReceiverTask != null) {
-            log.info("[{}]Stop receive deviceLog", device.getId());
-            logcatReceiverTask.removeLogCatListener(logcatListener);
-            logcatListener = null;
+            log.info("[{}]Stop to receive deviceLog", device.getId());
             logcatReceiverTask.stop();
             logcatReceiverTask = null;
         }
