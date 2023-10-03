@@ -32,5 +32,5 @@ jobs:
           context: ./file/file-web
           push: true
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-file:latest
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-file:1.0.1
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-file:latest-test
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-file:1.0.1-test

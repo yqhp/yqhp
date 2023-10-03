@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim-buster
+FROM openjdk:17.0.2-slim
 
 COPY ./target/*.jar file.jar
 

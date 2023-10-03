@@ -32,5 +32,5 @@ jobs:
           context: ./gateway
           push: true
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-gateway:latest
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-gateway:1.0.1
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-gateway:latest-test
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-gateway:1.0.1-test
