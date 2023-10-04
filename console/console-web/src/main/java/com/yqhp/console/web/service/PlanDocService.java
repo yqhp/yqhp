@@ -16,10 +16,7 @@
 package com.yqhp.console.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yqhp.console.model.param.CreatePlanDocParam;
-import com.yqhp.console.model.param.CreatePlanDocsParam;
-import com.yqhp.console.model.param.TableRowMoveEvent;
-import com.yqhp.console.model.param.UpdatePlanDocParam;
+import com.yqhp.console.model.param.*;
 import com.yqhp.console.repository.entity.PlanDoc;
 
 import java.util.List;
@@ -37,6 +34,8 @@ public interface PlanDocService extends IService<PlanDoc> {
 
     void deleteById(String id);
 
+    void deleteByPlanDoc(DeletePlanDocParam param);
+
     void deleteByDocId(String docId);
 
     PlanDoc getPlanDocById(String id);
@@ -44,6 +43,8 @@ public interface PlanDocService extends IService<PlanDoc> {
     List<String> listEnabledAndSortedDocIdByPlanId(String planId);
 
     List<PlanDoc> listSortedByPlanId(String planId);
+
+    List<PlanDoc> listByDocId(String docId);
 
     void move(TableRowMoveEvent moveEvent);
 }

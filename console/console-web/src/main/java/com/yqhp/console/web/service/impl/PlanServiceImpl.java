@@ -158,11 +158,12 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
             }
         }
         // 检查配置的action
-        List<String> actionIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
-        List<Doc> planActions = docService.listAvailableInIds(actionIds).stream()
-                .sorted(Comparator.comparingInt(doc -> actionIds.indexOf(doc.getId()))) // listAvailableInIds返回的结果乱序，重新排一下
+        List<String> docIds = planDocService.listEnabledAndSortedDocIdByPlanId(plan.getId());
+        List<Doc> availableActions = docService.listAvailableInIds(docIds).stream()
+                .filter(doc -> DocKind.JSH_ACTION.equals(doc.getKind()))
+                .sorted(Comparator.comparingInt(doc -> docIds.indexOf(doc.getId()))) // listAvailableInIds返回的结果乱序，重新排一下
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(planActions)) {
+        if (CollectionUtils.isEmpty(availableActions)) {
             throw new ServiceException(ResponseCodeEnum.AVAILABLE_PLAN_ACTIONS_NOT_FOUND);
         }
 
@@ -184,7 +185,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
         Set<String> finalDeviceIds = null;
         if (deviceMode) {
             // 给设备分配action, deviceId -> List<Doc>
-            Map<String, List<Doc>> deviceActionsMap = assignActionsToDevices(plan.getRunMode(), deviceIds, planActions);
+            Map<String, List<Doc>> deviceActionsMap = assignActionsToDevices(plan.getRunMode(), deviceIds, availableActions);
             // 高效模式下，有的device可能分不到action，以finalDeviceIds为准
             finalDeviceIds = deviceActionsMap.keySet();
             if (!plugins.isEmpty()) {
@@ -214,7 +215,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements Pl
                 DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), "", createBy);
                 docExecutionRecords.add(record);
             }
-            for (Doc doc : planActions) {
+            for (Doc doc : availableActions) {
                 DocExecutionRecord record = createDocExecutionRecord(doc, plan, executionRecord.getId(), "", createBy);
                 docExecutionRecords.add(record);
             }

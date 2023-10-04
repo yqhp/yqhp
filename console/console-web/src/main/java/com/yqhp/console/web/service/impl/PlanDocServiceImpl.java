@@ -20,10 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yqhp.auth.model.CurrentUser;
 import com.yqhp.common.web.exception.ServiceException;
-import com.yqhp.console.model.param.CreatePlanDocParam;
-import com.yqhp.console.model.param.CreatePlanDocsParam;
-import com.yqhp.console.model.param.TableRowMoveEvent;
-import com.yqhp.console.model.param.UpdatePlanDocParam;
+import com.yqhp.console.model.param.*;
 import com.yqhp.console.repository.entity.PlanDoc;
 import com.yqhp.console.repository.mapper.PlanDocMapper;
 import com.yqhp.console.web.enums.ResponseCodeEnum;
@@ -32,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -130,6 +126,16 @@ public class PlanDocServiceImpl
     }
 
     @Override
+    public void deleteByPlanDoc(DeletePlanDocParam param) {
+        LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
+        query.eq(PlanDoc::getPlanId, param.getPlanId());
+        query.eq(PlanDoc::getDocId, param.getDocId());
+        if (!remove(query)) {
+            throw new ServiceException(ResponseCodeEnum.DEL_PLAN_DOC_FAILED);
+        }
+    }
+
+    @Override
     public void deleteByDocId(String docId) {
         Assert.hasText(docId, "docId must has text");
         LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
@@ -154,6 +160,14 @@ public class PlanDocServiceImpl
         return listByPlanId(planId).stream()
                 .sorted(Comparator.comparing(PlanDoc::getWeight))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PlanDoc> listByDocId(String docId) {
+        Assert.hasText(docId, "docId must has text");
+        LambdaQueryWrapper<PlanDoc> query = new LambdaQueryWrapper<>();
+        query.eq(PlanDoc::getDocId, docId);
+        return list(query);
     }
 
     @Override

@@ -15,10 +15,7 @@
  */
 package com.yqhp.console.web.controller;
 
-import com.yqhp.console.model.param.CreatePlanDocParam;
-import com.yqhp.console.model.param.CreatePlanDocsParam;
-import com.yqhp.console.model.param.TableRowMoveEvent;
-import com.yqhp.console.model.param.UpdatePlanDocParam;
+import com.yqhp.console.model.param.*;
 import com.yqhp.console.repository.entity.PlanDoc;
 import com.yqhp.console.web.service.PlanDocService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +52,11 @@ public class PlanDocController {
         planDocService.deleteById(id);
     }
 
+    @DeleteMapping
+    public void deleteByPlanDoc(@Valid @RequestBody DeletePlanDocParam param) {
+        planDocService.deleteByPlanDoc(param);
+    }
+
     @PutMapping("/{id}")
     public PlanDoc updatePlanDoc(@PathVariable String id, @Valid @RequestBody UpdatePlanDocParam param) {
         return planDocService.updatePlanDoc(id, param);
@@ -65,8 +67,13 @@ public class PlanDocController {
         planDocService.move(moveEvent);
     }
 
-    @GetMapping
+    @GetMapping("/listSortedByPlanId")
     public List<PlanDoc> listSortedByPlanId(@NotBlank(message = "planId不能为空") String planId) {
         return planDocService.listSortedByPlanId(planId);
+    }
+
+    @GetMapping("/listByDocId")
+    public List<PlanDoc> listByDocId(@NotBlank(message = "docId不能为空") String docId) {
+        return planDocService.listByDocId(docId);
     }
 }

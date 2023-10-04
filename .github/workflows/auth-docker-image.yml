@@ -32,5 +32,5 @@ jobs:
           context: ./auth/auth-web
           push: true
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-auth:latest-test
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-auth:1.0.1-test
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-auth:latest
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-auth:1.0.2

@@ -32,5 +32,5 @@ jobs:
           context: ./console/console-web
           push: true
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:latest-test
-            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:1.0.7-test
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:latest
+            registry.cn-hangzhou.aliyuncs.com/jiangyitao/yqhp-console:1.0.8
