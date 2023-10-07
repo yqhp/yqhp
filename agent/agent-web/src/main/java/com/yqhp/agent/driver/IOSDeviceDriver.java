@@ -21,7 +21,6 @@ import com.yqhp.agent.iostools.IOSUtils;
 import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.console.repository.enums.ViewType;
-import io.appium.java_client.Setting;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.IOSMobileCapabilityType;
@@ -35,6 +34,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -102,8 +102,12 @@ public class IOSDeviceDriver extends DeviceDriver {
         // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
-        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
-        capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
+        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
+        }
+        if (capabilities.getCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL) == null) {
+            capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
+        }
         if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
             capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
         }
@@ -115,10 +119,7 @@ public class IOSDeviceDriver extends DeviceDriver {
         // wdaSessionId 与 driver.getSessionId() 不一样
         wdaSessionId = WdaUtils.getSessionId(wdaUrl);
         log.info("[ios][{}]IOSDriver wdaSessionId={}", device.getId(), wdaSessionId);
-
-        // https://appium.github.io/appium-xcuitest-driver/4.33/settings/
-        iosDriver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 0);
-        iosDriver.setSetting("animationCoolOffTimeout", 0);
+        iosDriver.setSettings(defaultWdaSettings());
         return iosDriver;
     }
 
@@ -129,6 +130,19 @@ public class IOSDeviceDriver extends DeviceDriver {
     public void createWdaSession() {
         wdaSessionId = WdaUtils.createSession(wdaUrl, Map.of());
         log.info("[ios][{}]Manual wdaSessionId={}", device.getId(), wdaSessionId);
+    }
+
+    /**
+     * https://appium.github.io/appium-xcuitest-driver/4.33/settings/
+     */
+    public Map<String, Object> defaultWdaSettings() {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put("waitForIdleTimeout", 0);
+        settings.put("animationCoolOffTimeout", 0);
+        settings.put("mjpegServerFramerate", 15); // wda视频流每秒截图次数 | 1~60 | 默认10
+        settings.put("mjpegScalingFactor", 30); // wda视频流截图缩放比 | 1~100 | 默认100
+        settings.put("mjpegServerScreenshotQuality", 10); // wda视频流截图质量 | 1~100 | 默认25
+        return settings;
     }
 
     public synchronized String runWdaIfNeeded() {
@@ -156,7 +170,7 @@ public class IOSDeviceDriver extends DeviceDriver {
         }
     }
 
-    public String getWdaMjpegUrl() {
+    public String forwardWdaMjpeg() {
         try {
             int mjpegLocalPort = LocalPortProvider.getWdaMjpegAvailablePort();
             log.info("[ios][{}]WdaMjpeg forward {} -> {}", device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);

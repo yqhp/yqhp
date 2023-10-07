@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -67,12 +68,16 @@ public class WdaFrameHandler extends InputHandler {
         driver.createWdaSession();
         log.info("[ios][{}]WdaSession created", driver.getDeviceId());
 
+        Map<String, Object> settings = driver.defaultWdaSettings();
+        settings.put("snapshotMaxDepth", 0); // 可以提升Touch操作速度
+        WdaUtils.appiumSettings(driver.getWdaUrl(), driver.getWdaSessionId(), settings);
+
         // 获取逻辑分辨率传给前端，后续坐标相关操作，基于该分辨率
         Size size = WdaUtils.getLogicalScreenSize(driver.getWdaUrl(), driver.getWdaSessionId());
         log.info("[ios][{}]Logical screen size: {}", driver.getDeviceId(), size);
         os.info(uid, size);
 
-        String wdaMjpegUrl = driver.getWdaMjpegUrl();
+        String wdaMjpegUrl = driver.forwardWdaMjpeg();
         HttpURLConnection conn = (HttpURLConnection) new URL(wdaMjpegUrl).openConnection();
         conn.setConnectTimeout(1000); // ms
         conn.setReadTimeout(30_000); // ms

@@ -11,7 +11,7 @@
 
     <artifactId>agent-web</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.7</version>
+    <version>1.1.8</version>
 
     <properties>
         <!-- 注意: dependencies发生变化，需要更新这个版本号  -->
