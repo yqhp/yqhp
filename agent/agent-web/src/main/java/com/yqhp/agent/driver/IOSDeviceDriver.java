@@ -29,14 +29,11 @@ import io.appium.java_client.remote.MobilePlatform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
-import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -158,11 +155,18 @@ public class IOSDeviceDriver extends DeviceDriver {
             log.info("[ios][{}]Wda forward {} -> {}", device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
             wdaForwardDestroyer = IOSUtils.forward(device.getId(), wdaLocalPort, WDA_REMOTE_PORT);
 
+            // 检查wda是否成功启动
+            long timeout = System.currentTimeMillis() + 20_000;
             String wdaLocalUrl = "http://localhost:" + wdaLocalPort;
-            String checkUrl = wdaLocalUrl + "/status";
-            log.info("[ios][{}]Check wda status, checkUrl={}", device.getId(), checkUrl);
-            new UrlChecker().waitUntilAvailable(30, TimeUnit.SECONDS, new URL(checkUrl));
+            while (!WdaUtils.isRunning(wdaLocalUrl)) {
+                log.info("[ios][{}]Wda is not running now", device.getId());
+                if (System.currentTimeMillis() > timeout) {
+                    throw new IllegalStateException("Timeout to check wda status");
+                }
+                Thread.sleep(500);
+            }
             log.info("[ios][{}]Wda is running now", device.getId());
+
             wdaUrl = wdaLocalUrl;
             return wdaUrl;
         } catch (Exception e) {
@@ -177,7 +181,7 @@ public class IOSDeviceDriver extends DeviceDriver {
             wdaMjpegForwardDestroyer = IOSUtils.forward(device.getId(), mjpegLocalPort, WDA_REMOTE_MJPEG_PORT);
             return "http://localhost:" + mjpegLocalPort;
         } catch (Exception e) {
-            throw new RuntimeException("Get wdaMjpegUrl failed. device=" + device.getId(), e);
+            throw new RuntimeException("Forward wdaMjpeg failed. device=" + device.getId(), e);
         }
     }
 
