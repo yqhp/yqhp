@@ -404,7 +404,7 @@ public class RemoteWebDriverWrapper {
      */
     public WebElement findElement(By by, Duration timeout) {
         WebDriverWait wait = new WebDriverWait(driver, timeout);
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
     /**
