@@ -16,7 +16,7 @@
 package com.yqhp.agent.web.ws.message;
 
 import com.yqhp.common.commons.util.JacksonUtils;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.Session;
@@ -60,7 +60,7 @@ public class OutputSender {
     public static <T> void send(Session session, Output<T> output) {
         try {
             String text = JacksonUtils.writeValueAsString(output);
-            WebsocketUtils.sendText(session, text);
+            WebsocketSessionUtils.sendText(session, text);
         } catch (Exception e) {
             log.warn("[{}]Failed to send {}", session.getId(), output, e);
         }

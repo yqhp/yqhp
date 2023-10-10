@@ -20,15 +20,16 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
+ * Websocket发送数据，统一使用这个类
+ * <p>
+ * Session发送数据不是线程安全的
+ * 不同线程同时使用Session发送数据，会出现IllegalStateException: The remote endpoint was in state [TEXT_FULL_WRITING / BINARY_FULL_WRITING] which is an invalid state for called method
+ * 通过synchronized (session) 保证线程安全
+ *
  * @author jiangyitao
  */
-public class WebsocketUtils {
+public class WebsocketSessionUtils {
 
-    /**
-     * session发送数据不是线程安全的
-     * 多线程发送会出现IllegalStateException: The remote endpoint was in state [TEXT_FULL_WRITING / BINARY_FULL_WRITING] which is an invalid state for called method
-     * 通过synchronized (session) 保证线程安全
-     */
     public static void sendText(Session session, String text) throws IOException {
         if (session != null && session.isOpen()) {
             synchronized (session) {

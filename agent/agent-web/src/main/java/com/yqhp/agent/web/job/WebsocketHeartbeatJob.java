@@ -16,13 +16,12 @@
 package com.yqhp.agent.web.job;
 
 import com.yqhp.agent.web.ws.WebsocketSessionPool;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.Session;
-import java.io.IOException;
 
 /**
  * @author jiangyitao
@@ -35,7 +34,7 @@ public class WebsocketHeartbeatJob {
     public void sendHeartbeat() {
         for (Session session : WebsocketSessionPool.getOpeningSessions()) {
             try {
-                WebsocketUtils.sendText(session, "pong");
+                WebsocketSessionUtils.sendText(session, "pong");
             } catch (Exception e) {
                 log.error("[{}]Send heartbeat failed", session.getId(), e);
             }

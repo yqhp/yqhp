@@ -19,7 +19,7 @@ import com.android.ddmlib.IDevice;
 import com.yqhp.agent.driver.AndroidDeviceDriver;
 import com.yqhp.agent.driver.DeviceDriver;
 import com.yqhp.agent.web.ws.WebsocketSessionPool;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -72,28 +72,28 @@ public class DeviceDevtoolsWebsocket {
             @SneakyThrows
             @Override
             public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-                WebsocketUtils.sendText(session, data.toString(), last);
+                WebsocketSessionUtils.sendText(session, data.toString(), last);
                 return WebSocket.Listener.super.onText(webSocket, data, last);
             }
 
             @SneakyThrows
             @Override
             public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-                WebsocketUtils.sendBinary(session, data, last);
+                WebsocketSessionUtils.sendBinary(session, data, last);
                 return WebSocket.Listener.super.onBinary(webSocket, data, last);
             }
 
             @SneakyThrows
             @Override
             public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
-                WebsocketUtils.sendPing(session, message);
+                WebsocketSessionUtils.sendPing(session, message);
                 return WebSocket.Listener.super.onPing(webSocket, message);
             }
 
             @SneakyThrows
             @Override
             public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
-                WebsocketUtils.sendPong(session, message);
+                WebsocketSessionUtils.sendPong(session, message);
                 return WebSocket.Listener.super.onPong(webSocket, message);
             }
 

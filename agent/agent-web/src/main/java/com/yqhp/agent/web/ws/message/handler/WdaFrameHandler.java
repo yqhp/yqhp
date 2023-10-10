@@ -22,7 +22,7 @@ import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.agent.web.ws.message.OutputSender;
 import com.yqhp.common.commons.model.Size;
 import com.yqhp.common.commons.util.MjpegInputStream;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.Session;
@@ -106,7 +106,7 @@ public class WdaFrameHandler extends InputHandler {
                 log.info("[ios][{}]Start sending frames...", driver.getDeviceId());
                 while (!Thread.currentThread().isInterrupted()) {
                     byte[] frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
-                    WebsocketUtils.sendBinary(session, ByteBuffer.wrap(frame));
+                    WebsocketSessionUtils.sendBinary(session, ByteBuffer.wrap(frame));
                 }
                 log.info("[ios][{}]Sending frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {

@@ -18,13 +18,12 @@ package com.yqhp.agent.web.ws.agent;
 import com.yqhp.agent.web.ws.message.handler.JShellEvalHandler;
 import com.yqhp.agent.web.ws.message.handler.JShellLoadPluginHandler;
 import com.yqhp.common.commons.util.JacksonUtils;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 
 /**
  * @author jiangyitao
@@ -42,7 +41,7 @@ public class JShellExecutionWebsocket extends AgentWebsocket {
 
         driver.addLogConsumer(_log -> {
             try {
-                WebsocketUtils.sendText(session, JacksonUtils.writeValueAsString(_log));
+                WebsocketSessionUtils.sendText(session, JacksonUtils.writeValueAsString(_log));
             } catch (Exception e) {
                 log.warn("Failed to send log:{}, cause:{}", _log, e.getMessage());
             }

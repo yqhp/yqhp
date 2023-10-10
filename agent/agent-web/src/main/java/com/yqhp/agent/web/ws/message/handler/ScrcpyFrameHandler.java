@@ -24,7 +24,7 @@ import com.yqhp.agent.web.config.Properties;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.agent.web.ws.message.OutputSender;
-import com.yqhp.common.web.util.WebsocketUtils;
+import com.yqhp.common.web.util.WebsocketSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.Session;
@@ -82,7 +82,7 @@ public class ScrcpyFrameHandler extends InputHandler<ScrcpyOptions> {
                 log.info("[{}]Start sending frames...", driver.getDeviceId());
                 while (!Thread.currentThread().isInterrupted()) {
                     ByteBuffer frame = blockingQueue.take(); // 若take()阻塞在此，sendFrameThread.interrupt()后，take()会抛出InterruptedException
-                    WebsocketUtils.sendBinary(session, frame);
+                    WebsocketSessionUtils.sendBinary(session, frame);
                 }
                 log.info("[{}]Sending frames stopped", driver.getDeviceId());
             } catch (Throwable cause) {
