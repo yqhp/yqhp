@@ -15,11 +15,11 @@
  */
 package com.yqhp.agent.web.ws.message.handler;
 
-import cn.hutool.core.lang.ParameterizedTypeImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yqhp.agent.web.ws.message.Command;
 import com.yqhp.agent.web.ws.message.Input;
 import com.yqhp.common.commons.util.JacksonUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -57,13 +57,14 @@ public class MessageHandler {
             }
 
             Type superclass = handler.getClass().getGenericSuperclass();
+            // 若父类包含范型，则将Input.data序列化为对应类型
             if (superclass instanceof ParameterizedType) {
                 // 父类范型
-                Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+                Type typeArgument = ((ParameterizedType) superclass).getActualTypeArguments()[0];
                 input = JacksonUtils.readValue(message, new TypeReference<>() {
                     @Override
                     public Type getType() {
-                        return new ParameterizedTypeImpl(new Type[]{type}, null, Input.class);
+                        return TypeUtils.parameterize(Input.class, typeArgument);
                     }
                 });
             }

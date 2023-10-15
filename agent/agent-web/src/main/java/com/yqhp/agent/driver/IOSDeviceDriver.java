@@ -22,6 +22,8 @@ import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobilePlatform;
 import io.appium.java_client.remote.options.BaseOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -96,12 +98,12 @@ public class IOSDeviceDriver extends DeviceDriver {
         // BaseOptions get/set capability将自动处理appium:前缀
         BaseOptions options = (BaseOptions) getOrCreateCaps();
 
-        options.setCapability("platformName", "iOS");
+        options.setCapability("platformName", MobilePlatform.IOS);
         options.setCapability("udid", device.getId());
 
         if (options.getCapability("automationName") == null) {
             // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
-            options.setCapability("automationName", "XCuiTest");
+            options.setCapability("automationName", AutomationName.IOS_XCUI_TEST);
         }
         if (options.getCapability("webDriverAgentUrl") == null) {
             options.setCapability("webDriverAgentUrl", runWdaIfNeeded());

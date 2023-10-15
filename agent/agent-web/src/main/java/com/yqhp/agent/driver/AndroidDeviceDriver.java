@@ -29,6 +29,7 @@ import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.Setting;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobilePlatform;
 import io.appium.java_client.remote.options.BaseOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,7 @@ public class AndroidDeviceDriver extends DeviceDriver {
         // BaseOptions get/set capability将自动处理appium:前缀
         BaseOptions options = (BaseOptions) getOrCreateCaps();
 
-        options.setCapability("platformName", "Android");
+        options.setCapability("platformName", MobilePlatform.ANDROID);
         options.setCapability("udid", device.getId());
         // 本地端口 -> 设备uiautomator2/espresso服务端口
         options.setCapability("systemPort", LocalPortProvider.getAndroidSystemAvailablePort());
