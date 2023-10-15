@@ -18,10 +18,10 @@ package com.yqhp.agent.driver;
 import com.yqhp.agent.jshell.Browser;
 import com.yqhp.common.jshell.JShellContext;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 
@@ -35,21 +35,13 @@ import java.util.Map;
 @Slf4j
 public class SeleniumDriver extends Driver {
 
-    protected DesiredCapabilities capabilities = new DesiredCapabilities();
     protected DriverService driverService;
+    private MutableCapabilities caps;
     private RemoteWebDriver webDriver;
 
     @Override
     protected void injectVar(JShellContext jshellCtx) {
         jshellCtx.injectVar(new Browser(this));
-    }
-
-    public void setCapability(String key, Object value) {
-        capabilities.setCapability(key, value);
-    }
-
-    private void resetCapability() {
-        capabilities = new DesiredCapabilities();
     }
 
     public synchronized DriverService getOrStartDriverService() {
@@ -85,20 +77,34 @@ public class SeleniumDriver extends Driver {
         return getOrCreateWebDriver();
     }
 
+    public MutableCapabilities getOrCreateCaps() {
+        return caps == null ? caps = newCaps() : caps;
+    }
+
+    protected MutableCapabilities newCaps() {
+        return new ChromeOptions();
+    }
+
+    public void setCapability(String key, Object value) {
+        getOrCreateCaps().setCapability(key, value);
+    }
+
+    private void resetCapabilities() {
+        caps = null;
+    }
+
     public synchronized RemoteWebDriver getOrCreateWebDriver() {
         if (webDriver != null) {
             return webDriver;
         }
-        log.info("Create webDriver, capabilities: {}", capabilities);
+        log.info("Create webDriver, capabilities: {}", caps);
         webDriver = newWebDriver();
-        log.info("WebDriver created, capabilities: {}", capabilities);
+        log.info("WebDriver created, capabilities: {}", caps);
         return webDriver;
     }
 
     protected RemoteWebDriver newWebDriver() {
-        ChromeOptions options = new ChromeOptions();
-        options.merge(capabilities);
-        return new ChromeDriver(options);
+        return new ChromeDriver((ChromeOptions) getOrCreateCaps());
     }
 
     public synchronized void quitWebDriver() {
@@ -129,7 +135,7 @@ public class SeleniumDriver extends Driver {
     public void release() {
         quitWebDriver();
         stopDriverService();
-        resetCapability();
+        resetCapabilities();
         super.release();
     }
 }

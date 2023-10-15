@@ -24,12 +24,14 @@ import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.remote.SupportsContextSwitching;
+import io.appium.java_client.remote.options.BaseOptions;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.service.DriverService;
 import org.springframework.util.Base64Utils;
 
@@ -120,6 +122,11 @@ public abstract class DeviceDriver extends SeleniumDriver {
         service.start();
         log.info("[{}]AppiumService started", device.getId());
         return service;
+    }
+
+    @Override
+    protected MutableCapabilities newCaps() {
+        return new BaseOptions<>();
     }
 
     public synchronized void receiveAppiumLog(Consumer<String> consumer) {

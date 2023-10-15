@@ -28,10 +28,8 @@ import com.yqhp.common.commons.model.Size;
 import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.Setting;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.remote.MobilePlatform;
+import io.appium.java_client.remote.options.BaseOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -89,36 +87,39 @@ public class AndroidDeviceDriver extends DeviceDriver {
 
     @Override
     protected RemoteWebDriver newWebDriver() {
-        // https://github.com/appium/appium-uiautomator2-driver
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
+        // BaseOptions get/set capability将自动处理appium:前缀
+        BaseOptions options = (BaseOptions) getOrCreateCaps();
+
+        options.setCapability("platformName", "Android");
+        options.setCapability("udid", device.getId());
         // 本地端口 -> 设备uiautomator2/espresso服务端口
-        capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, LocalPortProvider.getAndroidSystemAvailablePort());
+        options.setCapability("systemPort", LocalPortProvider.getAndroidSystemAvailablePort());
         // webview 本地端口 -> devtools communication
-        capabilities.setCapability(AndroidMobileCapabilityType.WEBVIEW_DEVTOOLS_PORT, LocalPortProvider.getAndroidWebviewDevtoolsAvailablePort());
+        options.setCapability("webviewDevtoolsPort", LocalPortProvider.getAndroidWebviewDevtoolsAvailablePort());
         // webview 启动chromedriver时 --port参数
-        capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_PORT, LocalPortProvider.getAndroidChromeDriverAvailablePort());
+        options.setCapability("chromedriverPort", LocalPortProvider.getAndroidChromeDriverAvailablePort());
 
-        if (capabilities.getCapability(AndroidMobileCapabilityType.RECREATE_CHROME_DRIVER_SESSIONS) == null) {
+        if (options.getCapability("recreateChromeDriverSessions") == null) {
             // webview切换到native时，kill chromedriver
-            capabilities.setCapability(AndroidMobileCapabilityType.RECREATE_CHROME_DRIVER_SESSIONS, true);
+            options.setCapability("recreateChromeDriverSessions", true);
         }
-        if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
-            capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
+        if (options.getCapability("newCommandTimeout") == null) {
+            options.setCapability("newCommandTimeout", 60 * 60 * 24); // seconds
         }
-        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
+        if (options.getCapability("automationName") == null) {
             // 默认uiautomator2
-            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
+            // https://github.com/appium/appium-uiautomator2-driver
+            options.setCapability("automationName", AutomationName.ANDROID_UIAUTOMATOR2);
         }
-        if (capabilities.getCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS) == null) {
-            capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
+        if (options.getCapability("autoGrantPermissions") == null) {
+            options.setCapability("autoGrantPermissions", true);
         }
-        if (capabilities.getCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE) == null) {
+        if (options.getCapability("skipLogcatCapture") == null) {
             // appium默认会执行logcat，关闭logcat捕获提升性能
-            capabilities.setCapability(AndroidMobileCapabilityType.SKIP_LOGCAT_CAPTURE, true);
+            options.setCapability("skipLogcatCapture", true);
         }
 
-        AndroidDriver androidDriver = new AndroidDriver(getOrStartDriverService().getUrl(), capabilities);
+        AndroidDriver androidDriver = new AndroidDriver(getOrStartDriverService().getUrl(), options);
         // appium-uiautomator2-server在很多地方加了Device.waitForIdle()，默认10秒
         // 导致设备在动态变化的时候很慢，如：点击，获取布局信息等
         // 设置waitForIdle超时时间为0，可以加速执行速度

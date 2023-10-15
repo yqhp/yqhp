@@ -22,10 +22,7 @@ import com.yqhp.agent.iostools.WdaUtils;
 import com.yqhp.agent.web.config.Properties;
 import com.yqhp.console.repository.enums.ViewType;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.IOSMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.remote.MobilePlatform;
+import io.appium.java_client.remote.options.BaseOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
@@ -96,23 +93,27 @@ public class IOSDeviceDriver extends DeviceDriver {
 
     @Override
     protected RemoteWebDriver newWebDriver() {
-        // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        capabilities.setCapability(MobileCapabilityType.UDID, device.getId());
-        if (capabilities.getCapability(MobileCapabilityType.AUTOMATION_NAME) == null) {
-            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
+        // BaseOptions get/set capability将自动处理appium:前缀
+        BaseOptions options = (BaseOptions) getOrCreateCaps();
+
+        options.setCapability("platformName", "iOS");
+        options.setCapability("udid", device.getId());
+
+        if (options.getCapability("automationName") == null) {
+            // https://appium.github.io/appium-xcuitest-driver/4.33/capabilities/
+            options.setCapability("automationName", "XCuiTest");
         }
-        if (capabilities.getCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL) == null) {
-            capabilities.setCapability(IOSMobileCapabilityType.WEB_DRIVER_AGENT_URL, runWdaIfNeeded());
+        if (options.getCapability("webDriverAgentUrl") == null) {
+            options.setCapability("webDriverAgentUrl", runWdaIfNeeded());
         }
-        if (capabilities.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT) == null) {
-            capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60 * 24); // seconds
+        if (options.getCapability("newCommandTimeout") == null) {
+            options.setCapability("newCommandTimeout", 60 * 60 * 24); // seconds
         }
-        if (capabilities.getCapability("skipLogCapture") == null) {
-            capabilities.setCapability("skipLogCapture", true);
+        if (options.getCapability("skipLogCapture") == null) {
+            options.setCapability("skipLogCapture", true);
         }
 
-        IOSDriver iosDriver = new IOSDriver(getOrStartDriverService().getUrl(), capabilities);
+        IOSDriver iosDriver = new IOSDriver(getOrStartDriverService().getUrl(), options);
         // wdaSessionId 与 driver.getSessionId() 不一样
         wdaSessionId = WdaUtils.getSessionId(wdaUrl);
         log.info("[ios][{}]IOSDriver wdaSessionId={}", device.getId(), wdaSessionId);

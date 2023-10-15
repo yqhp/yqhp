@@ -23,7 +23,7 @@
         <junixsocket.version>2.6.2</junixsocket.version>
         <jwt.version>0.11.5</jwt.version>
         <!-- 覆盖spring-boot-dependencies，解决appium.java-client依赖冲突 -->
-        <selenium.version>4.11.0</selenium.version>
+        <selenium.version>4.14.1</selenium.version>
         <!-- 覆盖spring-boot-dependencies，解决minio依赖冲突 -->
         <okhttp3.version>4.10.0</okhttp3.version>
     </properties>
@@ -255,7 +255,7 @@
             <dependency>
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
-                <version>8.5.1</version>
+                <version>9.0.0</version>
             </dependency>
             <!-- 覆盖spring-boot-dependencies，解决appium.java-client依赖冲突 -->
             <dependency>
